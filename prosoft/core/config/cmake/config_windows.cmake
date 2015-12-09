@@ -24,7 +24,7 @@
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 if(NOT PSCONFIG)
-	message(FATAL_ERROR, "PSCONFIG is missing!")
+    message(FATAL_ERROR, "PSCONFIG is missing!")
 endif()
 
 macro(ps_core_config_windows_required TARGET_NAME)

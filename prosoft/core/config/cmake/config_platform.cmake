@@ -24,7 +24,7 @@
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 if(NOT PSCONFIG)
-	message(FATAL_ERROR, "PSCONFIG is missing!")
+    message(FATAL_ERROR, "PSCONFIG is missing!")
 endif()
 
 if(WIN32)
@@ -33,16 +33,16 @@ endif()
 
 # Define missing CMake platform vars
 if(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
-	set(PSLINUX true)
+    set(PSLINUX true)
 elseif(${CMAKE_SYSTEM_NAME} MATCHES "FreeBSD")
-	set(PSFREEBSD true)
-	set(PSBSD true)
+    set(PSFREEBSD true)
+    set(PSBSD true)
 elseif(${CMAKE_SYSTEM_NAME} MATCHES "OpenBSD")
-	set(PSOPENBSD true)
-	set(PSBSD true)
+    set(PSOPENBSD true)
+    set(PSBSD true)
 endif()
 if(APPLE)
-	set(PSBSD true)
+    set(PSBSD true)
 endif()
 
 macro(ps_core_config_platform_required TARGET_NAME)

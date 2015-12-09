@@ -1,6 +1,6 @@
 # Copyright © 2015, Prosoft Engineering, Inc. (A.K.A "Prosoft")
 # All rights reserved.
-# 
+#
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions are met:
 #     * Redistributions of source code must retain the above copyright
@@ -11,7 +11,7 @@
 #     * Neither the name of Prosoft nor the names of its contributors may be
 #       used to endorse or promote products derived from this software without
 #       specific prior written permission.
-# 
+#
 # THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
 # ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
 # WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
@@ -32,13 +32,13 @@ include("${CMAKE_CURRENT_LIST_DIR}/../core.cmake")
 include("${CORETESTS}/test_utils.cmake")
 
 set(SRCTESTS
-	${CORETESTS}/src/byteorder_tests.cpp
-	${CORETESTS}/src/case_convert_tests.cpp
-	${CORETESTS}/src/regex_string_tests.cpp
-	${CORETESTS}/src/regex_u8string_tests.cpp
-	${CORETESTS}/src/regex_u16string_tests.cpp
-	${CORETESTS}/src/string_convert_tests.cpp
-	${CORETESTS}/src/u8string_tests.cpp
+    ${CORETESTS}/src/byteorder_tests.cpp
+    ${CORETESTS}/src/case_convert_tests.cpp
+    ${CORETESTS}/src/regex_string_tests.cpp
+    ${CORETESTS}/src/regex_u8string_tests.cpp
+    ${CORETESTS}/src/regex_u16string_tests.cpp
+    ${CORETESTS}/src/string_convert_tests.cpp
+    ${CORETESTS}/src/u8string_tests.cpp
 )
 
 add_executable(${PROJECT_NAME}
@@ -46,13 +46,13 @@ add_executable(${PROJECT_NAME}
     ${SRCTESTS}
 )
 
-if (APPLE)
+if(APPLE)
     target_sources(${PROJECT_NAME} PRIVATE
         ${CORETESTS}/src/apple_convert_tests.mm
     )
     set_source_files_properties(
         ${CORETESTS}/src/apple_convert_tests.mm
-        PROPERTIES COMPILE_FLAGS -fobjc-arc 
+        PROPERTIES COMPILE_FLAGS -fobjc-arc
     )
 endif()
 

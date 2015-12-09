@@ -26,17 +26,17 @@
 if(CMAKE_CXX_COMPILER_ID MATCHES ".*Clang")
     set(PSCLANG true)
 elseif(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
-	set(PSGCC true)
+    set(PSGCC true)
 endif()
 
 if (CMAKE_GENERATOR STREQUAL "Xcode")
-	set(PSXCODE true)
+    set(PSXCODE true)
 endif()
 
 macro(ps_core_config_compiler_default_flags TARGET_NAME)
     if(MSVC)
-		# /MP is for multi-processor compilation
-		# /4127 shows up with /W4
+        # /MP is for multi-processor compilation
+        # /4127 shows up with /W4
         target_compile_options(${TARGET_NAME} PRIVATE "/W3" "/WX" "/MP" "/sdl" "/wd4127")
     else()
         target_compile_options(${TARGET_NAME} PRIVATE "-Wall" "-Werror" "-Wextra")
@@ -116,14 +116,14 @@ macro(ps_core_config_compiler_maximum_warnings TARGET_NAME)
 endmacro()
 
 macro(ps_core_config_symbols_hidden TARGET_NAME)
-	include(CheckCCompilerFlag)
-	if (NOT DEFINED HAS_FVISIBILITY_FLAG AND NOT MINGW)
-		include(CheckCCompilerFlag)
-		check_c_compiler_flag(-fvisibility=hidden HAS_FVISIBILITY_FLAG)
-	endif()
-	if (HAS_FVISIBILITY_FLAG)
-		target_compile_options(${TARGET_NAME} PRIVATE "-fvisibility=hidden")
-	endif()
+    include(CheckCCompilerFlag)
+    if (NOT DEFINED HAS_FVISIBILITY_FLAG AND NOT MINGW)
+        include(CheckCCompilerFlag)
+        check_c_compiler_flag(-fvisibility=hidden HAS_FVISIBILITY_FLAG)
+    endif()
+    if (HAS_FVISIBILITY_FLAG)
+        target_compile_options(${TARGET_NAME} PRIVATE "-fvisibility=hidden")
+    endif()
 endmacro()
 
 macro(ps_core_config_compiler_defaults TARGET_NAME)

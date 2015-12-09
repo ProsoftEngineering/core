@@ -24,13 +24,13 @@
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 macro(ps_add_ctests_from_catch_tests TARGET_NAME)
-	get_target_property(srcfiles ${TARGET_NAME} SOURCES)
-	foreach(src ${srcfiles})
-		file(STRINGS ${src} srcstrs REGEX "TEST_CASE|SCENARIO\\(\".*\"\\)")
-		foreach(str ${srcstrs})
-			string(REGEX REPLACE "^.*\\(\"(.*)\"\\).*$" "\\1" testName ${str})
-			string(REPLACE " " "_" testName ${testName}) # test names can't have spaces
-			add_test(${testName} ${TARGET_NAME} ${testName})
-		endforeach()
-	endforeach()
+    get_target_property(srcfiles ${TARGET_NAME} SOURCES)
+    foreach(src ${srcfiles})
+        file(STRINGS ${src} srcstrs REGEX "TEST_CASE|SCENARIO\\(\".*\"\\)")
+        foreach(str ${srcstrs})
+            string(REGEX REPLACE "^.*\\(\"(.*)\"\\).*$" "\\1" testName ${str})
+            string(REPLACE " " "_" testName ${testName}) # test names can't have spaces
+            add_test(${testName} ${TARGET_NAME} ${testName})
+        endforeach()
+    endforeach()
 endmacro()
