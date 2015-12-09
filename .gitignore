@@ -1,0 +1,56 @@
+# Xcode
+build/
+build_xcode/
+xcuserdata/
+*.xcuserdatad/
+*.pbxuser
+*.mode1.*
+*.xcworkspace
+
+# OSX
+.DS_Store
+.FBC.*
+com.apple.Xcode_.*
+*~.nib
+
+# gdb
+.gdb_history
+
+#cmake temporaries
+CMakeCache.txt
+CMakeFiles/
+CMakeScripts/
+cmake_install.cmake
+
+# TEX
+*.aux
+*.glo
+*.gls
+*.ilg
+*.lof
+*.toc
+
+# link
+*.o
+*.lo
+*.la
+*.sym
+*.dSYM
+*.log
+*.out
+
+# VS
+*.sdf
+*.suo
+*.ipch
+
+*.idb
+*.pdb
+*.tlog
+*.ilk
+*.obj
+*.lastbuildstate
+
+# other build dirs (tests)
+build_*/
+buildVisualStudio*/
