@@ -67,7 +67,8 @@ if [ `uname -s` != 'Linux' ]; then
 # So (unfortunately) we disable SSL verification with -k
 curl -k -O ${URL}
 else
-wget ${URL}
+# Linux may also not have a certificate store (Travis)
+wget --no-check-certificate ${URL}
 fi
 
 BUILD_DIR=cmake-tmp-$$
