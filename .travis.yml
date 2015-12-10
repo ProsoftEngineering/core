@@ -43,7 +43,8 @@ matrix:
             apt:
                 sources: ['ubuntu-toolchain-r-test']
                 packages: ['gcc-5', 'g++-5']
-        env: PSCC=gcc-5 PSCXX=g++-5
+        # onig apparently has some leaks (or ASAN thinks it does), disable for now
+        env: PSCC=gcc-5 PSCXX=g++-5 ASAN_OPTIONS=detect_leaks=0
 
 install:
     - |
