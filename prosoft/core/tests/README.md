@@ -12,7 +12,7 @@ Tests should prefer the Catch BDD-style WHEN()/THEN() style. (Though some existi
 
 To build and execute tests, run the following from this directory:
 
-rake
+    rake
 
 Alternative build specific targets are also available in the rakefile.
 
