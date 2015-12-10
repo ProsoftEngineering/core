@@ -1,8 +1,8 @@
 # Core
 
-CI status: [![Build Status](https://travis-ci.org/ProsoftEngineering/core.svg?branch=master)](https://travis-ci.org/ProsoftEngineering/core)
-
 <https://github.com/ProsoftEngineering/core>
+
+[![Travis Status](https://travis-ci.org/ProsoftEngineering/core.svg?branch=master)](https://travis-ci.org/ProsoftEngineering/core) [![Appveyor Status](https://ci.appveyor.com/api/projects/status/github/bdb/core?branch=master&svg=true)](https://ci.appveyor.com/project/bdb/core)
 
 Core is a library of cross platform C++11 modules and headers that adds core functionality to the standard library.
 

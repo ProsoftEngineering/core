@@ -1,0 +1,18 @@
+version: {build}
+
+skip_tags: true
+
+deploy: off
+
+os: Visual Studio 2015
+
+install:
+  - gem update --system
+  - gem install rake
+
+build_script:
+- cmd: >-
+    cd prosoft/core/tests
+    rake
+
+test: off
