@@ -1,17 +1,24 @@
 language: cpp
 
-cache: apt
+sudo: false
+
+cache:
+    apt: true
+    directories:
+        - $HOME/depend
 
 matrix:
     include:
         # OS X
-      - os: OSX
+      - os: osx
         osx_image: xcode6.4
         compiler: clang
+        env: PSCC=clang PSCXX=clang++
 
-      - os: OSX
+      - os: osx
         osx_image: xcode7.1
         compiler: clang
+        env: PSCC=clang PSCXX=clang++
 
         # Linux
       - os: linux
@@ -19,29 +26,38 @@ matrix:
         addons: &gcc48
             apt:
                 sources: ['ubuntu-toolchain-r-test']
-                packages: ['g++-4.8']
-        env: CXX=g++-4.8
+                packages: ['gcc-4.8', 'g++-4.8']
+        env: PSCC=gcc-4.8 PSCXX=g++-4.8
 
       - os: linux
         compiler: gcc
         addons: &gcc49
             apt:
                 sources: ['ubuntu-toolchain-r-test']
-                packages: ['g++-4.9']
-        env: CXX=g++-4.9
+                packages: ['gcc-4.9', 'g++-4.9']
+        env: PSCC=gcc-4.9 PSCXX=g++-4.9
 
       - os: linux
         compiler: gcc
         addons: &gcc5
             apt:
                 sources: ['ubuntu-toolchain-r-test']
-                packages: ['g++-5']
-        env: CXX=g++-5
+                packages: ['gcc-5', 'g++-5']
+        env: PSCC=gcc-5 PSCXX=g++-5
 
 install:
-    - sh ${TRAVIS_BUILD_DIR}/prosoft/depend/get_cmake.sh 3.4.1
+    - |
+        INSTALL_DIR="${HOME}/depend"
+        mkdir -p "${INSTALL_DIR}" "${INSTALL_DIR}/bin" "${INSTALL_DIR}/man" "${INSTALL_DIR}/share"
+        if [ ! -x "${INSTALL_DIR}/bin/cmake" ]; then
+            ${TRAVIS_BUILD_DIR}/depend/get_cmake.sh --prefix ${INSTALL_DIR}
+        fi
+        export PATH=${INSTALL_DIR}/bin:${PATH}
 
-script:
+before_script:
     - cd ${TRAVIS_BUILD_DIR}
     - cd prosoft/core/tests
+    - export CC=${PSCC} CXX=${PSCXX}
+
+script:
     - rake
