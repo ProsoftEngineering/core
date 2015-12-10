@@ -12,7 +12,6 @@ install:
 
 build_script:
 - cmd: >-
-    cd prosoft/core/tests
-    rake
+    cd prosoft/core/tests && rake
 
 test: off
