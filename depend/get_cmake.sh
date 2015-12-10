@@ -58,7 +58,7 @@ VROOT=`echo ${CMAKE_VER} | grep -oE '[0-9]\.[0-9]'`
 URL=https://cmake.org/files/v${VROOT}/cmake-${CMAKE_VER}.tar.gz
 
 cd ${TMPDIR}
-if [ ! `uname -s` == 'Linux' ]; then
+if [ `uname -s` != 'Linux' ]; then
 # Note: recent versions of CuRL ship with TLS basically disabled since they do not provide a root cert trust.
 # See:
 # http://curl.haxx.se/docs/sslcerts.html
