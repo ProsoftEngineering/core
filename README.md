@@ -1,5 +1,7 @@
 # Core
 
+CI status: [![Build Status](https://travis-ci.org/ProsoftEngineering/core.svg?branch=master)](https://travis-ci.org/ProsoftEngineering/core)
+
 <https://github.com/ProsoftEngineering/core>
 
 Core is a library of cross platform C++11 modules and headers that adds core functionality to the standard library.
