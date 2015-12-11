@@ -35,6 +35,7 @@ set(SRCTESTS
     ${CORETESTS}/src/byteorder_tests.cpp
     ${CORETESTS}/src/case_convert_tests.cpp
     ${CORETESTS}/src/regex_tests.cpp
+    ${CORETESTS}/src/string_component_tests.cpp
     ${CORETESTS}/src/string_convert_tests.cpp
     ${CORETESTS}/src/u8string_tests.cpp
 )
