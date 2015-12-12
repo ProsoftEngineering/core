@@ -54,5 +54,56 @@ Modified BSD. See the LICENSE.txt file.
 We welcome any contribution, especially for platform support not already provided. However, there are a few conditions that must be met:
 
 * All code must have accompanying tests AND pass all integration tests for all platforms.
-* Code must be formatted using clang-format.
+* Code must be formatted using clang-format and adhere to the conventions set forth in Code Style.
 * New code must be licensed using the same license as existing code.
+
+## Code Style
+
+In addition to the the style enforced by clang-format, the following conventions should be followed:
+
+* Variable definitions should be one per line. Example :
+
+		int foo = 0;
+		int bar = 1;
+		
+	Not:
+	
+		int foo = 0, bar = 1;
+
+
+* 'const' should be used for all variables and member functions whenever possible. Example:
+
+		const int foo_that_never_changes = ...;
+		
+	Not:
+	
+		int foo_that_never_changes = ...;
+
+* Implementation details that must occur in a header should be declared in a module specific sub-namespace that is likely to be unique. This avoids potential ambiguity when partial namespace resolution is used. Prefixing the module name with 'i' is good example. Example:
+
+		namespace prosoft {
+			namespace istring {
+				// implementation details here
+			}
+		}
+		
+	Not:
+		
+		namespace prosoft {
+			namespace detail {
+			}
+			// or
+			namespace impl {
+			}
+		}
+
+* Implementation details that occur in a module implementation file, should use an anonymous namespace and not the 'static' keyword. Example:
+	
+		namespace {
+			const auto detail = ...;
+		}
+
+	Not:
+		
+		static const auto detail = ...;
+
