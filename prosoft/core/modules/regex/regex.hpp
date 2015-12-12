@@ -110,8 +110,7 @@ enum error_type {
 
 } // regex_constants
 
-namespace detail {
-namespace rx {
+namespace iregex {
 
 using Regex = struct re_pattern_buffer*;
 using uchar = unsigned char;
@@ -127,8 +126,8 @@ inline PS_CONSTEXPR encoding utf16() { return encoding::utf16le; }
 #elif BYTE_ORDER == BIG_ENDIAN
 inline PS_CONSTEXPR encoding utf16() { return encoding::utf16be; }
 #endif
-}
-}; // rx::detail
+
+} // iregex
 
 class regex_error : public std::runtime_error {
 public:
@@ -142,7 +141,7 @@ private:
     int _onigErr;
 };
 
-template <class CharT, class String, detail::rx::encoding Encoding>
+template <class CharT, class String, iregex::encoding Encoding>
 struct basic_regex_traits {
     typedef CharT char_type;
     typedef String string_type;
@@ -152,22 +151,21 @@ struct basic_regex_traits {
     // extensions
     typedef typename string_type::const_iterator string_iterator;
 
-    static PS_CONSTEXPR detail::rx::encoding encoding() {
-        using namespace detail;
-        return m_encoding != rx::encoding::utf16 ? m_encoding : rx::utf16();
+    static PS_CONSTEXPR iregex::encoding encoding() {
+        return m_encoding != iregex::encoding::utf16 ? m_encoding : iregex::utf16();
     }
 
 private:
     static PS_CONSTEXPR const auto m_encoding = Encoding;
 };
 
-template <class CharT, class String, detail::rx::encoding Encoding>
-PS_CONSTEXPR const detail::rx::encoding basic_regex_traits<CharT, String, Encoding>::m_encoding;
+template <class CharT, class String, iregex::encoding Encoding>
+PS_CONSTEXPR const iregex::encoding basic_regex_traits<CharT, String, Encoding>::m_encoding;
 
 template <class String>
-using u8regex_traits = basic_regex_traits<char, String, detail::rx::encoding::utf8>;
+using u8regex_traits = basic_regex_traits<char, String, iregex::encoding::utf8>;
 template <class String>
-using u16regex_traits = basic_regex_traits<char16_t, String, detail::rx::encoding::utf16>;
+using u16regex_traits = basic_regex_traits<char16_t, String, iregex::encoding::utf16>;
 
 template <class Traits>
 class basic_regex {
@@ -258,7 +256,7 @@ public:
 
     static string_type escaped_pattern(const string_type&);
 
-    detail::rx::Regex crx() const { return mRx; }
+    iregex::Regex crx() const { return mRx; }
     const string_type& pattern() const { return mPattern; }
 
 private:
@@ -266,7 +264,7 @@ private:
 
     string_type mPattern;
     flag_type mFlags;
-    detail::rx::Regex mRx;
+    iregex::Regex mRx;
 
     void clear();
     void compile();
@@ -279,8 +277,8 @@ PS_CONSTEXPR const regex_constants::syntax_option_type basic_regex<Traits>::nosu
 template <class Traits>
 PS_CONSTEXPR const regex_constants::syntax_option_type basic_regex<Traits>::default_flags;
 
-namespace detail {
-namespace rx {
+namespace iregex {
+
 extern void compile(Regex*, const uchar*, const uchar*, regex_constants::syntax_option_type, encoding);
 
 template <class Traits>
@@ -291,8 +289,8 @@ inline void compile(Regex* r, const typename Traits::string_type& pattern, regex
 }
 
 void free(Regex);
-}
-}; // rx::detail
+
+} // iregex
 
 template <class Traits>
 void basic_regex<Traits>::swap(basic_regex& other) PS_NOEXCEPT {
@@ -304,7 +302,7 @@ void basic_regex<Traits>::swap(basic_regex& other) PS_NOEXCEPT {
 
 template <class Traits>
 void basic_regex<Traits>::clear() {
-    detail::rx::free(mRx);
+    iregex::free(mRx);
     mRx = nullptr;
     mPattern.clear();
     mFlags = default_flags;
@@ -312,7 +310,7 @@ void basic_regex<Traits>::clear() {
 
 template <class Traits>
 inline void basic_regex<Traits>::compile() {
-    detail::rx::compile<Traits>(&mRx, mPattern, mFlags);
+    iregex::compile<Traits>(&mRx, mPattern, mFlags);
 }
 
 template <class Traits>
@@ -466,8 +464,7 @@ inline bool operator!=(const basic_regex_iterator<Traits>& lhs, const basic_rege
     return !lhs.operator==(rhs);
 }
 
-namespace detail {
-namespace rx {
+namespace iregex {
 
 typedef std::function<void(size_t pos, size_t length)> match_handler;
 extern bool rsearch(Regex, const uchar*, size_t length, regex_constants::match_flag_type, match_handler, bool exact);
@@ -496,8 +493,7 @@ inline iterator_range<Iterator> make_range(Iterator first, Iterator last, const 
     };
 }
 
-}
-} // rx::detail
+} // iregex
 
 template <class Traits>
 bool regex_match(typename Traits::string_iterator first, typename Traits::string_iterator last, const basic_regex<Traits>& rx, regex_constants::match_flag_type flags = regex_constants::match_default) {
@@ -505,7 +501,7 @@ bool regex_match(typename Traits::string_iterator first, typename Traits::string
         return false;
     }
     auto crx = rx.crx();
-    return (nullptr != crx && detail::rx::search<Traits>(crx, first, last, flags, nullptr, true));
+    return (nullptr != crx && iregex::search<Traits>(crx, first, last, flags, nullptr, true));
 }
 
 template <class Traits>
@@ -518,10 +514,10 @@ bool regex_match(typename Traits::string_iterator first, typename Traits::string
 
     auto crx = rx.crx();
     if (nullptr != crx) {
-        (void)detail::rx::search<Traits>(crx, first, last, flags, [&](size_t bpos, size_t blength) {
+        (void)iregex::search<Traits>(crx, first, last, flags, [&](size_t bpos, size_t blength) {
             // u8string: fastest way to create a substring when we have existing iters
-            const auto r = detail::rx::make_range<Traits>(bpos, blength);
-            auto ir  = detail::rx::make_range(first, last, r);
+            const auto r = iregex::make_range<Traits>(bpos, blength);
+            auto ir  = iregex::make_range(first, last, r);
             results.emplace_back(r.first, typename  Traits::string_type(ir.first, ir.second));
         }, true);
     }
@@ -544,7 +540,7 @@ bool regex_search(typename Traits::string_iterator first, typename Traits::strin
         return false;
     }
     auto crx = rx.crx();
-    return (nullptr != crx && detail::rx::search<Traits>(crx, first, last, flags, nullptr));
+    return (nullptr != crx && iregex::search<Traits>(crx, first, last, flags, nullptr));
 }
 
 template <class Traits>
@@ -557,9 +553,9 @@ bool regex_search(typename Traits::string_iterator first, typename Traits::strin
 
     auto crx = rx.crx();
     if (nullptr != crx) {
-        detail::rx::search<Traits>(crx, first, last, flags, [&](size_t bpos, size_t blength) {
-            const auto r = detail::rx::make_range<Traits>(bpos, blength);
-            auto ir  = detail::rx::make_range(first, last, r);
+        iregex::search<Traits>(crx, first, last, flags, [&](size_t bpos, size_t blength) {
+            const auto r = iregex::make_range<Traits>(bpos, blength);
+            auto ir  = iregex::make_range(first, last, r);
             results.emplace_back(r.first, typename  Traits::string_type(ir.first, ir.second));
         });
     }

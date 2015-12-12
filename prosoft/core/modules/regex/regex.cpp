@@ -38,7 +38,7 @@ regex_error::regex_error(regex_constants::error_type err, int onigErr)
     , _code(err)
     , _onigErr(onigErr) {}
 
-void prosoft::detail::rx::compile(Regex* rx, const uchar* first, const uchar* last, regex_constants::syntax_option_type flags, encoding enc) {
+void prosoft::iregex::compile(Regex* rx, const uchar* first, const uchar* last, regex_constants::syntax_option_type flags, encoding enc) {
     using namespace prosoft::regex_constants;
 
     OnigOptionType opt = ONIG_OPTION_NONE;
@@ -103,7 +103,7 @@ void prosoft::detail::rx::compile(Regex* rx, const uchar* first, const uchar* la
     }
 }
 
-void prosoft::detail::rx::free(Regex rx) {
+void prosoft::iregex::free(Regex rx) {
     if (rx) {
         ::onig_free(rx);
     }
@@ -155,7 +155,7 @@ For a function that returns true when the match is only part of the sequence, se
 */
 
 // Onig results buffer [0] is the match, >[0] are group captures.
-inline void _rxparse_results(Region& region, prosoft::detail::rx::match_handler callback) {
+inline void _rxparse_results(Region& region, prosoft::iregex::match_handler callback) {
     for (int i = 0; i < region->num_regs; ++i) {
         if (region->beg[i] >= 0) {
             size_t count = region->end[i] - region->beg[i];
@@ -223,7 +223,7 @@ void throw_onig_error(int oerr) {
 
 } // anon
 
-bool prosoft::detail::rx::rsearch(OnigRegex rx, const uchar* haystack, size_t length, regex_constants::match_flag_type flags, match_handler callback, bool exact) {
+bool prosoft::iregex::rsearch(OnigRegex rx, const uchar* haystack, size_t length, regex_constants::match_flag_type flags, match_handler callback, bool exact) {
     OnigOptionType opt = match_flags_to_onig(flags);
     auto start = reinterpret_cast<const OnigUChar*>(haystack);
     auto end = start + length;

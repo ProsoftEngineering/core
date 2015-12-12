@@ -47,7 +47,7 @@ class u8string {
     typedef std::string container_type;
 
 public:
-    typedef detail::unicode_type unicode_type;
+    typedef iu8string::unicode_type unicode_type;
     typedef unicode_type value_type;
     typedef std::char_traits<value_type> traits_type;
     typedef container_type::size_type size_type;
@@ -58,8 +58,8 @@ public:
     typedef const data_type& const_data_reference;
     typedef data_type::const_pointer const_data_pointer;
 
-    typedef detail::u8_iterator<container_type::iterator> iterator;
-    typedef detail::u8_iterator<container_type::const_iterator> const_iterator;
+    typedef iu8string::u8_iterator<container_type::iterator> iterator;
+    typedef iu8string::u8_iterator<container_type::const_iterator> const_iterator;
     typedef std::reverse_iterator<iterator> reverse_iterator;
     typedef std::reverse_iterator<const_iterator> const_reverse_iterator;
 

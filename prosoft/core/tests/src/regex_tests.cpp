@@ -62,7 +62,7 @@ TEST_CASE("regex-u16string") {
 using traits = u16regex_traits<u16string>;
 
 #if PS_HAVE_CONSTEXPR
-static_assert(traits::encoding() == detail::rx::utf16(), "WTF?");
+static_assert(traits::encoding() == iregex::utf16(), "WTF?");
 #endif
 
 auto string = [](const char* s) -> traits::string_type {

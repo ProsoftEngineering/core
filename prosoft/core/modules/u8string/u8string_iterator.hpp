@@ -30,7 +30,7 @@
 #include <iterator>
 
 namespace prosoft {
-namespace detail {
+namespace iu8string {
 
 // char32_t ensures we use the type_traits<char32_t> specialization which has the proper int_type.
 // uint32_t is used by utf8cpp but the types should be equivalent.
@@ -142,7 +142,7 @@ inline bool operator>=(const u8_iterator<octet_iterator>& lhs, const u8_iterator
     return lhs.base() >= rhs.base();
 }
 
-} // detail
+} // iu8string
 } // prosoft
 
 #endif // PS_CORE_U8STRING_ITERATOR_HPP

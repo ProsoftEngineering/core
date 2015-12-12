@@ -103,7 +103,7 @@ struct uppercase<u8string::unicode_type> {
     }
 };
 
-namespace udetail {
+namespace iunicode {
 // UTF16 lower/upper, still lossy but better than std:: ASCII
 template <class UnaryOperator>
 u16string::value_type u16convert(u16string::value_type c, UnaryOperator converter) {
@@ -122,7 +122,7 @@ template <>
 struct lowercase<u16string::value_type> {
     typedef u16string::value_type char_type;
     char_type operator()(char_type c) {
-        return udetail::u16convert(c, prosoft::unicode::tolower);
+        return iunicode::u16convert(c, prosoft::unicode::tolower);
     }
 };
 
@@ -130,7 +130,7 @@ template <>
 struct uppercase<u16string::value_type> {
     typedef u16string::value_type char_type;
     char_type operator()(char_type c) {
-        return udetail::u16convert(c, prosoft::unicode::toupper);
+        return iunicode::u16convert(c, prosoft::unicode::toupper);
     }
 };
 

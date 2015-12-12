@@ -33,7 +33,7 @@
 
 namespace prosoft {
 
-namespace detail {
+namespace istring {
 
 template <class String>
 inline bool starts_with(const String& str, const String& prefix) {
@@ -48,7 +48,7 @@ bool ends_with(const String& str, const String& suffix) {
     return false;
 }
 
-} // detail
+} // istring
 
 #if PS_HAVE_INLINE_NAMESPACES
 inline namespace string {
@@ -59,7 +59,7 @@ inline bool starts_with(const String&) { return false; } // termination handler 
 
 template <class String, typename... Args>
 bool starts_with(const String& str, const String& prefix, Args... args) {
-    return detail::starts_with(str, prefix) ? true : starts_with<String>(str, args...);
+    return istring::starts_with(str, prefix) ? true : starts_with<String>(str, args...);
 }
 
 template <class String, typename... Args>
@@ -67,7 +67,7 @@ inline bool ends_with(const String&) { return false; } // termination handler fo
 
 template <class String, typename... Args>
 bool ends_with(const String& str, const String& suffix, Args... args) {
-    return detail::ends_with(str, suffix) ? true : ends_with<String>(str, args...);
+    return istring::ends_with(str, suffix) ? true : ends_with<String>(str, args...);
 }
 
 template <class String, typename... Args>
@@ -75,7 +75,7 @@ inline String prefix(const String&) { return String{}; } // termination handler 
 
 template <class String, typename... Args>
 String prefix(const String& str, const String& first, Args... args) {
-    return detail::starts_with(str, first) ? String{first} : prefix<String>(str, args...);
+    return istring::starts_with(str, first) ? String{first} : prefix<String>(str, args...);
 }
 
 template <class String, typename... Args>
@@ -83,7 +83,7 @@ inline String suffix(const String&) { return String{}; } // termination handler 
 
 template <class String, typename... Args>
 String suffix(const String& str, const String& first, Args... args) {
-    return detail::ends_with(str, first) ? String{first} : suffix<String>(str, args...);
+    return istring::ends_with(str, first) ? String{first} : suffix<String>(str, args...);
 }
 
 enum class tokenize_options {

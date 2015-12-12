@@ -39,7 +39,8 @@
 
 namespace prosoft {
 
-namespace detail {
+namespace iconversion {
+
 using char_buf = std::unique_ptr<char[]>;
 
 inline char_buf CFString_to_bytes(CFStringRef s, CFStringEncoding encoding = kCFStringEncodingUTF8) {
@@ -79,7 +80,7 @@ public:
         if (const auto buf = (s ? ::CFStringGetCStringPtr(s, kCFStringEncodingUTF8) : nullptr)) {
             return u8string{buf};
         } else {
-            return u8string{detail::CFString_to_bytes(s).get()};
+            return u8string{iconversion::CFString_to_bytes(s).get()};
         }
     }
 };
@@ -95,7 +96,7 @@ public:
     }
 
     result_type operator()(const argument_type s, CFStringEncoding encoding) {
-        return result_type{detail::CFString_to_bytes(s, encoding).get()};
+        return result_type{iconversion::CFString_to_bytes(s, encoding).get()};
     }
 };
 
