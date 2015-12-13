@@ -35,6 +35,7 @@ set(SRCTESTS
     ${CORETESTS}/src/byteorder_tests.cpp
     ${CORETESTS}/src/case_convert_tests.cpp
     ${CORETESTS}/src/regex_tests.cpp
+    ${CORETESTS}/src/semaphore_tests.cpp
     ${CORETESTS}/src/string_component_tests.cpp
     ${CORETESTS}/src/string_convert_tests.cpp
     ${CORETESTS}/src/u8string_tests.cpp
@@ -56,6 +57,10 @@ if(APPLE)
 endif()
 
 target_include_directories(${PROJECT_NAME} PRIVATE ${CORETESTS})
+
+if (UNIX AND NOT APPLE)
+    target_link_libraries(${PROJECT_NAME} pthread) # required for std::thread
+endif()
 
 ps_core_configure(${PROJECT_NAME})
 ps_core_use_regex(${PROJECT_NAME})
