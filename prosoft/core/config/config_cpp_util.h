@@ -82,7 +82,7 @@ inline PS_CONSTEXPR bool is_set(ET lhs)  { using int_t = std::underlying_type<ET
 
 namespace prosoft {
 template <typename T>
-inline T clamp(T v, T min, T max) {
+PS_CONSTEXPR_IF_CPP14 inline const T& clamp(const T& v, const T& min, const T& max) {
     return std::min(max, (std::max(min, v)));
 }
 }
