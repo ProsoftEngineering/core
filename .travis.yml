@@ -45,7 +45,10 @@ matrix:
                 packages: ['gcc-5', 'g++-5']
         # onig apparently has some leaks (or ASAN thinks it does), disable for now
         env: PSCC=gcc-5 PSCXX=g++-5 ASAN_OPTIONS=detect_leaks=0
-
+        # enable Ubuntu 14 image
+        sudo: required
+        dist: trusty
+        
 install:
     - |
         INSTALL_DIR="${HOME}/depend"
