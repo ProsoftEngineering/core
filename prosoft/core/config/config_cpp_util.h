@@ -88,6 +88,15 @@ PS_CONSTEXPR_IF_CPP14 inline const T& clamp(const T& v, const T& min, const T& m
 }
 #define PS_CLAMP(v, min, max) prosoft::clamp(v, min, max)
 
+namespace prosoft {
+#if !__LLP64__
+typedef long ssize_t;
+#else
+typedef long long ssize_t;
+#endif
+};
+static_assert(sizeof(prosoft::ssize_t) == sizeof(size_t), "Broken assumption");
+
 #endif // __cplusplus
 
 #endif // PS_CORE_CONFIG_CPP_UTIL_H
