@@ -40,7 +40,7 @@ namespace prosoft {
 namespace isemaphore {
 
 struct semaphore_value {
-    typedef ssize_t value_type;
+    typedef s_size_t value_type;
     static PS_CONSTEXPR const value_type signal_value = 0;
     static PS_CONSTEXPR const value_type default_value = 0;
 

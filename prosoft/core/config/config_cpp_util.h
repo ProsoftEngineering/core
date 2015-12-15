@@ -89,13 +89,14 @@ PS_CONSTEXPR_IF_CPP14 inline const T& clamp(const T& v, const T& min, const T& m
 #define PS_CLAMP(v, min, max) prosoft::clamp(v, min, max)
 
 namespace prosoft {
+// ssize_t is avaialble on most (all?) UNIX systems, but not Windows.
 #if !__LLP64__
-typedef long ssize_t;
+typedef long s_size_t;
 #else
-typedef long long ssize_t;
+typedef long long s_size_t;
 #endif
 };
-static_assert(sizeof(prosoft::ssize_t) == sizeof(size_t), "Broken assumption");
+static_assert(sizeof(prosoft::s_size_t) == sizeof(size_t), "Broken assumption");
 
 #endif // __cplusplus
 
