@@ -171,3 +171,18 @@ SECTION("trim") {
     trim(s);
     CHECK(s == "Hello World");
 }
+
+SECTION("replace_all") {
+    S s("a,b,c");
+    CHECK(replace_all(s, S{","}, S{"."}));
+    CHECK(s == "a.b.c");
+    CHECK(replace_all(s, S{"."}, S{".."}));
+    CHECK(s == "a..b..c");
+    s = S{"a,b,c"};
+    CHECK_FALSE(replace_all(s, S{"d"}, S{"e"}));
+    CHECK(replace_all(s, S{","}, S{"."}, 2));
+    CHECK(s == "a,b.c");
+    s = S{"a,b,c"};
+    CHECK(replace_all(s, S{","}, S{"."}, 1));
+    CHECK(s == "a.b.c");
+}

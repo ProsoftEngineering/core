@@ -185,7 +185,7 @@ String trim(const String& str) {
 }
 
 template <class String>
-typename String::size_t replace_all(String& str, const String& findStr, const String& replaceStr, typename String::size_type pos = 0) {
+typename String::size_type replace_all(String& str, const String& findStr, const String& replaceStr, typename String::size_type pos = 0) {
     typename String::size_type count = 0;
     while ((pos = str.find(findStr, pos)) != String::npos) {
         str.replace(pos, findStr.length(), replaceStr);
