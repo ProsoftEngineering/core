@@ -38,6 +38,10 @@ SECTION("create") {
     CHECK(rx.flags() == rx_default_flags);
     // NULL is used instead of nullptr because MSVC considers nullptr ambiguous for operator<<().
     CHECK(rx.crx() == NULL);
+    
+    const auto s = string("abcd");
+    rx = s;
+    CHECK(rx.crx() != NULL);
  
     regex rx2(string("abcd"));
     CHECK(rx2.flags() == rx_default_flags);
@@ -192,8 +196,6 @@ SECTION("capture") {
     REQUIRE(results.size() == 3); // match and 2 captures
     CHECK(results[1] == string("4"));
     CHECK(results[2] == string("40"));
-    
-    CHECK_THROWS_AS(rx = string("(\\d:"), regex_error);
 }
 
 SECTION("iterators") {
@@ -238,6 +240,16 @@ SECTION("iterators") {
         ++count;
     }
     CHECK(4 == count);
+    
+    i = {haystack.cbegin(), haystack.cend(), rx};
+    j = {haystack.cbegin(), haystack.cend(), rx};
+    CHECK(i == j);
+}
+
+SECTION("errors") {
+    CHECK_THROWS_AS(rx = string("[ab+"), regex_error);
+    CHECK_THROWS_AS(rx = string("[ab]+\\"), regex_error);
+    CHECK_THROWS_AS(rx = string("(\\d:"), regex_error);
 }
 
 SECTION("pattern escape") {

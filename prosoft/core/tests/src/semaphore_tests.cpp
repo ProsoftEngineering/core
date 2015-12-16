@@ -48,6 +48,8 @@ TEST_CASE("semaphore internals") {
         i = v++;
         REQUIRE(i < sem_signal);
         REQUIRE(v >= sem_signal);
+        
+        CHECK_THROWS(semaphore_value{-1});
     }
     
     SECTION("semaphore signal-before-wait") {
@@ -81,6 +83,9 @@ TEST_CASE("semaphore internals") {
         i = --ev;
         REQUIRE(i < event_signal);
         REQUIRE(ev < event_signal);
+        
+        CHECK_THROWS(ev.reset(-1));
+        CHECK_THROWS(semaphore_value{-1});
     }
     
     SECTION("event pre-signal") {
@@ -193,6 +198,9 @@ TEST_CASE("binary_semaphore") {
     
     // channel is drained, so more waits are basically nops
     REQUIRE(semaphore::status_type::no_timeout == s.wait_for(std::chrono::milliseconds(1)));
+    
+    s.reset();
+    REQUIRE(semaphore::status_type::timeout == s.wait_for(std::chrono::milliseconds(1)));
 }
 
 TEST_CASE("event_semaphore") {

@@ -170,6 +170,9 @@ SECTION("trim") {
     s = S{"  \t\tHello World\r\n"};
     trim(s);
     CHECK(s == "Hello World");
+    
+    const auto sc = S{"  \t\tHello World\r\n"};
+    CHECK(trim(sc) == "Hello World");
 }
 
 SECTION("replace_all") {

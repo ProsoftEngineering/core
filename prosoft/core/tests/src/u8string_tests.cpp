@@ -117,6 +117,9 @@ TEST_CASE("u8string") {
         CHECK_FALSE(s8.is_ascii());
         CHECK(s8.length() == 1);
         CHECK(s8[0] == u32codepoint);
+        auto u32 = unicode::u32(s8);
+        CHECK(u32.size() == 1);
+        CHECK(u32[0] == u32codepoint);
 
         u8string s9(u16test);
         CHECK_FALSE(s9.is_ascii());
@@ -298,6 +301,7 @@ TEST_CASE("u8string") {
         CHECK(s.length() < prefix.length());
         CHECK_FALSE(s == prefix);
         CHECK(0 != s.compare(0, prefix.length(), prefix));
+        CHECK(0 == s.compare(0, 2, s, 0, 2));
 
         // test with std::string to ensure same behavior
         test_ascii_compare<std::string>();
@@ -344,6 +348,7 @@ TEST_CASE("u8string") {
             CHECK(s2.length() == s.length() - 1);
             CHECK(0 == s2.compare(s.substr(0, 4)));
         }
+        
         {
             auto start = s.begin();
             auto fin = s.end();
@@ -352,6 +357,27 @@ TEST_CASE("u8string") {
             CHECK(s2.length() == s.length() - 1);
             CHECK(0 == s2.compare(s.substr(0, 4)));
         }
+        
+        WHEN("iterator is constructed with an invalid range") {
+            auto data = s.str();
+            auto start = ++data.begin();
+            THEN("an exception is thrown") {
+                CHECK_THROWS(make_ranged_iterator<u8string::iterator>(data.begin(), start, data.end()));
+            }
+        }
+        
+        // MSVC checked iterators will fire their own assert in Debug builds and abort.
+#if !_MSC_VER || !DEBUG
+        WHEN("iterators of different strings are compared") {
+            u8string s1{"test"};
+            u8string s2{"test2"};
+            auto a = s1.begin();
+            auto b = s2.begin();
+            THEN("an exception is thrown") {
+                CHECK_THROWS(void(a == b));
+            }
+        }
+#endif
     }
 
     SECTION("find") {

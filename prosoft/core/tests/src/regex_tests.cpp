@@ -35,6 +35,11 @@ using namespace prosoft;
 
 TEST_CASE("regex-string") {
 
+SECTION("invalid encoding") {
+    using invalid_traits = basic_regex_traits<char, std::string, static_cast<iregex::encoding>(0x7f)>;
+    CHECK_THROWS(basic_regex<invalid_traits>{"test"});
+}
+
 using traits = u8regex_traits<std::string>;
 
 auto string = [](const char* s) -> traits::string_type {
