@@ -849,6 +849,8 @@ TEST_CASE("u8string") {
     SECTION("BOM") {
         auto s = u8string::bom;
         CHECK((3 == s.data_size() && 1 == s.length()));
+        CHECK(s.has_bom());
+        CHECK_FALSE(u8string("abc").has_bom());
 
         u16string u16(u16test);
         u16.insert(0, 1, 0xFEFF);

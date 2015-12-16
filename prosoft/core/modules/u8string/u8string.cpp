@@ -601,7 +601,7 @@ bool u8string::is_valid() const {
 bool u8string::has_bom() const {
     static_assert(sizeof(utf8::bom) >= 3, "broken assumption");
     auto start = _u8._s.cbegin();
-    return (_u8._s.length() > sizeof(utf8::bom) && utf8::starts_with_bom(start, start + sizeof(utf8::bom)));
+    return (_u8._s.length() >= sizeof(utf8::bom) && utf8::starts_with_bom(start, start + sizeof(utf8::bom)));
 }
 
 u8string::size_type u8string::find(const u8string& other, size_type pos) const {
