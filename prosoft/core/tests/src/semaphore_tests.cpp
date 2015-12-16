@@ -221,5 +221,5 @@ TEST_CASE("event_semaphore") {
     }};
     t.detach();
     
-    REQUIRE(semaphore::status_type::no_timeout == s.wait_for(std::chrono::milliseconds(10)));
+    REQUIRE(semaphore::status_type::no_timeout == s.wait_for(std::chrono::milliseconds(50)));
 }
