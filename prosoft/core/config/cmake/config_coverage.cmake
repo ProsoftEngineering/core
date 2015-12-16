@@ -1,6 +1,6 @@
-# Copyright © 2013-2015, Prosoft Engineering, Inc. (A.K.A "Prosoft")
+# Copyright © 2015, Prosoft Engineering, Inc. (A.K.A "Prosoft")
 # All rights reserved.
-# 
+#
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions are met:
 #     * Redistributions of source code must retain the above copyright
@@ -11,7 +11,7 @@
 #     * Neither the name of Prosoft nor the names of its contributors may be
 #       used to endorse or promote products derived from this software without
 #       specific prior written permission.
-# 
+#
 # THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
 # ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
 # WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
@@ -23,25 +23,38 @@
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-cmake_minimum_required(VERSION 3.1)
+macro(ps_enable_code_coverage TARGET_FILES)
+    if(NOT WIN32)
+        set_source_files_properties(${TARGET_FILES} PROPERTIES COMPILE_FLAGS -coverage)
+    endif()
+endmacro()
 
-# Private module config
+macro(ps_link_code_coverage TARGET_NAME)
+    if(NOT WIN32)
+        set_target_properties(${TARGET_NAME} PROPERTIES LINK_FLAGS -coverage)
+    endif()
+endmacro()
 
-include("${CMAKE_CURRENT_LIST_DIR}/../config/cmake/config.cmake")
-include("${CMAKE_CURRENT_LIST_DIR}/../config/cmake/config_coverage.cmake")
+macro(ps_enable_target_code_coverage TARGET_NAME)
+    get_target_property(srcfiles ${TARGET_NAME} SOURCES)
+    ps_enable_code_coverage("${srcfiles}")
+    ps_link_code_coverage(${TARGET_NAME})
+endmacro()
 
-set(PS_CORE_MODULE_INCLUDE_DIRS
-    "${CMAKE_CURRENT_LIST_DIR}/../../.."
-    "${CMAKE_CURRENT_LIST_DIR}/../include"
-)
+macro(ps_core_enable_code_coverage TARGET_FILES)
+    if(PSCOVERAGE)
+        ps_enable_code_coverage("${TARGET_FILES}")
+    endif()
+endmacro()
 
-macro(ps_core_module_config TARGET_NAME)
-	if(WIN32 AND BUILD_SHARED_LIBS)
-		target_compile_definitions(${TARGET_NAME} PRIVATE PS_LIB_EXPORTS=1)
-	endif()
-	target_include_directories(${TARGET_NAME} PRIVATE ${PS_CORE_MODULE_INCLUDE_DIRS})
-	ps_core_config_cpp_version(${TARGET_NAME})
-	ps_core_config_platform_required(${TARGET_NAME})
-	ps_core_config_symbols_hidden(${TARGET_NAME})
-	# XXX: can't config sanitizer for modules as we don't know if the host target has it configured
+macro(ps_core_link_code_coverage TARGET_NAME)
+    if(PSCOVERAGE)
+        ps_link_code_coverage(${TARGET_NAME})
+    endif()
+endmacro()
+
+macro(ps_core_enable_target_code_coverage TARGET_NAME)
+    if(PSCOVERAGE)
+        ps_enable_target_code_coverage(${TARGET_NAME})
+    endif()
 endmacro()

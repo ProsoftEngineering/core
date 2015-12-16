@@ -51,3 +51,5 @@ if(WIN32)
 endif()
 
 set_target_properties(${regex_lib} PROPERTIES INTERFACE_LINK_LIBRARIES onig)
+
+ps_core_enable_code_coverage(${PSREGEX}/regex.cpp)
