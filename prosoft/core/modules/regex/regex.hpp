@@ -220,7 +220,7 @@ public:
         return assign(other);
     }
     basic_regex& operator=(basic_regex&& other) PS_NOEXCEPT {
-        return assign(std::forward<basic_regex>(other));
+        return assign(std::move(other));
     }
     basic_regex& operator=(const string_type& other) {
         return assign(other);
@@ -238,20 +238,20 @@ public:
 
     // extensions to std::regex API
     basic_regex(string_type&& s, flag_type flags = default_flags)
-        : mPattern(std::forward<string_type>(s))
+        : mPattern(std::move(s))
         , mFlags(flags)
         , mRx(nullptr) {
         compile();
     }
 
     basic_regex& assign(string_type&& pattern, flag_type flags = default_flags) {
-        basic_regex tmp(std::forward<string_type>(pattern), flags);
+        basic_regex tmp(std::move(pattern), flags);
         swap(tmp);
         return *this;
     }
 
     basic_regex& operator=(string_type&& s) {
-        return assign(std::forward<string_type>(s));
+        return assign(std::move(s));
     }
 
     static string_type escaped_pattern(const string_type&);
