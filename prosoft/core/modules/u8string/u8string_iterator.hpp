@@ -60,7 +60,7 @@ public:
         , mStart(start)
         , mEnd(end)
         , mMovement(0) {
-        if (mI < mStart || mI > mEnd) {
+        if (PS_UNEXPECTED(mI < mStart || mI > mEnd)) {
             throw std::out_of_range("Invalid utf-8 iterator position");
         }
     }
@@ -77,10 +77,10 @@ public:
     pointer operator->() const { return operator*(); }
 
     bool operator==(const u8_iterator& other) const {
-        if (mStart != other.mStart || mEnd != other.mEnd) {
+        if (PS_UNEXPECTED(mStart != other.mStart || mEnd != other.mEnd)) {
             throw std::logic_error("Comparing utf-8 iterators defined with different ranges");
         }
-        return (mI == other.mI);
+        return mI == other.mI;
     }
 
     u8_iterator& operator++() {
