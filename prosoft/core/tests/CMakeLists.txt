@@ -46,6 +46,7 @@ set(SRCTESTS
     ${CORETESTS}/src/semaphore_tests.cpp
     ${CORETESTS}/src/string_component_tests.cpp
     ${CORETESTS}/src/string_convert_tests.cpp
+    ${CORETESTS}/src/unique_resource_tests.cpp
     ${CORETESTS}/src/u8string_tests.cpp
 )
 
