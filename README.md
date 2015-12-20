@@ -79,7 +79,7 @@ In addition to the the style enforced by clang-format, the following conventions
 	
 		int foo_that_never_changes = ...;
 
-* Implementation details that must occur in a header should be declared in a module specific sub-namespace that is likely to be unique. This avoids potential ambiguity when partial namespace resolution is used. Prefixing the module name with 'i' is good example. Example:
+* Implementation details that must occur in a header should be declared in a module specific sub-namespace that is likely to be unique. This avoids potential ambiguity when partial namespace resolution is used. Prefixing the module name with an 'i' is a good example. Example:
 
 		namespace prosoft {
 			namespace istring {
