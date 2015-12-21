@@ -37,9 +37,6 @@
 #include <prosoft/core/include/byteorder.h>
 #include <prosoft/core/include/uniform_access.hpp>
 
-// When we can rely on the presence of std::regex, this could be turned into template specializations of std::regex.
-// GCC is the unexpected laggard here with std::regex not implemented until 4.9.
-
 struct re_pattern_buffer; // private Onig type
 
 namespace prosoft {
