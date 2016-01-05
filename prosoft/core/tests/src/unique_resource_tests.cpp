@@ -125,6 +125,16 @@ TEST_CASE("unique_resource") {
             CHECK(!h);
         }
     }
+    
+    WHEN("Swapping two Handles") {
+        windows::Handle h{ INVALID_HANDLE_VALUE };
+        windows::Handle h2;
+        h.swap(h2);
+        THEN("the handle values are swapped") {
+            CHECK(h.get() == NULL);
+            CHECK(h2.get() == INVALID_HANDLE_VALUE);
+        }
+    }
 
     WHEN("Creating a Handle with an invalid value") {
         windows::Handle h{ INVALID_HANDLE_VALUE };

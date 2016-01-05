@@ -187,7 +187,7 @@ public:
     Ptr release() PS_NOEXCEPT { return m_up.release(); }
     void reset(Ptr p = Ptr{}) PS_NOEXCEPT { m_up.reset(p); }
     void operator=(std::nullptr_t) PS_NOEXCEPT { reset(); }
-    void swap(unique_handle& up) PS_NOEXCEPT { m_up.swap(up); }
+    void swap(unique_handle& uh) PS_NOEXCEPT { m_up.swap(uh.m_up); }
 };
 
 using Handle = unique_handle<HANDLE, handle_traits>;
