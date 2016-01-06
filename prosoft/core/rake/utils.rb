@@ -38,8 +38,7 @@ def which(cmd)
 end
 
 HAVE_VS2015 = File.exist? 'C:/Program Files (x86)/Microsoft Visual Studio 14.0/VC/vcvarsall.bat'
-HAVE_VS2013 = File.exist? 'C:/Program Files (x86)/Microsoft Visual Studio 12.0/VC/vcvarsall.bat'
-if HAVE_VS2015 || HAVE_VS2013
+if HAVE_VS2015
   UNAME = 'MSVC'
 elsif which('uname')
   UNAME = `uname -s`.strip
@@ -65,8 +64,6 @@ elsif which('ninja')
   CMAKE_DEFAULT_GENERATOR = 'Ninja'
 elsif HAVE_VS2015
   CMAKE_DEFAULT_GENERATOR = 'Visual Studio 14 Win64'
-elsif HAVE_VS2013
-  CMAKE_DEFAULT_GENERATOR = 'Visual Studio 12 Win64'
 else
   CMAKE_DEFAULT_GENERATOR = 'Unix Makefiles'
 end
@@ -75,10 +72,6 @@ CMAKE_GENERATORS = [CMAKE_DEFAULT_GENERATOR]
 if HAVE_VS2015
   CMAKE_GENERATORS << 'Visual Studio 14 Win64'
   CMAKE_GENERATORS << 'Visual Studio 14'
-end
-if HAVE_VS2013  
-  CMAKE_GENERATORS << 'Visual Studio 12 Win64'
-  CMAKE_GENERATORS << 'Visual Studio 12'
 end
 CMAKE_GENERATORS.uniq!
 
