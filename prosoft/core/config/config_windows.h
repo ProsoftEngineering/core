@@ -1,4 +1,4 @@
-// Copyright © 2015, Prosoft Engineering, Inc. (A.K.A "Prosoft")
+// Copyright © 2016, Prosoft Engineering, Inc. (A.K.A "Prosoft")
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without
@@ -23,13 +23,13 @@
 // (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#ifndef PS_CORE_CONFIG_PLATFORM_H
-#define PS_CORE_CONFIG_PLATFORM_H
+#ifndef PS_CORE_CONFIG_WINDOWS_H
+#define PS_CORE_CONFIG_WINDOWS_H
 
-#if __APPLE__
-#include <prosoft/core/config/config_apple.h>
-#elif _WIN32
-#include <prosoft/core/config/config_windows.h>
+#if !defined(_WIN32_WINNT)
+// Win7 default
+#define _WIN32_WINNT 0x0601
 #endif
+#include <sdkddkver.h>
 
-#endif // PS_CORE_CONFIG_PLATFORM_H
+#endif // PS_CORE_CONFIG_WINDOWS_H

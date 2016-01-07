@@ -12,6 +12,8 @@ This core set of extensions powers all of Prosoft's applications.
 
 * u8string: Full UTF8 string class that is modeled to match std::string as much as possible.
 
+* identity: Login account information.
+
 * string: various template string algorithms and conversions from/to all Unicode variants and platform natives (e.g. CFString/NSString)
 
 * regex: Modeled after std::regex but powered by [Onigurama](https://github.com/kkos/oniguruma) so it's fully Unicode aware. In addition it builds with GCC 4.8 which does not provide a std::regex implementation.

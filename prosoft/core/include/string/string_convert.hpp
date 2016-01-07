@@ -1,4 +1,4 @@
-// Copyright © 2015, Prosoft Engineering, Inc. (A.K.A "Prosoft")
+// Copyright © 2015-2016, Prosoft Engineering, Inc. (A.K.A "Prosoft")
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without
@@ -76,6 +76,14 @@ struct uppercase {
         return std::toupper(c);
     }
 };
+
+// Placeholder for future use, both args should be constant C strings
+#if !defined(PSLocalizedString)
+#define PSLocalizedString(key, comment) key
+#endif
+
+template <class Result>
+using from_localized_string = to_string<Result, std::string>;
 
 #if PS_HAVE_INLINE_NAMESPACES
 } // conversion

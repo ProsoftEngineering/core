@@ -1,4 +1,4 @@
-// Copyright © 2015, Prosoft Engineering, Inc. (A.K.A "Prosoft")
+// Copyright © 2015-2016, Prosoft Engineering, Inc. (A.K.A "Prosoft")
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without
@@ -23,13 +23,38 @@
 // (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#ifndef PS_CORE_CONFIG_PLATFORM_H
-#define PS_CORE_CONFIG_PLATFORM_H
+#ifndef PS_CORE_SYSTEM_UTILS_HPP
+#define PS_CORE_SYSTEM_UTILS_HPP
 
-#if __APPLE__
-#include <prosoft/core/config/config_apple.h>
-#elif _WIN32
+#if _WIN32
 #include <prosoft/core/config/config_windows.h>
+#include <windows.h>
 #endif
 
-#endif // PS_CORE_CONFIG_PLATFORM_H
+#include <prosoft/core/include/unique_resource.hpp>
+
+namespace prosoft {
+namespace system {
+
+#if _WIN32
+template <typename Data>
+unique_malloc<Data> token_info(TOKEN_INFORMATION_CLASS tclass, HANDLE token, DWORD& err) {
+    DWORD size = 0;
+    ::GetTokenInformation(token, tclass, nullptr, size, &size);
+    if ((err = ::GetLastError()) == ERROR_INSUFFICIENT_BUFFER && size > 0) {
+        auto tinfo = make_malloc_throw<Data>(size);
+        if (::GetTokenInformation(token, tclass, tinfo.get(), size, &size)) {
+            err = 0;
+            return std::move(tinfo);
+        } else {
+            err = ::GetLastError();
+        }
+    }
+    return {};
+}
+
+#endif // WIN32
+} // system
+} // prosoft
+
+#endif // PS_CORE_SYSTEM_UTILS_HPP

@@ -56,6 +56,19 @@ public:
 };
 
 template <>
+class to_string<u16string, std::string> {
+public:
+    typedef u16string result_type;
+    typedef std::string argument_type;
+    result_type operator()(const argument_type& s) {
+        return operator()(s.c_str());
+    }
+    result_type operator()(const char* s) {
+        return to_string<result_type, u8string>{}(u8string{s});
+    }
+};
+
+template <>
 class to_string<u8string, u16string> {
 public:
     typedef u8string result_type;

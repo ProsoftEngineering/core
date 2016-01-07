@@ -1,4 +1,4 @@
-# Copyright © 2015, Prosoft Engineering, Inc. (A.K.A "Prosoft")
+# Copyright © 2015-2016, Prosoft Engineering, Inc. (A.K.A "Prosoft")
 # All rights reserved.
 # 
 # Redistribution and use in source and binary forms, with or without
@@ -71,4 +71,12 @@ macro(ps_core_use_regex TARGET_NAME)
         add_subdirectory(${PSCORE}/modules/regex ${CMAKE_BINARY_DIR}/psregex)
     endif()
     target_link_libraries(${TARGET_NAME} PUBLIC regex)
+endmacro()
+
+macro(ps_core_use_system_identity TARGET_NAME)
+    ps_core_use_u8string(${TARGET_NAME})
+    if(NOT TARGET system_identity)
+        add_subdirectory(${PSCORE}/modules/system_identity ${CMAKE_CURRENT_BINARY_DIR}/pssystem_identity)
+    endif()
+    target_link_libraries(${TARGET_NAME} PUBLIC system_identity)
 endmacro()

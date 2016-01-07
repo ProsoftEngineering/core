@@ -56,3 +56,15 @@ macro(ps_core_module_config TARGET_NAME)
 	    ps_add_ctests_from_catch_tests_to_host(${TARGET_NAME} $<TARGET_FILE:coretests>)
 	endif()
 endmacro()
+
+macro(ps_core_module_use_external_module TARGET_NAME MODULE_NAME)
+    # This will not bring in the headers of the module
+    target_include_directories(${TARGET_NAME} PRIVATE "${CMAKE_CURRENT_LIST_DIR}/../${MODULE_NAME}")
+    target_link_libraries(${TARGET_NAME} PUBLIC ${MODULE_NAME})
+endmacro()
+
+macro(ps_core_module_use_u8string_module TARGET_NAME)
+    ps_core_module_use_external_module(${TARGET_NAME} u8string)
+    target_include_directories(${TARGET_NAME} PRIVATE "${CMAKE_CURRENT_LIST_DIR}/../u8string/vendor/utf8cpp/source")
+endmacro()
+

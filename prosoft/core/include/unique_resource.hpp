@@ -29,6 +29,7 @@
 #if __APPLE__
 #include <CoreFoundation/CoreFoundation.h>
 #elif _WIN32
+#include <prosoft/core/config/config_windows.h>
 #include <windows.h>
 #endif
 

@@ -46,6 +46,7 @@ set(SRCTESTS
     ${CORETESTS}/src/semaphore_tests.cpp
     ${CORETESTS}/src/string_component_tests.cpp
     ${CORETESTS}/src/string_convert_tests.cpp
+    ${CORETESTS}/src/system_identity_tests.cpp
     ${CORETESTS}/src/unique_resource_tests.cpp
     ${CORETESTS}/src/u8string_tests.cpp
 )
@@ -77,7 +78,7 @@ ps_core_configure(${PROJECT_NAME})
 enable_testing()
 
 ps_core_use_regex(${PROJECT_NAME})
-ps_core_use_u8string(${PROJECT_NAME})
+ps_core_use_system_identity(${PROJECT_NAME}) # brings in u8string
 
 # We add all of our tests to coverage as they will produce the coverage for header-only implementations
 ps_core_enable_target_code_coverage(${PROJECT_NAME})
