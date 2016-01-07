@@ -1,4 +1,4 @@
-# Copyright © 2013-2015, Prosoft Engineering, Inc. (A.K.A "Prosoft")
+# Copyright © 2013-2016, Prosoft Engineering, Inc. (A.K.A "Prosoft")
 # All rights reserved.
 # 
 # Redistribution and use in source and binary forms, with or without
@@ -35,6 +35,10 @@ set(PS_CORE_MODULE_INCLUDE_DIRS
     "${CMAKE_CURRENT_LIST_DIR}/../include"
 )
 
+if (DEFINED CORETESTS)
+    include("${CMAKE_CURRENT_LIST_DIR}/../tests/test_utils.cmake")
+endif()
+
 macro(ps_core_module_config TARGET_NAME)
 	if(WIN32 AND BUILD_SHARED_LIBS)
 		target_compile_definitions(${TARGET_NAME} PRIVATE PS_LIB_EXPORTS=1)
@@ -44,4 +48,11 @@ macro(ps_core_module_config TARGET_NAME)
 	ps_core_config_platform_required(${TARGET_NAME})
 	ps_core_config_symbols_hidden(${TARGET_NAME})
 	# XXX: can't config sanitizer for modules as we don't know if the host target has it configured
+	
+	if (DEFINED CORETESTS)
+	    # Allows modules to define internal tests
+	    target_include_directories(${TARGET_NAME} PRIVATE "${CMAKE_CURRENT_LIST_DIR}/../../tests") # for catch
+	    target_compile_definitions(${TARGET_NAME} PRIVATE PSTEST_HARNESS=1)
+	    ps_add_ctests_from_catch_tests_to_host(${TARGET_NAME} $<TARGET_FILE:coretests>)
+	endif()
 endmacro()

@@ -1,4 +1,4 @@
-# Copyright © 2015, Prosoft Engineering, Inc. (A.K.A "Prosoft")
+# Copyright © 2015-2016, Prosoft Engineering, Inc. (A.K.A "Prosoft")
 # All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
@@ -72,11 +72,14 @@ if (UNIX AND NOT APPLE)
 endif()
 
 ps_core_configure(${PROJECT_NAME})
+
+# This must be done before using modules so that the modules can setup their internal tests (if any)
+enable_testing()
+
 ps_core_use_regex(${PROJECT_NAME})
 ps_core_use_u8string(${PROJECT_NAME})
 
 # We add all of our tests to coverage as they will produce the coverage for header-only implementations
 ps_core_enable_target_code_coverage(${PROJECT_NAME})
 
-enable_testing()
 ps_add_ctests_from_catch_tests(${PROJECT_NAME})

@@ -1,4 +1,4 @@
-# Copyright © 2015, Prosoft Engineering, Inc. (A.K.A "Prosoft")
+# Copyright © 2015-2016, Prosoft Engineering, Inc. (A.K.A "Prosoft")
 # All rights reserved.
 # 
 # Redistribution and use in source and binary forms, with or without
@@ -23,14 +23,19 @@
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-macro(ps_add_ctests_from_catch_tests TARGET_NAME)
+# HOST_NAME can be different from TARGET_NAME to support internal library tests
+macro(ps_add_ctests_from_catch_tests_to_host TARGET_NAME HOST_NAME)
     get_target_property(srcfiles ${TARGET_NAME} SOURCES)
     foreach(src ${srcfiles})
         file(STRINGS ${src} srcstrs REGEX "TEST_CASE|SCENARIO\\(\".*\"\\)")
         foreach(str ${srcstrs})
             string(REGEX REPLACE "^.*\\(\"(.*)\"\\).*$" "\\1" testName ${str})
             string(REPLACE " " "_" testName ${testName}) # test names can't have spaces
-            add_test(${testName} ${TARGET_NAME} ${testName})
+            add_test(NAME ${testName} COMMAND ${HOST_NAME} ${testName})
         endforeach()
     endforeach()
+endmacro()
+
+macro(ps_add_ctests_from_catch_tests TARGET_NAME)
+    ps_add_ctests_from_catch_tests_to_host(${TARGET_NAME} ${TARGET_NAME})
 endmacro()
