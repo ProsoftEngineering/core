@@ -53,7 +53,7 @@ macro(ps_core_config_asan TARGET_NAME)
     # So the app will only run on machines where Xcode is installed.
     if(HAVE_ADDRESS_SANITIZER)
         target_compile_options(${TARGET_NAME} PRIVATE "-fsanitize=address" "-fno-omit-frame-pointer")
-        target_link_libraries(${TARGET_NAME} "-fsanitize=address")
+        target_link_libraries(${TARGET_NAME} PUBLIC "-fsanitize=address")
     endif()
     
     set(CMAKE_REQUIRED_FLAGS ${SAVED_CMAKE_REQUIRED_FLAGS})
@@ -75,7 +75,7 @@ macro(ps_core_config_ubsan TARGET_NAME)
         check_c_compiler_flag("-fsanitize=undefined" HAVE_UNDEFINED_SANITIZER)
         if(HAVE_UNDEFINED_SANITIZER)
             target_compile_options(${TARGET_NAME} PRIVATE "-fsanitize=undefined" "-fno-omit-frame-pointer")
-            target_link_libraries(${TARGET_NAME} "-fsanitize=undefined")
+            target_link_libraries(${TARGET_NAME} PUBLIC "-fsanitize=undefined")
         endif()
 
         set(CMAKE_REQUIRED_FLAGS ${SAVED_CMAKE_REQUIRED_FLAGS})

@@ -53,6 +53,6 @@ if(WIN32)
     target_compile_definitions(${u8string_lib} PRIVATE UTF8PROC_EXPORTS=)
 endif()
 
-set_target_properties(${u8string_lib} PROPERTIES INTERFACE_LINK_LIBRARIES utf8proc)
+target_link_libraries(${u8string_lib} PRIVATE utf8proc)
 
 ps_core_enable_code_coverage(${U8STRING}/u8string.cpp)

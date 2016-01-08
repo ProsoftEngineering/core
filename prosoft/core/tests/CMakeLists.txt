@@ -68,7 +68,7 @@ endif()
 target_include_directories(${PROJECT_NAME} PRIVATE ${CORETESTS})
 
 if (UNIX AND NOT APPLE)
-    target_link_libraries(${PROJECT_NAME} pthread) # required for std::thread
+    target_link_libraries(${PROJECT_NAME} PUBLIC pthread) # required for std::thread
 endif()
 
 ps_core_configure(${PROJECT_NAME})

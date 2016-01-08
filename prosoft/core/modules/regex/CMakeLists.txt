@@ -50,6 +50,6 @@ if(WIN32)
     target_compile_definitions(${regex_lib} PRIVATE ONIG_EXTERN=extern)
 endif()
 
-set_target_properties(${regex_lib} PROPERTIES INTERFACE_LINK_LIBRARIES onig)
+target_link_libraries(${regex_lib} PRIVATE onig)
 
 ps_core_enable_code_coverage(${PSREGEX}/regex.cpp)

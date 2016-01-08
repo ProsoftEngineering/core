@@ -53,7 +53,7 @@ macro(ps_core_config_cpp_version TARGET_NAME)
 		check_cxx_compiler_flag("-stdlib=libc++" HAVE_STDLIB_LIBCPP_FLAG)
 		if(HAVE_STDLIB_LIBCPP_FLAG)
 			set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -stdlib=libc++")
-			target_link_libraries(${TARGET_NAME} "-stdlib=libc++")
+			target_link_libraries(${TARGET_NAME} PUBLIC "-stdlib=libc++")
 		endif()
 		# Turn on _GLIBCXX_USE_CXX11_ABI to use GCC 5.1 C++11 ABI
 		if(CMAKE_COMPILER_IS_GNUCXX)
