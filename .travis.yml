@@ -26,7 +26,7 @@ matrix:
         addons: &gcc48
             apt:
                 sources: ['ubuntu-toolchain-r-test']
-                packages: ['gcc-4.8', 'g++-4.8']
+                packages: ['gcc-4.8', 'g++-4.8', 'libacl1-dev']
         env: PSCC=gcc-4.8 PSCXX=g++-4.8
 
       - os: linux
@@ -34,7 +34,7 @@ matrix:
         addons: &gcc49
             apt:
                 sources: ['ubuntu-toolchain-r-test']
-                packages: ['gcc-4.9', 'g++-4.9']
+                packages: ['gcc-4.9', 'g++-4.9', 'libacl1-dev']
         env: PSCC=gcc-4.9 PSCXX=g++-4.9
 
       - os: linux
@@ -42,7 +42,7 @@ matrix:
         addons: &gcc5
             apt:
                 sources: ['ubuntu-toolchain-r-test']
-                packages: ['gcc-5', 'g++-5']
+                packages: ['gcc-5', 'g++-5', 'libacl1-dev']
         # onig apparently has some leaks (or ASAN thinks it does), disable for now
         env: PSCC=gcc-5 PSCXX=g++-5 ASAN_OPTIONS=detect_leaks=0
         # enable Ubuntu 14 image

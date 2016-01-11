@@ -10,6 +10,8 @@ This core set of extensions powers all of Prosoft's applications.
 
 ## Brief
 
+* filesystem: Implementation of C++17 filesystem, with extensions for: ACLs, extended attributes, alternate data streams, and more.
+
 * u8string: Full UTF8 string class that is modeled to match std::string as much as possible.
 
 * identity: Login account information.

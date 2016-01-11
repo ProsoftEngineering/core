@@ -1,4 +1,4 @@
-// Copyright © 2015, Prosoft Engineering, Inc. (A.K.A "Prosoft")
+// Copyright © 2015-2016, Prosoft Engineering, Inc. (A.K.A "Prosoft")
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without
@@ -23,20 +23,48 @@
 // (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#ifndef PS_CORE_CONFIG_PLATFORM_H
-#define PS_CORE_CONFIG_PLATFORM_H
+#ifndef PS_CORE_FILESYSTEM_PRIVATE_HPP
+#define PS_CORE_FILESYSTEM_PRIVATE_HPP
 
-#if __APPLE__
-#include <prosoft/core/config/config_apple.h>
-#elif _WIN32
-#include <prosoft/core/config/config_windows.h>
-#endif
+namespace prosoft {
+namespace filesystem {
+inline namespace v1 {
+namespace ifilesystem {
 
-// Same purpose as Win32 TEXT() macro for ASCII/Unicode string literals. Just don't have to bring in Windows.h.
-#if _WIN32 && defined(UNICODE)
-#define PS_TEXT(S) L##S
+#if !_WIN32
+using native_path_type = u8string;
 #else
-#define PS_TEXT(S) S
+using native_path_type = u16string;
 #endif
 
-#endif // PS_CORE_CONFIG_PLATFORM_H
+using to_native_path = to_string<native_path_type, path::string_type>;
+
+inline void error(int e, error_code& ec) {
+    ec.assign(e, filesystem_category());
+}
+
+inline void system_error(error_code& ec) {
+    system::system_error(ec);
+}
+
+inline error_code system_error() {
+    return system::system_error();
+}
+
+// This takes a raw string because std::string may alloc mem and clear the global error state.
+inline filesystem_error system_error(const char* msg) {
+    auto ec = system_error(); // Ditto on temp var.
+    return filesystem_error{msg, ec};
+}
+
+#if _WIN32
+// Implemented in ACL module
+owner make_owner(const path&, error_code&) noexcept;
+#endif
+
+} // ifilesystem
+} // v1
+} // filesystem
+} // prosoft
+
+#endif // PS_CORE_FILESYSTEM_PRIVATE_HPP

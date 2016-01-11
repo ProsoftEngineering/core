@@ -1,4 +1,4 @@
-// Copyright © 2015, Prosoft Engineering, Inc. (A.K.A "Prosoft")
+// Copyright © 2015-2016, Prosoft Engineering, Inc. (A.K.A "Prosoft")
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without
@@ -23,20 +23,20 @@
 // (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#ifndef PS_CORE_CONFIG_PLATFORM_H
-#define PS_CORE_CONFIG_PLATFORM_H
+#include <filesystem/path_utils.hpp>
+#include <string/string_types.hpp>
+#include <u8string/u8string.hpp>
 
-#if __APPLE__
-#include <prosoft/core/config/config_apple.h>
-#elif _WIN32
-#include <prosoft/core/config/config_windows.h>
-#endif
+#include "catch.hpp"
 
-// Same purpose as Win32 TEXT() macro for ASCII/Unicode string literals. Just don't have to bring in Windows.h.
-#if _WIN32 && defined(UNICODE)
-#define PS_TEXT(S) L##S
-#else
-#define PS_TEXT(S) S
-#endif
+using namespace prosoft::filesystem;
 
-#endif // PS_CORE_CONFIG_PLATFORM_H
+TEST_CASE("path_utils-string") {
+    using path_t = std::string;
+    #include "path_utils_tests_i.cpp"
+}
+
+TEST_CASE("path_utils-u8string") {
+    using path_t = prosoft::u8string;
+    #include "path_utils_tests_i.cpp"
+}
