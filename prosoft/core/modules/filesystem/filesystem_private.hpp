@@ -62,6 +62,10 @@ inline filesystem_error system_error(const char* msg) {
 owner make_owner(const path&, error_code&) noexcept;
 #endif
 
+#if !_WIN32
+constexpr const char* TMPDIR = "TMPDIR";
+#endif
+
 } // ifilesystem
 } // v1
 } // filesystem

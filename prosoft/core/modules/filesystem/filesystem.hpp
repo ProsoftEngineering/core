@@ -514,6 +514,9 @@ inline file_status directory_entry::symlink_status(error_code& ec) const noexcep
     return prosoft::filesystem::symlink_status(get_path(), ec);
 }
 
+path temp_directory_path();
+path temp_directory_path(error_code&);
+
 } // v1
 } // filesystem
 } // prosoft

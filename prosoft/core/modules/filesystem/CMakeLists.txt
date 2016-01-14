@@ -32,6 +32,7 @@ include("${CMAKE_CURRENT_LIST_DIR}/../config_module.cmake")
 
 set(fs_lib ${PROJECT_NAME})
 add_library(${fs_lib}
+    ${PSFS}/src/dirops.cpp
     ${PSFS}/src/filesystem.cpp
     ${PSFS}/src/filesystem_acl.cpp
 )

@@ -24,6 +24,7 @@
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <filesystem/filesystem.hpp>
+#include <filesystem/filesystem_private.hpp>
 
 #include "catch.hpp"
 
@@ -155,5 +156,38 @@ TEST_CASE("filesystem") {
             CHECK_FALSE(exists(p, ec));
         }
     }
-
+    
+    WHEN("getting the temp dir") {
+        error_code ec;
+        const auto p = temp_directory_path(ec);
+        const auto st = status(p, ec);
+        THEN("the path exists") {
+            CHECK(exists(st));
+        } AND_THEN("the path is a directory") {
+            CHECK(is_directory(st));
+        }
+    }
+    
+#if !_WIN32
+    WHEN("getting the temp dir and TMPDIR is not set") {
+        const char* t = ::getenv(ifilesystem::TMPDIR);
+        if (!t) {
+            t = "";
+        }
+        std::string save{t};
+        if (!save.empty()) {
+            ::unsetenv(ifilesystem::TMPDIR);
+            std::unique_ptr<std::string, void(*)(const std::string*)>{&save, [](const std::string* s){ ::setenv(ifilesystem::TMPDIR, s->c_str(), 0); }};
+        }
+        
+        error_code ec;
+        const auto p = temp_directory_path(ec);
+        const auto st = status(p, ec);
+        THEN("the path exists") {
+            CHECK(exists(st));
+        } AND_THEN("the path is a directory") {
+            CHECK(is_directory(st));
+        }
+    }
+#endif
 }
