@@ -58,7 +58,7 @@ public:
     typedef String string_type;
     typedef typename string_type::value_type value_type;
     typedef typename string_type::const_pointer const_pointer;
-    typedef typename std::remove_pointer<typename std::remove_const<const_pointer>::type>::type encoding_value_type; // for u8string this will be char
+    typedef typename std::remove_const<typename std::remove_pointer<const_pointer>::type>::type encoding_value_type; // for u8string this will be char
     static constexpr const value_type preferred_separator = (preferred_separator_style == path_style::posix ? static_cast<value_type>('/') : static_cast<value_type>('\\'));
 
     basic_path() noexcept(std::is_nothrow_default_constructible<string_type>::value);
