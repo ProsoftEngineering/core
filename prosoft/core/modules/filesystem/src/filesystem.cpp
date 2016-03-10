@@ -261,6 +261,53 @@ namespace prosoft {
 namespace filesystem {
 inline namespace v1 {
 
+bool equivalent(const path& p1, const path& p2) {
+    error_code ec;
+    auto val = equivalent(p1, p2, ec);
+    PS_THROW_IF(ec.value(), filesystem_error("file equivalence failed", p1, p2, ec));
+    return val;
+}
+
+bool equivalent(const path& p1, const path& p2, error_code& ec) noexcept {
+    ec.clear();
+#if !_WIN32
+    struct stat sb;
+    sb.st_ino = 0;
+    sb.st_dev = 0;
+    if (0 != ::stat(p1.c_str(), &sb)) {
+        ifilesystem::system_error(ec);
+        return false;
+    }
+    
+    const auto ino = sb.st_ino;
+    const auto dev = sb.st_dev;
+    
+    sb.st_ino = 0;
+    sb.st_dev = 0;
+    if (0 != ::stat(p2.c_str(), &sb)) {
+        ifilesystem::system_error(ec);
+        return false;
+    }
+    
+    return (dev == sb.st_dev && ino == sb.st_ino);
+#else
+    // TODO: use file info
+    static auto ends_with_separator = [](const path& p) -> bool {
+        return !p.empty() && *(--p.native().end()) == path::preferred_separator;
+    };
+    const auto s1 = ends_with_separator(p1);
+    const auto s2 = ends_with_separator(p2);
+    
+    if (s1 == s2) {
+        return p1 == p2;
+    } else if (s1 && !s2) {
+        return p1 == (p2 / path{path::preferred_separator});
+    } else {
+        return p2 == (p1 / path{path::preferred_separator});
+    }
+#endif
+}
+
 file_status status(const path& p) {
     error_code ec;
     auto fs = status(p, ec);

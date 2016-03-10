@@ -207,7 +207,7 @@ TEST_CASE("filesystem") {
         const auto p = temp_directory_path();
         CHECK_NOTHROW(current_path(p));
         THEN("the path is changed") {
-            CHECK(current_path() == canonical(p)); // current path may have resolved symlinks now while p does not
+            CHECK(equivalent(current_path(), canonical(p))); // current path may have resolved symlinks now while p does not
         }
     }
 }

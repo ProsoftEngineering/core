@@ -394,6 +394,9 @@ inline path canonical(const path& p, error_code& ec) {
     return canonical(p, current_path(ec), ec);
 }
 
+bool equivalent(const path&, const path&);
+bool equivalent(const path&, const path&, error_code&) noexcept;
+
 file_status status(const path&);
 file_status status(const path&, error_code&) noexcept;
 
