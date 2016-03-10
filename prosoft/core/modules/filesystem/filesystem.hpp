@@ -383,6 +383,17 @@ public:
 };
 
 // operations
+path current_path();
+path current_path(error_code&);
+void current_path(const path&);
+void current_path(const path&, error_code&);
+
+path canonical(const path&, const path& base = current_path());
+path canonical(const path&, const path& base, error_code&);
+inline path canonical(const path& p, error_code& ec) {
+    return canonical(p, current_path(ec), ec);
+}
+
 file_status status(const path&);
 file_status status(const path&, error_code&) noexcept;
 

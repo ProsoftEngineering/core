@@ -190,4 +190,24 @@ TEST_CASE("filesystem") {
         }
     }
 #endif
+
+    WHEN("getting the current path") {
+        error_code ec;
+        const auto p = current_path(ec);
+        const auto st = status(p, ec);
+        THEN("the path exists") {
+            CHECK(exists(st));
+        } AND_THEN("the path is a directory") {
+            CHECK(is_directory(st));
+        }
+    }
+    
+    WHEN("setting the current path") {
+        error_code ec;
+        const auto p = temp_directory_path();
+        CHECK_NOTHROW(current_path(p));
+        THEN("the path is changed") {
+            CHECK(current_path() == canonical(p)); // current path may have resolved symlinks now while p does not
+        }
+    }
 }
