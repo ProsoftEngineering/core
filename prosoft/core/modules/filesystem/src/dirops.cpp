@@ -69,8 +69,9 @@ path temp_directory_path(error_code& ec) {
     PSASSERT_NOTNULL(t);
     p = t;
 #else // !_WIN32
-    std::wstring buf(::GetTempPathW(0, nullptr) + 1, 0);
+    std::wstring buf(::GetTempPathW(0, nullptr), 0); // It's not documented, but the returned size accounts for the null term.
     if (buf.size() > 1 && ::GetTempPathW(static_cast<DWORD>(buf.size()), &buf[0]) > 1) {
+        PSASSERT(*(--buf.end()) == 0, "Broken assumption.");
         buf.erase(--buf.end()); // null term
         p = std::move(buf);
     } else {
