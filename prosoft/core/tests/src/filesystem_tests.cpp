@@ -207,7 +207,24 @@ TEST_CASE("filesystem") {
         const auto p = temp_directory_path();
         CHECK_NOTHROW(current_path(p));
         THEN("the path is changed") {
-            CHECK(equivalent(current_path(), canonical(p))); // current path may have resolved symlinks now while p does not
+            CHECK(equivalent(current_path(), p)); // current path may have resolved symlinks now while p does not
         }
+    }
+
+    WHEN("resolving a relative path") {
+        const auto base = current_path();
+        const auto p = path{PS_TEXT("EC160FB0-4E55-46F5-B16D-8149A260FA27")};
+        CHECK(canonical(p) == base / p);
+    }
+
+    WHEN("resolving a partial path") {
+        const auto base = current_path();
+        const auto p = path{PS_TEXT("a")} / PS_TEXT("EC160FB0-4E55-46F5-B16D-8149A260FA27");
+        CHECK(canonical(p) == base / p);
+    }
+
+    WHEN("resolving an absolute path") {
+        const auto p = current_path() / PS_TEXT("EC160FB0-4E55-46F5-B16D-8149A260FA27");
+        CHECK(canonical(p) == p);
     }
 }
