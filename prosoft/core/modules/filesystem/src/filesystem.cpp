@@ -291,20 +291,22 @@ bool equivalent(const path& p1, const path& p2, error_code& ec) noexcept {
     
     return (dev == sb.st_dev && ino == sb.st_ino);
 #else
-    // TODO: use file info
-    static auto ends_with_separator = [](const path& p) -> bool {
-        return !p.empty() && *(--p.native().end()) == path::preferred_separator;
-    };
-    const auto s1 = ends_with_separator(p1);
-    const auto s2 = ends_with_separator(p2);
-    
-    if (s1 == s2) {
-        return p1 == p2;
-    } else if (s1 && !s2) {
-        return p1 == (p2 / path{path::preferred_separator});
-    } else {
-        return p2 == (p1 / path{path::preferred_separator});
+    ::BY_HANDLE_FILE_INFORMATION info;
+    if (!ifilesystem::finfo(p1, &info, ec)) {
+        return false;
     }
+
+    const uint64_t ino = uint64_t(info.nFileIndexLow) |  (uint64_t(info.nFileIndexHigh) << 32ULL);
+    const auto vsn = info.dwVolumeSerialNumber;
+
+    info.nFileIndexLow = info.nFileIndexHigh = 0;
+    info.dwVolumeSerialNumber = 0;
+    if (!ifilesystem::finfo(p2, &info, ec)) {
+        return false;
+    }
+
+    const uint64_t ino2 = uint64_t(info.nFileIndexLow) |  (uint64_t(info.nFileIndexHigh) << 32ULL);
+    return (vsn == info.dwVolumeSerialNumber && ino == ino2);
 #endif
 }
 
@@ -329,6 +331,39 @@ file_status symlink_status(const path& p) {
 file_status symlink_status(const path& p, error_code& ec) noexcept {
     return link_stat(p, ec);
 }
+
+#if _WIN32
+namespace ifilesystem { // private API
+
+windows::Handle open(const path& p, DWORD accessMode, DWORD shareMode, DWORD createMode, DWORD flags, error_code& ec) {
+    if (is_directory(p, ec)) {
+        flags |= FILE_FLAG_BACKUP_SEMANTICS; // Required to open a dir handle. Can also bypass security restrictions.
+        flags &= ~FILE_ATTRIBUTE_NORMAL;
+        // http://stackoverflow.com/questions/10198420/open-directory-using-createfile
+    }
+    if (ec.value()) {
+        return {};
+    }
+    auto h = ::CreateFileW(p.c_str(), accessMode, shareMode, nullptr, createMode, flags, nullptr);
+    if (!h) {
+        system_error(ec);
+    }
+    return {h};
+}
+
+bool finfo(const path& p, ::BY_HANDLE_FILE_INFORMATION* info, error_code& ec) {
+    if (auto h = open(p, 0, FILE_SHARE_READ | FILE_SHARE_WRITE, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, ec)) {
+        if (::GetFileInformationByHandle(h.get(), info)) {
+            return true;
+        } else {
+            system_error(ec); // fall through to false
+        }
+    }
+    return false;
+}
+
+} // ifilesystem
+#endif
 
 } // v1
 } // filesystem

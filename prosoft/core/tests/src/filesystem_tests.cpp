@@ -201,6 +201,18 @@ TEST_CASE("filesystem") {
             CHECK(is_directory(st));
         }
     }
+
+    WHEN("comparing path equivalence") {
+        const auto p = temp_directory_path();
+        CHECK(equivalent(p, temp_directory_path()));
+        CHECK_FALSE(equivalent(p.parent_path(), p));
+
+        const auto nop = current_path() / path{PS_TEXT("EC160FB0-4E55-46F5-B16D-8149A260FA27")};
+        error_code ec;
+        REQUIRE_FALSE(exists(nop, ec));
+        CHECK_FALSE(equivalent(p, nop, ec));
+        CHECK_FALSE(equivalent(nop, p, ec));
+    }
     
     WHEN("setting the current path") {
         error_code ec;

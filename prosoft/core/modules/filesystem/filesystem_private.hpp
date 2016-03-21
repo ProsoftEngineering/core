@@ -26,6 +26,10 @@
 #ifndef PS_CORE_FILESYSTEM_PRIVATE_HPP
 #define PS_CORE_FILESYSTEM_PRIVATE_HPP
 
+#if _WIN32
+#include <unique_resource.hpp>
+#endif
+
 namespace prosoft {
 namespace filesystem {
 inline namespace v1 {
@@ -57,13 +61,20 @@ inline filesystem_error system_error(const char* msg) {
     return filesystem_error{msg, ec};
 }
 
-#if _WIN32
-// Implemented in ACL module
-owner make_owner(const path&, error_code&) noexcept;
-#endif
-
 #if !_WIN32
 constexpr const char* TMPDIR = "TMPDIR";
+#endif
+
+#if _WIN32
+owner make_owner(const path&, error_code&) noexcept; // Implemented in ACL module
+
+windows::Handle open(const path& p, DWORD accessMode, DWORD shareMode, DWORD createMode, DWORD flags, error_code&);
+
+inline windows::Handle open(const path& p, DWORD accessMode, error_code& ec) {
+    return open(p, accessMode, FILE_SHARE_READ|FILE_SHARE_WRITE, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, ec);
+}
+
+inline bool finfo(const path&s, ::BY_HANDLE_FILE_INFORMATION*, error_code& ec);
 #endif
 
 } // ifilesystem
