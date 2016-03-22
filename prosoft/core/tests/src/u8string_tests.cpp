@@ -388,13 +388,13 @@ TEST_CASE("u8string") {
         CHECK(0 == s.find(needle.str())); // test conversion
         CHECK(0 == s.rfind(needle.str())); // ditto
 
-        needle = std::move(u8string("sed do"));
+        needle = u8string("sed do");
         auto pos = s.str().find(needle.str());
         CHECK(pos == s.find(needle, pos - 1));
         CHECK(pos == s.rfind(needle, pos + needle.length()));
         CHECK(u8string::npos == s.rfind(needle, pos - needle.length()));
 
-        s = std::move(u8string(u8test));
+        s = u8string(u8test);
         CHECK_FALSE(s.is_ascii());
         needle = s;
         CHECK_FALSE(needle.is_ascii());
@@ -410,7 +410,7 @@ TEST_CASE("u8string") {
         needle = s.substr(1, 2);
         CHECK(1 == s.rfind(needle, 3));
 
-        s = std::move(u8string("abcdefghijklmnopqrstuvwxyz"));
+        s = u8string("abcdefghijklmnopqrstuvwxyz");
         CHECK(0 == s.find('a'));
         CHECK(2 == s.find('c', 1));
         CHECK(25 == s.rfind('z'));
@@ -482,7 +482,7 @@ TEST_CASE("u8string") {
         CHECK((u8string::npos == s.find_first_of("A", 1)));
         CHECK((u8string::npos == s.find_first_of("Z", s.length() - 1)));
 
-        s = std::move(u8string(u32test));
+        s = u8string(u32test);
         CHECK(0 == s.find(s[0]));
         CHECK(0 == s.rfind(s[0]));
 

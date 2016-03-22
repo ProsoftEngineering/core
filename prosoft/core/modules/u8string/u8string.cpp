@@ -223,12 +223,12 @@ void u8string::_init(const std::string& other) {
 
 u8string::u8string(const_iterator& start, const_iterator& fin)
     // XXX: The iters are external; thus we cannot assume that movement() is correct for either. Therefore we don't cache the length here.
-    : u8string(std::move(std::string(start.base(), fin.base())), npos, false) {
+    : u8string(std::string(start.base(), fin.base()), npos, false) {
 }
 
 // Unlike std::, utf8 does not provide conversion from non-const to const iters.
 u8string::u8string(iterator& start, iterator& fin)
-    : u8string(std::move(std::string(start.base(), fin.base())), npos, false) {
+    : u8string(std::string(start.base(), fin.base()), npos, false) {
 }
 
 u8string::u8string(std::string&& other, size_type count, bool ASCII) {
@@ -253,7 +253,7 @@ u8string::u8string(const char* other, size_type len) {
         if (ascii() || normalized) { // avoid conversion for ascii (which should be the most common case)
             _u8._s.assign(other, len);
         } else {
-            _u8._s = std::move(normalize(other, len));
+            _u8._s = normalize(other, len);
         }
     } else {
         throw invalid_utf8(*i);
@@ -295,7 +295,7 @@ u8string::u8string(const value_type* other, size_type len) {
 }
 
 const u8string& u8string::operator=(const u16string& other) {
-    *this = std::move(u8string(other));
+    *this = u8string(other);
     return *this;
 }
 
@@ -581,12 +581,12 @@ u8string u8string::substr(size_type pos, size_type len) const {
     }
 
     if (ascii()) {
-        return u8string(std::move(str().substr(pos, len)), len, true);
+        return u8string(str().substr(pos, len), len, true);
     } else {
         auto start = cbegin();
         auto fin = cend();
         advance(start, fin, pos, len, max);
-        return u8string(std::move(std::string(start.base(), fin.base())), len, false);
+        return u8string(std::string(start.base(), fin.base()), len, false);
     }
 }
 
