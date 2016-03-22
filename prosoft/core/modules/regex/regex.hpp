@@ -433,7 +433,7 @@ basic_regex_iterator<Traits>& basic_regex_iterator<Traits>::operator++() {
         if (base < prosoft::base(_last)) {
             auto start = make_ranged_iterator<input_iterator>(base, prosoft::base(_first), prosoft::base(_last));
             if (regex_search(start, _last, _results, *_rx, _flags | regex_constants::match_prev_avail)) {
-                // XXX: our results positions will be offests from start not _first, so we need to fix them up.
+                // XXX: our results positions will be offsets from start not _first, so we need to fix them up.
                 for (auto& p : _results._results) {
                     p.first += offset;
                 }
