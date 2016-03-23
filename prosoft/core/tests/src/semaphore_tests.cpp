@@ -85,7 +85,7 @@ TEST_CASE("semaphore internals") {
         REQUIRE(ev < event_signal);
         
         CHECK_THROWS(ev.reset(-1));
-        CHECK_THROWS(semaphore_value{-1});
+        CHECK_THROWS(event_semaphore_value{-1});
     }
     
     SECTION("event pre-signal") {
