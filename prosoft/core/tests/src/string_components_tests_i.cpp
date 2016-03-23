@@ -42,6 +42,7 @@ SECTION("prefix/suffix") {
 
     CHECK(ends_with(s, S{"a"}, S{"b"}, S{"ld"}));
     CHECK_FALSE(ends_with(s));
+    CHECK_FALSE(ends_with(s, (s+s)));
 
     CHECK(prefix(s, S{"j"}, S{"He"}, S{"1"}) == S{"He"});
     CHECK(prefix(s, S{"j"}, S{"e"}, S{"1"}).empty());
