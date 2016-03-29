@@ -140,6 +140,11 @@ struct local_delete {
         ::LocalFree(p);
     }
 };
+struct taskmem_delete {
+    void operator() (void* p) noexcept {
+        ::CoTaskMemFree(p);
+    }
+};
 } // iunique
 
 namespace windows {
@@ -148,6 +153,9 @@ using unique_global = std::unique_ptr<T, iunique::global_delete>;
 
 template <typename T>
 using unique_local = std::unique_ptr<T, iunique::local_delete>;
+
+template <typename T>
+using unique_taskmem = std::unique_ptr<T, iunique::taskmem_delete>;
 
 struct handle_traits {
     typedef HANDLE pointer;

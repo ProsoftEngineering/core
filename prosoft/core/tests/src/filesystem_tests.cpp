@@ -160,6 +160,7 @@ TEST_CASE("filesystem") {
     WHEN("getting the temp dir") {
         error_code ec;
         const auto p = temp_directory_path(ec);
+        CHECK_FALSE(p.empty());
         const auto st = status(p, ec);
         THEN("the path exists") {
             CHECK(exists(st));
@@ -182,6 +183,7 @@ TEST_CASE("filesystem") {
         
         error_code ec;
         const auto p = temp_directory_path(ec);
+        CHECK_FALSE(p.empty());
         const auto st = status(p, ec);
         THEN("the path exists") {
             CHECK(exists(st));
@@ -194,6 +196,7 @@ TEST_CASE("filesystem") {
     WHEN("getting the current path") {
         error_code ec;
         const auto p = current_path(ec);
+        CHECK_FALSE(p.empty());
         const auto st = status(p, ec);
         THEN("the path exists") {
             CHECK(exists(st));
@@ -239,4 +242,25 @@ TEST_CASE("filesystem") {
         const auto p = current_path() / PS_TEXT("EC160FB0-4E55-46F5-B16D-8149A260FA27");
         CHECK(canonical(p) == p);
     }
+    
+    WHEN("getting the home dir") {
+        error_code ec;
+        const auto p = home_directory_path(ec);
+        CHECK_FALSE(p.empty());
+        const auto st = status(p, ec);
+        THEN("the path exists") {
+            CHECK(exists(st));
+        } AND_THEN("the path is a directory") {
+            CHECK(is_directory(st));
+        }
+    }
+
+#if !_WIN32
+    WHEN("getting the home dir for an invalid user") {
+        error_code ec;
+        const auto p = ifilesystem::home_directory_path(access_control_identity::invalid_user(), ec);
+        CHECK(p.empty());
+        CHECK(ec.value() != 0);
+    }
+#endif
 }

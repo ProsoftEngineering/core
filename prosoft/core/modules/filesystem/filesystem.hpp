@@ -531,6 +531,16 @@ inline file_status directory_entry::symlink_status(error_code& ec) const noexcep
 path temp_directory_path();
 path temp_directory_path(error_code&);
 
+// Extensions
+namespace ifilesystem {
+path home_directory_path(const access_control_identity&, error_code&); // private as Windows only supports the current user
+}
+path home_directory_path(); // XXX: UNIX daemon users may not have a home dir.
+inline path home_directory_path(error_code& ec) {
+    return ifilesystem::home_directory_path(access_control_identity::process_user(), ec);
+}
+// Extensions
+
 } // v1
 } // filesystem
 } // prosoft

@@ -28,12 +28,34 @@
 #if !_WIN32
 #include <sys/errno.h>
 #include <unistd.h>
+#include <pwd.h>
 #else
 #include <windows.h>
+#include <shlobj.h>
 #endif
 
 #include "filesystem.hpp"
 #include "filesystem_private.hpp"
+
+namespace {
+using namespace prosoft;
+using namespace prosoft::filesystem;
+
+void assert_directory_exists(path& p, error_code& ec) {
+    if (ec || p.empty() || !is_directory(p, ec)) {
+        p.clear();
+        if (!ec) {
+#if !_WIN32
+            constexpr int default_err = ENOENT;
+#else
+            constexpr int default_err = ERROR_PATH_NOT_FOUND;
+#endif
+            ec.assign(default_err, filesystem_category());
+        }
+    }
+}
+
+} // anon
 
 namespace prosoft {
 namespace filesystem {
@@ -79,17 +101,50 @@ path temp_directory_path(error_code& ec) {
     }
 #endif // !_WIN32
 
-    if (ec || p.empty() || !is_directory(p, ec)) {
-        p.clear();
-        if (!ec) {
+    assert_directory_exists(p, ec);
+    return p;
+}
+
+path home_directory_path() {
+    error_code ec;
+    auto p = home_directory_path(ec);
+    PS_THROW_IF(ec.value(), filesystem_error("home dir failed", p, ec));
+    return p;
+}
+
+path ifilesystem::home_directory_path(const access_control_identity& cid, error_code& ec) {
+    ec.clear();
+    
+    path p;
 #if !_WIN32
-            constexpr int default_err = ENOENT;
-#else
-            constexpr int default_err = ERROR_PATH_NOT_FOUND;
-#endif
-            ec.assign(default_err, filesystem_category());
+    struct passwd pw;
+    struct passwd* result;
+    char buf[PATH_MAX];
+    if (0 == ::getpwuid_r(cid.system_identity(), &pw, buf, sizeof(buf), &result)) {
+        if (result) {
+            p = result->pw_dir;
+        } else {
+            ifilesystem::error(ESRCH, ec); // ENOENT is used to represent a non-existent dir
         }
+    } else {
+        ifilesystem::system_error(ec);
     }
+#else
+    (void)cid; // TODO?
+    static auto system_directory = [](REFKNOWNFOLDERID t, error_code& ec) -> path {
+        windows::unique_taskmem<wchar_t> buf;
+        const auto err = ::SHGetKnownFolderPath(t, 0, nullptr, handle(buf));
+        if (S_OK == err) {
+            return path{buf.get()};
+        } else {
+            ifilesystem::error(err, ec);
+            return {};
+        }
+    };
+    p = system_directory(FOLDERID_Profile, ec);
+#endif
+    
+    assert_directory_exists(p, ec);
     return p;
 }
 

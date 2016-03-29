@@ -45,6 +45,10 @@ target_include_directories(${fs_lib}
     ${PSFS}
 )
 
+if(WIN32)
+    target_link_libraries(${fs_lib} PUBLIC "shell32")
+endif()
+
 ps_core_module_use_u8string_module(${fs_lib})
 ps_core_module_use_external_module(${fs_lib} system_identity)
 
