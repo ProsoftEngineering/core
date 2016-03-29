@@ -96,7 +96,16 @@ inline wchar_t* fullpath<wchar_t>(const wchar_t* p) {
 }
 #endif
 
+path shell_expansion(const path& p, error_code& ec) { // returns empty if no expansion (to avoid an unnecessary copy
+    static const path homeshortcut{PS_TEXT("~")};
+    auto i = p.begin();
+    if (*i == homeshortcut) {
+        return home_directory_path(ec) / path{path::string_type{p.native()}.erase(0,1)};
+    }
+    return {};
 }
+
+} // anon
 
 namespace prosoft {
 namespace filesystem {
@@ -109,8 +118,14 @@ path canonical(const path& p, const path& base) {
     return rp;
 }
 
-path canonical(const path& p, const path& base, error_code& ec) {
+path canonical(const path& rp, const path& base, error_code& ec) {
     ec.clear();
+    
+    auto ep = shell_expansion(rp, ec);
+    if (ec.value()) {
+        return {rp};
+    }
+    const path& p = !ep.empty() ? ep : rp;
     
 #if !_WIN32
     static const path rootp{path::preferred_separator};
@@ -132,8 +147,8 @@ path canonical(const path& p, const path& base, error_code& ec) {
     }
     return path{p};
 #else
-    auto rp = sanitize(p.native(), path::preferred_separator_style);
-    unique_malloc<path::encoding_value_type> tmp{fullpath(rp.c_str())};
+    auto sp = sanitize(p.native(), path::preferred_separator_style);
+    unique_malloc<path::encoding_value_type> tmp{fullpath(sp.c_str())};
     if (tmp) {
         return {tmp.get()};
     } else {

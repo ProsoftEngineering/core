@@ -243,6 +243,14 @@ TEST_CASE("filesystem") {
         CHECK(canonical(p) == p);
     }
     
+    WHEN("resolving a tilde-prefixed path") {
+        const auto tilde  = path{PS_TEXT("~")};
+        const auto home = home_directory_path();
+        CHECK(canonical(tilde) == home);
+        const auto subp = path{PS_TEXT("a/b/c/d")}.make_preferred();
+        CHECK(canonical(tilde / subp) == home / subp);
+    }
+    
     WHEN("getting the home dir") {
         error_code ec;
         const auto p = home_directory_path(ec);

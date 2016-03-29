@@ -388,6 +388,7 @@ path current_path(error_code&);
 void current_path(const path&);
 void current_path(const path&, error_code&);
 
+// As an extension, canonical will expand an initial '~' char to home_directory_path().
 path canonical(const path&, const path& base = current_path());
 path canonical(const path&, const path& base, error_code&);
 inline path canonical(const path& p, error_code& ec) {
