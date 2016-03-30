@@ -69,6 +69,34 @@ inline std::system_error system_error(const char* msg) {
     auto ec = system_error(); // Ditto on temp var.
     return std::system_error{ec, msg};
 }
+
+inline void posix_error(error_code& ec) {
+#if !_WIN32
+    return system_error(ec);
+#else
+    const auto e = errno;
+    ec.assign(e, std::generic_category());
+#endif
+}
+
+inline error_code posix_error() {
+#if !_WIN32
+    return system_error();
+#else
+    const auto e = errno;
+    return error_code{e, std::generic_category()};
+#endif
+}
+
+inline std::system_error posix_error(const char* msg) {
+#if !_WIN32
+    return system_error(msg);
+#else
+    auto ec = posix_error();
+    return std::system_error{ec, msg};
+#endif
+}
+
 } // system
 } // prosoft
 
