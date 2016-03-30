@@ -160,15 +160,33 @@ TEST_CASE("filesystem") {
         }
     }
     
+    WHEN("path is a file") {
+        const auto p = temp_directory_path() / PS_TEXT("fs17test");
+        {
+            std::ofstream ts{p.c_str(), std::ios::binary};
+            REQUIRE(ts);
+        }
+        const auto st = status(p);
+        CHECK(is_regular_file(p));
+        CHECK(is_regular_file(st));
+        
+        CHECK_FALSE(is_directory(st));
+        CHECK_FALSE(is_symlink(st));
+        CHECK_FALSE(is_socket(st));
+        CHECK_FALSE(is_fifo(st));
+        CHECK_FALSE(is_device_file(st));
+        
+        REQUIRE(remove(p));
+    }
+    
     WHEN("getting the temp dir") {
         error_code ec;
         const auto p = temp_directory_path(ec);
         CHECK_FALSE(p.empty());
-        const auto st = status(p, ec);
         THEN("the path exists") {
-            CHECK(exists(st));
+            CHECK(exists(p, ec));
         } AND_THEN("the path is a directory") {
-            CHECK(is_directory(st));
+            CHECK(is_directory(p, ec));
         }
     }
     
