@@ -23,6 +23,9 @@
 // (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
+#include <fstream>
+#include <iosfwd>
+
 #include <filesystem/filesystem.hpp>
 #include <filesystem/filesystem_private.hpp>
 
@@ -271,4 +274,92 @@ TEST_CASE("filesystem") {
         CHECK(ec.value() != 0);
     }
 #endif
+
+    SECTION("create and remove dirs") {
+        const auto p  = temp_directory_path() / PS_TEXT("fs17test");
+        
+        WHEN("creating a directory that does not exist") {
+            error_code ec;
+            REQUIRE_FALSE(is_directory(p, ec));
+            CHECK(create_directory(p));
+            REQUIRE(remove(p));
+        }
+        
+        WHEN("creating a directory that exists") {
+            const auto d = temp_directory_path();
+            REQUIRE(is_directory(d));
+            CHECK(create_directory(d));
+        }
+        
+        WHEN("creating a directory that exists as a non-dir") {
+            error_code ec;
+            REQUIRE_FALSE(is_directory(p, ec));
+            {
+                std::ofstream ts{p.c_str(), std::ios::binary};
+                REQUIRE(ts);
+            }
+            CHECK_THROWS(create_directory(p));
+            REQUIRE(remove(p));
+        }
+        
+        WHEN("creating a directory with attributes from another directory") {
+            error_code ec;
+            REQUIRE(create_directory(p));
+            
+            const auto np = temp_directory_path() / PS_TEXT("fs17test2");
+            REQUIRE_FALSE(exists(np, ec));
+            CHECK(create_directory(np, p));
+            
+            // Check create succeeds with an existing dir
+            REQUIRE(exists(np, ec));
+            CHECK(create_directory(np, p));
+            
+            REQUIRE(remove(p));
+            REQUIRE(remove(np));
+        }
+        
+        WHEN("creating a directory that has missing parent components") {
+            error_code ec;
+            REQUIRE_FALSE(is_directory(p, ec));
+            // Check create succeeds for a single non-existant dir
+            CHECK(create_directories(p));
+            REQUIRE(remove(p));
+            
+            const auto fp = p / PS_TEXT("1") / PS_TEXT("2");
+            CHECK_THROWS(create_directory(fp));
+            
+            CHECK(create_directories(fp));
+            
+            REQUIRE(is_directory(fp, ec));
+            // Check create succeeds with an existing dir
+            CHECK(create_directories(fp));
+            
+            REQUIRE(remove(fp));
+            REQUIRE(remove(fp.parent_path()));
+            REQUIRE(remove(p));
+        }
+        
+        WHEN("creating a directory that has non-dir parent components") {
+            error_code ec;
+            REQUIRE_FALSE(is_directory(p, ec));
+            REQUIRE(create_directory(p));
+            
+            const auto fp = p / PS_TEXT("1") / PS_TEXT("2");
+            const auto ndp = fp.parent_path();
+            {
+                std::ofstream ts{ndp.c_str(), std::ios::binary};
+                REQUIRE(ts);
+            }
+            CHECK_THROWS(create_directories(fp));
+            
+            REQUIRE(remove(ndp));
+            REQUIRE(remove(p));
+        }
+        
+         WHEN("removing an item that does not exist") {
+            error_code ec;
+            REQUIRE_FALSE(exists(p, ec));
+            CHECK_THROWS(remove(p));
+        }
+    }
 }

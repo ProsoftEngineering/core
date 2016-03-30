@@ -25,10 +25,13 @@
 
 #include <prosoft/core/config/config.h>
 
+#include <stdio.h>
+
 #if !_WIN32
 #include <sys/errno.h>
-#include <unistd.h>
 #include <pwd.h>
+#include <sys/stat.h>
+#include <unistd.h>
 #else
 #include <windows.h>
 #include <shlobj.h>
@@ -55,11 +58,162 @@ void assert_directory_exists(path& p, error_code& ec) {
     }
 }
 
+class mkdir_err_policy {
+    static constexpr auto eexist =
+#if !_WIN32
+    EEXIST;
+#else
+    ERROR_ALREADY_EXISTS;
+#endif
+public:
+    int operator()(const path& p) {
+        auto ec = system::system_error();
+        PSASSERT(ec.value() > 0, "Broken assumption");
+        error_code dummy;
+        if (eexist == ec.value() && is_directory(p, dummy)) {
+            return 0;
+        }
+        return ec.value();
+    }
+};
+
+int mkdir(const path& p, perms ap) noexcept {
+#if !_WIN32
+    auto err = ::mkdir(p.c_str(), static_cast<mode_t>(ap));
+    if (PS_UNEXPECTED(-1 == err && EINTR == errno)) {
+        err = ::mkdir(p.c_str(), static_cast<mode_t>(ap));
+    }
+    return !err ? 0 : mkdir_err_policy{}(p);
+#else
+    (void)ap;
+    if (::CreateDirectoryW(p.c_str(), nullptr)) {
+        return 0;
+    } else {
+        return mkdir_err_policy{}(p);
+    }
+#endif
+}
+
 } // anon
 
 namespace prosoft {
 namespace filesystem {
 inline namespace v1 {
+
+bool create_directories(const path& p) {
+    error_code ec;
+    const auto good = create_directories(p, ec);
+    PS_THROW_IF(!good, filesystem_error("create dirs failed", p, ec));
+    return good;
+}
+
+bool create_directories(const path& p, error_code& ec) noexcept {
+    constexpr auto enoent =
+#if !_WIN32
+    ENOENT;
+#else
+    ERROR_PATH_NOT_FOUND;
+#endif
+    
+    if (create_directory(p, ec)) {
+        return true;
+    } else if (enoent == ec.value()) {
+        const auto parent = p.parent_path();
+        if (create_directories(parent, ec)) {
+            return create_directory(p, ec);
+        }
+    }
+    return false;
+}
+
+bool create_directory(const path& p) {
+    error_code ec;
+    const auto good = create_directory(p, ec);
+    PS_THROW_IF(!good, filesystem_error("create dir failed", p, ec));
+    return good;
+}
+
+bool create_directory(const path& p, error_code& ec) noexcept {
+    ec.clear();
+    const auto err = mkdir(p, perms::all);
+    if (!err) {
+        return true;
+    } else {
+        ifilesystem::error(err, ec);
+        return false;
+    }
+}
+
+bool create_directory(const path& p, const path& cloneFrom) {
+    error_code ec;
+    const auto good = create_directory(p, cloneFrom, ec);
+    PS_THROW_IF(!good, filesystem_error("clone dir failed", p, cloneFrom, ec));
+    return good;
+}
+
+bool create_directory(const path& p, const path& cloneFrom, error_code& ec) noexcept {
+    ec.clear();
+#if !_WIN32
+    const auto st = status(cloneFrom, ec);
+    if (!ec) {
+        const auto err = mkdir(p, st.permissions());
+        if (!err) {
+            return true;
+        } else {
+            ifilesystem::error(err, ec);
+        }
+    }
+#else
+    if (::CreateDirectoryExW(cloneFrom.c_str(), p.c_str(), nullptr)) {
+        return true;
+    } else {
+        const auto err = mkdir_err_policy{}(p);
+        if (!err) {
+            return true;
+        } else {
+            ifilesystem::error(err, ec);
+        }
+    }
+#endif
+    return false;
+}
+
+bool remove(const path& p) {
+    error_code ec;
+    const auto good = remove(p, ec);
+    PS_THROW_IF(!good, filesystem_error("remove failed", p, ec));
+    return good;
+}
+
+bool remove(const path& p, error_code& ec) noexcept {
+#if !_WIN32
+    constexpr auto rem = ::remove;
+#else
+    // XXX: ::remove() fails with EACCESS in tests. Not sure why.
+    static auto rem = [](const wchar_t* p) noexcept -> int {
+        if (::DeleteFileW(p)) {
+            return 0;
+        } else {
+            // DeleteFile returns ERROR_ACCESS_DENIED for both a perms error AND if the target is a dir (on Win10).
+            // Better to not rely on that odd behavior.
+            if (ERROR_FILE_NOT_FOUND != ::GetLastError()) { 
+                ::SetLastError(0);
+                if (::RemoveDirectoryW(p)) {
+                    return 0;
+                }   
+            }
+        }
+        return -1;
+    };
+#endif
+    ec.clear();
+    if (0 == rem(p.c_str())) {
+        return true;
+    } else {
+        system::system_error(ec);
+        return false;
+    }
+}
 
 path temp_directory_path() {
     error_code ec;

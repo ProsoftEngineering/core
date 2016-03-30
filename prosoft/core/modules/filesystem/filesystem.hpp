@@ -395,8 +395,19 @@ inline path canonical(const path& p, error_code& ec) {
     return canonical(p, current_path(ec), ec);
 }
 
+bool create_directories(const path&);
+bool create_directories(const path&, error_code&) noexcept;
+
+bool create_directory(const path&);
+bool create_directory(const path&, error_code&) noexcept;
+bool create_directory(const path&, const path& cloneFrom);
+bool create_directory(const path&, const path& cloneFrom, error_code&) noexcept;
+
 bool equivalent(const path&, const path&);
 bool equivalent(const path&, const path&, error_code&) noexcept;
+
+bool remove(const path&);
+bool remove(const path&, error_code&) noexcept;
 
 file_status status(const path&);
 file_status status(const path&, error_code&) noexcept;
