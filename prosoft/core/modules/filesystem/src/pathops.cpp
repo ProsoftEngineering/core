@@ -72,12 +72,16 @@ path current_path(const Provider& cwd, error_code& ec) {
         ifilesystem::system_error(ec);
     }
 #else
-    std::wstring buf(cwd(0, nullptr), 0); // GetCurrentDirecotry will account for the null term.
+    std::wstring buf(cwd(0, nullptr), 0); // GetCurrentDirectory will account for the null term.
     if (buf.size() > 1 && cwd(static_cast<DWORD>(buf.size()), &buf[0]) > 1) {
         buf.erase(--buf.end()); // null term
         return {std::move(buf)};
     } else {
         ifilesystem::system_error(ec);
+        if (!ec.value()) {
+            // GetLastError was cleared (by wstring) or not set
+            ifilesystem::error(ERROR_FILE_NOT_FOUND, ec);
+        }
     }
 #endif
     return {};
