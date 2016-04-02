@@ -42,6 +42,14 @@ inline const std::error_category& error_category() {
     return std::system_category();
 }
 
+inline const std::error_category& posix_category() {
+#if !_WIN32
+    return error_category();
+#else
+    return std::generic_category();
+#endif
+}
+
 using error_code = std::error_code;
 
 inline void system_error(error_code& ec) {
@@ -75,7 +83,7 @@ inline void posix_error(error_code& ec) {
     return system_error(ec);
 #else
     const auto e = errno;
-    ec.assign(e, std::generic_category());
+    ec.assign(e, posix_category());
 #endif
 }
 
@@ -84,7 +92,7 @@ inline error_code posix_error() {
     return system_error();
 #else
     const auto e = errno;
-    return error_code{e, std::generic_category()};
+    return error_code{e, posix_category()};
 #endif
 }
 

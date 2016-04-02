@@ -1,4 +1,4 @@
-// Copyright © 2015-2016, Prosoft Engineering, Inc. (A.K.A "Prosoft")
+// Copyright ï¿½ 2015-2016, Prosoft Engineering, Inc. (A.K.A "Prosoft")
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without
@@ -46,6 +46,8 @@ TEST_CASE("system_error") {
 
     auto msg = pe.message();
     CHECK_FALSE(msg.empty());
+    
+    CHECK_NOTHROW(prosoft::system::posix_category());
 
 #if !WIN32
     CHECK(prosoft::system::system_error().value() == EINVAL);
