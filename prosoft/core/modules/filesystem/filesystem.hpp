@@ -554,10 +554,44 @@ path temp_directory_path(error_code&);
 // Extensions
 namespace ifilesystem {
 path home_directory_path(const access_control_identity&, error_code&); // private as Windows only supports the current user
-}
+} // ifilesystem
 path home_directory_path(); // XXX: UNIX daemon users may not have a home dir.
 inline path home_directory_path(error_code& ec) {
     return ifilesystem::home_directory_path(access_control_identity::process_user(), ec);
+}
+
+enum class domain {
+    user, // XXX: UNIX daemon users may not have a home dir for relative sub-paths.
+    user_local, // Windows only -- local to the machine, mapped to 'user' for other systems
+    shared,
+};
+
+enum class standard_directory {
+    app_data,
+    cache,
+};
+
+enum class standard_directory_options {
+    none = 0x0,
+    create = 0x1
+};
+PS_ENUM_BITMASK_OPS(standard_directory_options);
+
+path standard_directory_path(domain, standard_directory, standard_directory_options);
+path standard_directory_path(domain, standard_directory, standard_directory_options, error_code&);
+inline path standard_directory_path(standard_directory sd) {
+    return standard_directory_path(domain::user, sd, standard_directory_options::create);
+}
+inline path standard_directory_path(standard_directory sd, error_code& ec) {
+    return standard_directory_path(domain::user, sd, standard_directory_options::create, ec);
+}
+
+// For the cache we want to default to user_local.
+inline path cache_directory_path() {
+    return standard_directory_path(domain::user_local, standard_directory::cache, standard_directory_options::create);
+}
+inline path cache_directory_path(error_code& ec) {
+    return standard_directory_path(domain::user_local, standard_directory::cache, standard_directory_options::create, ec);
 }
 // Extensions
 

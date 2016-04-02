@@ -25,6 +25,8 @@
 
 #include <fstream>
 #include <iosfwd>
+#include <limits>
+#include <type_traits>
 
 #include <filesystem/filesystem.hpp>
 #include <filesystem/filesystem_private.hpp>
@@ -292,6 +294,30 @@ TEST_CASE("filesystem") {
         CHECK(ec.value() != 0);
     }
 #endif
+
+    WHEN("getting cache dir path") {
+        error_code ec;
+        CHECK_NOTHROW(cache_directory_path());
+        const auto p = cache_directory_path(ec);
+        CHECK_FALSE(p.empty());
+        const auto st = status(p, ec);
+        CHECK(exists(st));
+        CHECK(is_directory(st));
+    }
+    
+    WHEN("getting standard dir paths") {
+        path p;
+        CHECK_NOTHROW(p = standard_directory_path(domain::user, standard_directory::app_data, standard_directory_options::create));
+        CHECK_NOTHROW(is_directory(p));
+        
+        CHECK_NOTHROW(p = standard_directory_path(domain::shared, standard_directory::app_data, standard_directory_options::create));
+        CHECK_NOTHROW(is_directory(p));
+    }
+    
+    WHEN("getting an invalid standard dir path") {
+        constexpr auto invalid = static_cast<standard_directory>(std::numeric_limits<typename std::underlying_type<standard_directory>::type>{}.max());
+        CHECK_THROWS(standard_directory_path(domain::user, invalid, standard_directory_options::none));
+    }
 
     SECTION("create and remove dirs") {
         const auto p  = temp_directory_path() / PS_TEXT("fs17test");
