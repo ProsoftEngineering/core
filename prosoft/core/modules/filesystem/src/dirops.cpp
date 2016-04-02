@@ -79,11 +79,18 @@ public:
 
 int mkdir(const path& p, perms ap) noexcept {
 #if !_WIN32
-    auto err = ::mkdir(p.c_str(), static_cast<mode_t>(ap));
+    auto err = ::mkdir(p.c_str(), static_cast<mode_t>(ap & perms::all));
     if (PS_UNEXPECTED(-1 == err && EINTR == errno)) {
-        err = ::mkdir(p.c_str(), static_cast<mode_t>(ap));
+        err = ::mkdir(p.c_str(), static_cast<mode_t>(ap & perms::all));
     }
-    return !err ? 0 : mkdir_err_policy{}(p);
+    if (!err) {
+        if (is_set(ap & perms::mask & ~perms::all)) { // set extended bits, mkdir does not support these directly
+            (void)::chmod(p.c_str(), static_cast<mode_t>(ap & perms::mask));
+        }
+        return 0;
+    } else {
+        return mkdir_err_policy{}(p);
+    }
 #else
     (void)ap;
     if (::CreateDirectoryW(p.c_str(), nullptr)) {
@@ -100,14 +107,14 @@ namespace prosoft {
 namespace filesystem {
 inline namespace v1 {
 
-bool create_directories(const path& p) {
+bool create_directories(const path& p, perms perm) {
     error_code ec;
-    const auto good = create_directories(p, ec);
+    const auto good = create_directories(p, perm, ec);
     PS_THROW_IF(!good, filesystem_error("create dirs failed", p, ec));
     return good;
 }
 
-bool create_directories(const path& p, error_code& ec) noexcept {
+bool create_directories(const path& p, perms perm, error_code& ec) noexcept {
     constexpr auto enoent =
 #if !_WIN32
     ENOENT;
@@ -115,27 +122,27 @@ bool create_directories(const path& p, error_code& ec) noexcept {
     ERROR_PATH_NOT_FOUND;
 #endif
     
-    if (create_directory(p, ec)) {
+    if (create_directory(p, perm, ec)) {
         return true;
     } else if (enoent == ec.value()) {
         const auto parent = p.parent_path();
-        if (create_directories(parent, ec)) {
-            return create_directory(p, ec);
+        if (create_directories(parent, perm, ec)) {
+            return create_directory(p, perm, ec);
         }
     }
     return false;
 }
 
-bool create_directory(const path& p) {
+bool create_directory(const path& p, perms perm) {
     error_code ec;
-    const auto good = create_directory(p, ec);
+    const auto good = create_directory(p, perm, ec);
     PS_THROW_IF(!good, filesystem_error("create dir failed", p, ec));
     return good;
 }
 
-bool create_directory(const path& p, error_code& ec) noexcept {
+bool create_directory(const path& p, perms perm, error_code& ec) noexcept {
     ec.clear();
-    const auto err = mkdir(p, perms::all);
+    const auto err = mkdir(p, perm);
     if (!err) {
         return true;
     } else {

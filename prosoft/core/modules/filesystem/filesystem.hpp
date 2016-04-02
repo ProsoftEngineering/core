@@ -395,11 +395,19 @@ inline path canonical(const path& p, error_code& ec) {
     return canonical(p, current_path(ec), ec);
 }
 
-bool create_directories(const path&);
-bool create_directories(const path&, error_code&) noexcept;
+// perms are an extension and ignored on Windows. perms:all is the std. default.
+bool create_directories(const path&, perms perm = perms::all);
+bool create_directories(const path&, perms, error_code&) noexcept;
+inline bool create_directories(const path& p, error_code& ec) noexcept {
+    return create_directories(p, perms::all, ec);
+}
 
-bool create_directory(const path&);
-bool create_directory(const path&, error_code&) noexcept;
+bool create_directory(const path&, perms perm = perms::all);
+bool create_directory(const path&, perms, error_code&) noexcept;
+inline bool create_directory(const path& p, error_code& ec) noexcept {
+    return create_directory(p, perms::all, ec);
+}
+
 bool create_directory(const path&, const path& cloneFrom);
 bool create_directory(const path&, const path& cloneFrom, error_code&) noexcept;
 
