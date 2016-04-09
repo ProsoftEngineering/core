@@ -306,6 +306,8 @@ TEST_CASE("u8string") {
         // test with std::string to ensure same behavior
         test_ascii_compare<std::string>();
         test_ascii_compare<u8string>();
+
+        CHECK(-1 == u8string::compare(0xffffffffU, 0xffffffffU)); // invalid codepoint compare
     }
 
     SECTION("iteration") {
@@ -588,6 +590,12 @@ TEST_CASE("u8string") {
         i = s.insert(i, s2.cbegin(), s2.cend());
         CHECK(s.length() == len + s2.length());
         CHECK((char32_t)'z' == *i);
+
+        len = s.length();
+        s.insert(len, u8string{"d"});
+        CHECK(s.length() == len+1);
+
+        CHECK_THROWS(s.insert(s.length()+1, u8string{"d"}));
 
         s = as_utf8("Amel");
         CHECK(s.is_ascii());
