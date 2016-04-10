@@ -594,10 +594,6 @@ bool u8string::is_ascii() const {
     return _u8._ascii;
 }
 
-bool u8string::is_valid() const {
-    return is_valid(_u8._s);
-}
-
 bool u8string::has_bom() const {
     static_assert(sizeof(utf8::bom) >= 3, "broken assumption");
     auto start = _u8._s.cbegin();

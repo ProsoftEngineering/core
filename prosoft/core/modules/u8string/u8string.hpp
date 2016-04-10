@@ -86,7 +86,7 @@ public:
 
     // XXX: conversions from other types are explicit as they may throw exceptions
     // XXX: DO NOT RELY on the resulting u8string raw bytes (str(), c_str()) comparing to the raw input bytes!
-    //      (Which are likely be transformed during normalization.)
+    //      (Which are likely to be transformed during normalization.)
     //      Only use the provided comparison methods to compare bytes in any form.
     //      Codepoint -- not char -- count (length) may also be different as well as byte count.
     explicit u8string(const std::string& other) {
@@ -281,7 +281,6 @@ public:
     PS_EXPORT u8string substr(size_type pos = 0, size_type length = npos) const;
 
     PS_EXPORT bool is_ascii() const;
-    PS_EXPORT bool is_valid() const;
     PS_EXPORT bool has_bom() const;
 
     // ==
