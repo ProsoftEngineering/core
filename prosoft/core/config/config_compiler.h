@@ -286,14 +286,9 @@
 
 #if __has_attribute(warn_unused_result) || defined(__GNUC__)
 #define PS_WARN_UNUSED_RESULT __attribute__((warn_unused_result))
+#elif _MSC_VER
+#define PS_WARN_UNUSED_RESULT _Check_return_
 #else
-// XXX: MSVC has _Check_return_ since VS2012, however it appears that attributes must appear at the beginning of a function instead of the end.
-#if defined(_MSC_VER)
-#define PS_WARN_UNUSED_RESULT_MSVC _Check_return_
-#else
-#define PS_WARN_UNUSED_RESULT_MSVC
-#endif
-//
 #define PS_WARN_UNUSED_RESULT
 #endif
 
