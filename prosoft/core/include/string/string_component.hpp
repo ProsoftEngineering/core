@@ -171,14 +171,14 @@ String& trim(String& str) {
 }
 
 template <class String, typename = typename std::enable_if<!std::is_lvalue_reference<String>::value>::type>
-String trim(String&& str) {
+String PS_WARN_UNUSED_RESULT trim(String&& str) {
     String s{std::move(str)};
     trim(s);
     return s;
 }
 
 template <class String>
-String trim(const String& str) {
+String PS_WARN_UNUSED_RESULT trim(const String& str) {
     String s{str};
     trim(s);
     return s;
