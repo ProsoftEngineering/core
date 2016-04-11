@@ -156,7 +156,7 @@ path canonical(const path& rp, const path& base, error_code& ec) {
     if (tmp) {
         return {tmp.get()};
     } else {
-        return {std::move(rp)};
+        return sp;
     }
 #endif
 }
