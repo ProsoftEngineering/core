@@ -88,7 +88,7 @@ path current_path(const Provider& cwd, error_code& ec) {
 }
 
 #if _WIN32
-template <typename T>
+template <typename T> // Templates are used just to avoid unused function warnings.
 T* fullpath(const T*) {PSASSERT(0, "BUG"); return nullptr;}
 template<>
 inline char* fullpath<char>(const char* p) {

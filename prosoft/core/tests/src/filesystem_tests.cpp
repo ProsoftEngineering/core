@@ -228,12 +228,14 @@ TEST_CASE("filesystem") {
         }
     }
 
+    const auto uniqueName = path{PS_TEXT("EC160FB0-4E55-46F5-B16D-8149A260FA27")};
+
     WHEN("comparing path equivalence") {
         const auto p = temp_directory_path();
         CHECK(equivalent(p, temp_directory_path()));
         CHECK_FALSE(equivalent(p.parent_path(), p));
 
-        const auto nop = current_path() / path{PS_TEXT("EC160FB0-4E55-46F5-B16D-8149A260FA27")};
+        const auto nop = current_path() / uniqueName;
         error_code ec;
         REQUIRE_FALSE(exists(nop, ec));
         CHECK_FALSE(equivalent(p, nop, ec));
@@ -249,20 +251,24 @@ TEST_CASE("filesystem") {
         }
     }
 
+    WHEN("setting the current path to an invalid dir") {
+        CHECK_THROWS(current_path(current_path().root_path() / uniqueName));
+    }
+
     WHEN("resolving a relative path") {
         const auto base = current_path();
-        const auto p = path{PS_TEXT("EC160FB0-4E55-46F5-B16D-8149A260FA27")};
+        const auto p = uniqueName;
         CHECK(canonical(p) == base / p);
     }
 
     WHEN("resolving a partial path") {
         const auto base = current_path();
-        const auto p = path{PS_TEXT("a")} / PS_TEXT("EC160FB0-4E55-46F5-B16D-8149A260FA27");
+        const auto p = path{PS_TEXT("a")} / uniqueName;
         CHECK(canonical(p) == base / p);
     }
 
     WHEN("resolving an absolute path") {
-        const auto p = current_path() / PS_TEXT("EC160FB0-4E55-46F5-B16D-8149A260FA27");
+        const auto p = current_path() / uniqueName;
         CHECK(canonical(p) == p);
     }
     
@@ -358,6 +364,14 @@ TEST_CASE("filesystem") {
             REQUIRE(exists(np, ec));
             CHECK(create_directory(np, p));
             
+            // Check fails with existing non-dir
+            REQUIRE(remove(np));
+            {
+                std::ofstream ts{np.c_str(), std::ios::binary};
+                REQUIRE(ts);
+            }
+            CHECK_THROWS(create_directory(np, p));
+
             REQUIRE(remove(p));
             REQUIRE(remove(np));
         }

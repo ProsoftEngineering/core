@@ -368,3 +368,49 @@ bool finfo(const path& p, ::BY_HANDLE_FILE_INFORMATION* info, error_code& ec) {
 } // v1
 } // filesystem
 } // prosoft
+
+#if PSTEST_HARNESS
+// Internal tests.
+#include "catch.hpp"
+
+TEST_CASE("filesystem internal") {
+    using namespace prosoft::filesystem;
+    
+    SECTION("file type") {
+        auto tft = to_file_type{};
+#if !_WIN32
+        struct stat sb;
+        sb.st_mode = S_IFBLK;
+        CHECK(tft(sb) == file_type::block);
+        sb.st_mode = S_IFCHR;
+        CHECK(tft(sb) == file_type::character);
+        sb.st_mode = S_IFDIR;
+        CHECK(tft(sb) == file_type::directory);
+        sb.st_mode = S_IFIFO;
+        CHECK(tft(sb) == file_type::fifo);
+        sb.st_mode = S_IFREG;
+        CHECK(tft(sb) == file_type::regular);
+        sb.st_mode = S_IFLNK;
+        CHECK(tft(sb) == file_type::symlink);
+        sb.st_mode = S_IFSOCK;
+        CHECK(tft(sb) == file_type::socket);
+
+        CHECK(tft(error_code{ENOENT, filesystem_category()}) == file_type::not_found);
+        CHECK(tft(error_code{EPERM, filesystem_category()}) == file_type::unknown);
+        CHECK(tft(error_code{EACCES, filesystem_category()}) == file_type::unknown);
+        CHECK(tft(error_code{EBUSY, filesystem_category()}) == file_type::none);
+#else
+        CHECK(tft(FILE_ATTRIBUTE_REPARSE_POINT) == file_type::directory);
+        CHECK(tft(FILE_ATTRIBUTE_DEVICE) == file_type::character);
+    
+        CHECK(tft(error_code{ERROR_FILE_NOT_FOUND, filesystem_category()}) == file_type::not_found);
+        CHECK(tft(error_code{ERROR_PATH_NOT_FOUND, filesystem_category()}) == file_type::not_found);
+        CHECK(tft(error_code{ERROR_ACCESS_DENIED, filesystem_category()}) == file_type::unknown);
+        CHECK(tft(error_code{ERROR_SHARING_VIOLATION, filesystem_category()}) == file_type::unknown);
+        CHECK(tft(error_code{ERROR_TOO_MANY_OPEN_FILES, filesystem_category()}) == file_type::unknown);
+        CHECK(tft(error_code{ERROR_BAD_NETPATH, filesystem_category()}) == file_type::unknown);
+        CHECK(tft(error_code{ERROR_INVALID_HANDLE, filesystem_category()}) == file_type::none);
+#endif
+    }
+}
+#endif // PSTEST_HARNESS

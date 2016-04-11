@@ -312,3 +312,36 @@ path ifilesystem::home_directory_path(const access_control_identity& cid, error_
 } // v1
 } // filesystem
 } // prosoft
+
+#if PSTEST_HARNESS
+// Internal tests.
+#include "catch.hpp"
+
+TEST_CASE("dirops internal") {
+    using namespace prosoft::filesystem;
+    
+    SECTION("directory exists") {
+        auto p = ""_p; // empty path fail
+        auto ec = error_code{0, filesystem_category()};
+        REQUIRE(ec.value() == 0);
+        REQUIRE(p.empty());
+        assert_directory_exists(p, ec);
+        CHECK(ec.value() != 0);
+
+        p = "adfhaosidufbasdfoiuabsdofiubasodbfaosdbfaosbdfoabsdf"_p; // not dir fail
+        ec.clear();
+        REQUIRE(ec.value() == 0);
+        REQUIRE_FALSE(p.empty());
+        assert_directory_exists(p, ec);
+        CHECK(ec.value() != 0);
+        CHECK(p.empty());
+
+        p = "test"_p;
+        ec = error_code{5, filesystem_category()}; // error fail
+        REQUIRE_FALSE(p.empty());
+        assert_directory_exists(p, ec);
+        CHECK(ec.value() == 5);
+        CHECK(p.empty());
+    }
+}
+#endif // PSTEST_HARNESS
