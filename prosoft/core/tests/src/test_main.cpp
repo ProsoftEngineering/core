@@ -31,7 +31,7 @@
 #define CATCH_CONFIG_RUNNER
 #include "catch.hpp"
 
-int main(int argc, char * const argv[])
+int main(int argc, char* argv[])
 {
 	int catchResult = Catch::Session().run(argc, argv);
 	
