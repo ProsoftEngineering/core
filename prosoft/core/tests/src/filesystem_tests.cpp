@@ -126,7 +126,7 @@ TEST_CASE("filesystem") {
         WHEN("replacing an entry filename") {
             const auto p = path{"/a/b/c"}.make_preferred();
             auto de = directory_entry{p};
-            de.replace_filename("d");
+            de.replace_filename(path{"d"});
             THEN("the entry path equals the input path") {
                 CHECK(de.path() == p.parent_path()/path{"d"});
             }

@@ -190,7 +190,7 @@ inline namespace v1 {
 path standard_directory_path(domain d, standard_directory sd, standard_directory_options sdo) {
     error_code ec;
     auto p = standard_directory_path(d, sd, sdo, ec);
-    PS_THROW_IF(ec.value(), filesystem_error("standard dir search failed", tostring(d,sd), ec));
+    PS_THROW_IF(ec.value(), filesystem_error("standard dir search failed", path{tostring(d,sd)}, ec));
     return p;
 }
 

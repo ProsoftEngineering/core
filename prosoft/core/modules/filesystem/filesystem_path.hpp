@@ -65,9 +65,23 @@ public:
     basic_path(const basic_path&);
     basic_path(basic_path&&) noexcept(std::is_nothrow_move_constructible<string_type>::value);
     template <class Source>
-    basic_path(const Source&);
+    explicit basic_path(const Source&);
+    // Implicit conversion
     template <class InputIterator>
     basic_path(InputIterator, InputIterator);
+    basic_path(const string_type& s)
+        : m_pathname(s) {}
+    basic_path(string_type&& s) noexcept(std::is_nothrow_move_constructible<string_type>::value)
+        : m_pathname(std::move(s)) {}
+    basic_path(value_type v)
+        : m_pathname(&v, 1) {}
+    basic_path(const_pointer p)
+        :  m_pathname(p) {}
+    basic_path(typename std::remove_const<typename std::remove_pointer<const_pointer>::type>::type* p)
+        :  m_pathname(p) {}
+    template <typename = typename std::enable_if<!std::is_same<value_type, encoding_value_type>::value>>
+    basic_path(encoding_value_type v)
+        :  m_pathname(&v, 1) {}
     /*
     template <class Source>
     basic_path(const Source&, const std::locale&);
@@ -97,9 +111,9 @@ public:
     basic_path& operator+=(const string_type&);
     basic_path& operator+=(const_pointer);
     basic_path& operator+=(value_type);
-    /*
     template <class Source>
     basic_path& operator+=(const Source&);
+    /*
     template <class EcharT>
     basic_path& operator+=(EcharT);
     */
@@ -174,11 +188,6 @@ public:
 
     iterator begin() const;
     iterator end() const;
-
-    // Extensions //
-    basic_path(string_type&& s) noexcept(std::is_nothrow_move_constructible<string_type>::value)
-        : m_pathname(std::move(s)) {}
-    // Extensions //
 
 private:
     const string_type& raw() const& noexcept {
@@ -448,6 +457,12 @@ template <class String>
 inline basic_path<String>& basic_path<String>::operator+=(value_type c) {
     m_pathname.push_back(c);
     return *this;
+}
+
+template <class String>
+template <class Source>
+inline basic_path<String>& basic_path<String>::operator+=(const Source& s) {
+    return concat(s);
 }
 
 template <class String>
