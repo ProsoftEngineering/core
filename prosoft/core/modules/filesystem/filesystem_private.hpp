@@ -43,15 +43,15 @@ using native_path_type = u16string;
 
 using to_native_path = to_string<native_path_type, path::string_type>;
 
-inline void error(int e, error_code& ec) {
+inline void error(int e, error_code& ec) noexcept {
     ec.assign(e, filesystem_category());
 }
 
-inline void system_error(error_code& ec) {
+inline void system_error(error_code& ec) noexcept {
     system::system_error(ec);
 }
 
-inline error_code system_error() {
+inline error_code system_error() noexcept {
     return system::system_error();
 }
 

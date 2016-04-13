@@ -127,7 +127,7 @@ inline path u8path(InputIterator first, InputIterator last) {
 }
 
 // Extensions
-inline const std::error_category& filesystem_category() {
+inline const std::error_category& filesystem_category() noexcept {
     return system::error_category();
 }
 // Extensions

@@ -38,11 +38,11 @@
 namespace prosoft {
 namespace system {
 
-inline const std::error_category& error_category() {
+inline const std::error_category& error_category() noexcept {
     return std::system_category();
 }
 
-inline const std::error_category& posix_category() {
+inline const std::error_category& posix_category() noexcept {
 #if !_WIN32
     return error_category();
 #else
@@ -52,7 +52,7 @@ inline const std::error_category& posix_category() {
 
 using error_code = std::error_code;
 
-inline void system_error(error_code& ec) {
+inline void system_error(error_code& ec) noexcept {
 // Using a temp var assures the global error is not perturbed by call optimizations that may clear its state.
 #if !_WIN32
     const auto e = errno;
@@ -62,7 +62,7 @@ inline void system_error(error_code& ec) {
     ec.assign(e, error_category());
 }
 
-inline error_code system_error() {
+inline error_code system_error() noexcept {
 // Ditto on the temp var.
 #if !_WIN32
     const auto e = errno;
@@ -75,10 +75,10 @@ inline error_code system_error() {
 // This takes a raw string because std::string may alloc mem and clear the global error state.
 inline std::system_error system_error(const char* msg) {
     auto ec = system_error(); // Ditto on temp var.
-    return std::system_error{ec, msg};
+    return std::system_error{ec, msg}; // can throw
 }
 
-inline void posix_error(error_code& ec) {
+inline void posix_error(error_code& ec) noexcept {
 #if !_WIN32
     return system_error(ec);
 #else
@@ -87,7 +87,7 @@ inline void posix_error(error_code& ec) {
 #endif
 }
 
-inline error_code posix_error() {
+inline error_code posix_error() noexcept {
 #if !_WIN32
     return system_error();
 #else
@@ -101,7 +101,7 @@ inline std::system_error posix_error(const char* msg) {
     return system_error(msg);
 #else
     auto ec = posix_error();
-    return std::system_error{ec, msg};
+    return std::system_error{ec, msg}; // can throw
 #endif
 }
 
