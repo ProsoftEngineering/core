@@ -181,6 +181,17 @@ TEST_CASE("filesystem") {
         REQUIRE(remove(p));
     }
     
+    WHEN("path is a device") {
+        path p {
+#if !_WIN32
+            "/dev/random"
+#else
+            R"(\\.\C:\)"
+#endif
+        };
+        CHECK(is_device_file(p));
+    }
+    
     WHEN("getting the temp dir") {
         error_code ec;
         const auto p = temp_directory_path(ec);
