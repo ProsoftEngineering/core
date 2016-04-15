@@ -292,7 +292,7 @@ TEST_CASE("regex internal") {
         syntax = nullptr;
         const auto opt = options(syntax_option_type::egrep, syntax);
         CHECK(ONIG_SYNTAX_GREP == syntax);
-        CHECK((opt & ONIG_OPTION_EXTEND));
+        CHECK(0 != (opt & ONIG_OPTION_EXTEND));
 
         syntax = nullptr;
         options(syntax_option_type::icase, syntax);

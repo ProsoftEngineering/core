@@ -178,15 +178,15 @@ SECTION("trim") {
 
 SECTION("replace_all") {
     S s("a,b,c");
-    CHECK(replace_all(s, S{","}, S{"."}));
+    CHECK(replace_all(s, S{","}, S{"."}) > 0);
     CHECK(s == "a.b.c");
-    CHECK(replace_all(s, S{"."}, S{".."}));
+    CHECK(replace_all(s, S{"."}, S{".."}) > 0);
     CHECK(s == "a..b..c");
     s = S{"a,b,c"};
-    CHECK_FALSE(replace_all(s, S{"d"}, S{"e"}));
-    CHECK(replace_all(s, S{","}, S{"."}, 2));
+    CHECK_FALSE(replace_all(s, S{"d"}, S{"e"}) > 0);
+    CHECK(replace_all(s, S{","}, S{"."}, 2) > 0);
     CHECK(s == "a,b.c");
     s = S{"a,b,c"};
-    CHECK(replace_all(s, S{","}, S{"."}, 1));
+    CHECK(replace_all(s, S{","}, S{"."}, 1) > 0);
     CHECK(s == "a.b.c");
 }

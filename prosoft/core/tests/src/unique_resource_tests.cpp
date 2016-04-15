@@ -1,4 +1,4 @@
-// Copyright © 2013-2015, Prosoft Engineering, Inc. (A.K.A "Prosoft")
+// Copyright © 2013-2016, Prosoft Engineering, Inc. (A.K.A "Prosoft")
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without
@@ -131,7 +131,7 @@ TEST_CASE("unique_resource") {
         windows::Handle h2;
         h.swap(h2);
         THEN("the handle values are swapped") {
-            CHECK(h.get() == NULL);
+            CHECK(h.get() == nullptr);
             CHECK(h2.get() == INVALID_HANDLE_VALUE);
         }
     }

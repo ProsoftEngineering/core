@@ -36,16 +36,15 @@ regex rx;
 SECTION("create") {
     static PS_CONSTEXPR const auto rx_default_flags = regex_constants::syntax_option_type::ruby;
     CHECK(rx.flags() == rx_default_flags);
-    // NULL is used instead of nullptr because MSVC considers nullptr ambiguous for operator<<().
-    CHECK(rx.crx() == NULL);
+    CHECK(rx.crx() == nullptr);
     
     const auto s = string("abcd");
     rx = s;
-    CHECK(rx.crx() != NULL);
+    CHECK(rx.crx() != nullptr);
  
     regex rx2(string("abcd"));
     CHECK(rx2.flags() == rx_default_flags);
-    CHECK(rx2.crx() != NULL);
+    CHECK(rx2.crx() != nullptr);
     
     auto crx = rx2.crx();
     auto flags = rx2.flags();
@@ -55,13 +54,13 @@ SECTION("create") {
     CHECK(crx == rx3.crx());
     CHECK(flags == rx3.flags());
     CHECK(pat == rx3.pattern());
-    CHECK(rx2.crx() == NULL);
+    CHECK(rx2.crx() == nullptr);
     CHECK(rx2.flags() == rx_default_flags);
     CHECK(rx2.pattern().size() == 0);
     
     regex rx4(string("ABCD"), regex::icase);
     CHECK(rx4.flags() == regex::icase);
-    CHECK(rx4.crx() != NULL);
+    CHECK(rx4.crx() != nullptr);
     CHECK(rx4.pattern() == string("ABCD"));
     
     // operator= are just aliases for assign
@@ -71,13 +70,13 @@ SECTION("create") {
     CHECK(rx4.flags() == rx3.flags());
     CHECK(rx4.pattern() == rx3.pattern());
     CHECK_FALSE(rx4.crx() == rx3.crx());
-    CHECK(rx4.crx() != NULL);
+    CHECK(rx4.crx() != nullptr);
     
     rx4.assign(string("ABCD"), regex::icase);
     CHECK_FALSE(rx4.flags() == rx3.flags());
     CHECK_FALSE(rx4.pattern() == rx3.pattern());
     CHECK(rx4.flags() == regex::icase);
-    CHECK(rx4.crx() != NULL);
+    CHECK(rx4.crx() != nullptr);
     CHECK(rx4.pattern() == string("ABCD"));
     
     crx = rx4.crx();
@@ -87,7 +86,7 @@ SECTION("create") {
     CHECK(crx == rx3.crx());
     CHECK(flags == rx3.flags());
     CHECK(pat == rx3.pattern());
-    CHECK(rx4.crx() == NULL);
+    CHECK(rx4.crx() == nullptr);
     CHECK(rx4.flags() == rx_default_flags);
     CHECK(rx4.pattern().size() == 0);
     
@@ -95,7 +94,7 @@ SECTION("create") {
     CHECK(crx == rx4.crx());
     CHECK(flags == rx4.flags());
     CHECK(pat == rx4.pattern());
-    CHECK(rx3.crx() == NULL);
+    CHECK(rx3.crx() == nullptr);
     CHECK(rx3.flags() == rx_default_flags);
     CHECK(rx3.pattern().size() == 0);
 }

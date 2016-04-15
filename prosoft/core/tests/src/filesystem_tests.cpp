@@ -44,21 +44,21 @@ TEST_CASE("filesystem") {
         
         WHEN("creating an error with standard args") {
             filesystem_error e{description, error_code{1, filesystem_category()}};
-            CHECK(e.what() != NULL); // what() is implementation defined by std::system_error(), but it will include the description
+            CHECK(e.what() != nullptr); // what() is implementation defined by std::system_error(), but it will include the description
             CHECK(e.code().value() == 1);
             CHECK(e.path1().empty());
             CHECK(e.path2().empty());
         }
         WHEN("creating an error with a single path") {
             filesystem_error e{description, p, error_code{1, filesystem_category()}};
-            CHECK(e.what() != NULL); // MSVC 2013 does not have operator<<() for nullptr, which catch requires
+            CHECK(e.what() != nullptr);
             CHECK(e.code().value() == 1);
             CHECK(e.path1() == p);
             CHECK(e.path2().empty());
         }
         WHEN("creating an error with a two paths") {
             filesystem_error e{description, p, p, error_code{1, filesystem_category()}};
-            CHECK(e.what() != NULL);
+            CHECK(e.what() != nullptr);
             CHECK(e.code().value() == 1);
             CHECK(e.path1() == p);
             CHECK(e.path2() == p);
