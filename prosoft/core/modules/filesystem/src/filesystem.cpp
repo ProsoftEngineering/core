@@ -197,6 +197,7 @@ struct to_perms {
                 pp = perms::none;
                 const auto first = al.begin();
                 const auto last = al.end();
+                // XXX: if an identity exists more than once in the ACL, find only returns the first instance.
                 auto i = find(first, last, o.user());
                 if (i != last) {
                     pp |= user_perms(i->perms());
@@ -206,13 +207,23 @@ struct to_perms {
                 if (i != last) {
                     pp |= group_perms(i->perms());
                 }
-                // if everyone is present it may define perms that the group does not
-                i = find(first, last, access_control_identity::everyone_group());
-                if (i != last) {
-                    pp |= group_perms(i->perms());
+                
+                // if we are not the owner check our membership in groups for "other" perms
+                if (o.user() != access_control_identity::effective_user()) {
+                    for (const auto& ae : al) {
+                        std::error_code ec;
+                        if (is_member(ae.identity(), ec)) {
+                            pp |= other_perms(ae.perms());
+                        }
+                    }
                 }
 
-                PSASSERT(pp != perms::none, "WTF?");
+                if (perms::none == pp) {
+                    // owner and group were not found in the ACL. This can happen with devices or other system files.
+                    // (e.g. C: is owned by TrustedInstaller, but that ID may not have an explicit ACE set).
+                    pp = perms::owner_read; // guess
+                }
+
                 ident = std::move(o);
             }
         }
