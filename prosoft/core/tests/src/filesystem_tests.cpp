@@ -180,6 +180,18 @@ TEST_CASE("filesystem") {
         
         REQUIRE(remove(p));
     }
+
+    WHEN("path is a symlink/junction") {
+#if _WIN32
+        auto p = path{R"(C:\Users\All Users)"}; // symlink (Since Vista)
+        CHECK_FALSE(is_directory(p));
+        CHECK(is_symlink(p));
+
+        p = path{R"(C:\Users\Default User)"}; // junction (ditto)
+        CHECK_FALSE(is_symlink(p));
+        CHECK(is_directory(p));
+#endif
+    }
     
     WHEN("path is a device") {
         path p {
