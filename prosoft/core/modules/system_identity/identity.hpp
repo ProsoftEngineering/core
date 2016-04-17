@@ -29,6 +29,7 @@
 #include <climits>
 #include <limits>
 #include <memory>
+#include <system_error>
 
 #include <prosoft/core/config/config.h>
 
@@ -248,6 +249,17 @@ inline bool is_user(const identity& lhs) noexcept {
 
 inline bool is_group(const identity& lhs) noexcept {
     return lhs.type() == identity_type::group;
+}
+
+// XXX: for Win32 this will always error out for anything but effective_user()
+bool is_member(const identity& user, const identity& group);
+bool is_member(const identity& user, const identity& group, std::error_code&);
+
+inline bool is_member(const identity& group) {
+    return is_member(identity::effective_user(), group);
+}
+inline bool is_member(const identity& group, std::error_code& ec) {
+    return is_member(identity::effective_user(), group, ec);
 }
 
 bool exists(const identity&); // false if unknown or if known and the identity does not exist on the current system

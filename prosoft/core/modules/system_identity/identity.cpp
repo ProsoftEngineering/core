@@ -650,6 +650,34 @@ prosoft::system::identity prosoft::system::identity::console_user() {
     return invalid_user(); // lookup has failed
 }
 
+bool prosoft::system::is_member(const identity& user, const identity& group) {
+    std::error_code ec;
+    const bool val = prosoft::system::is_member(user, group, ec);
+    PS_THROW_IF(ec.value(), std::system_error(ec, "group member check failed"));
+    return val;
+}
+
+bool prosoft::system::is_member(const identity& user, const identity& group, std::error_code& ec) {
+    ec.clear();
+#if _WIN32
+    // Should we use NetLocalGroupGetMembers? Or is there some Nt sub-system function?
+    if (user != identity::effective_user()) {
+        ec.assign(ERROR_INVALID_PARAMETER, error_category());
+        return false;
+    }
+
+    BOOL val = false;
+    if (::CheckTokenMembership(nullptr, group.system_identity(), &val)) {
+        return val == TRUE;
+    } else {
+        system_error(ec);
+    }
+#else
+    ec.assign(ENOTSUP, error_category());
+#endif
+    return false;
+}
+
 bool prosoft::system::exists(const prosoft::system::identity& i) {
     return i && !is_unknown(i) && SIDProperties(i);
 }
