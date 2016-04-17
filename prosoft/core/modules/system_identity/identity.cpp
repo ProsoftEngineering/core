@@ -107,12 +107,28 @@ inline sid_ptr make_admin_group_sid() {
     return s;
 }
 
+#if notyet
+inline sid_ptr make_users_group_sid() {
+    SID_IDENTIFIER_AUTHORITY auth = SECURITY_NT_AUTHORITY;
+    sid_ptr s;
+    (void)::AllocateAndInitializeSid(&auth, 2, SECURITY_BUILTIN_DOMAIN_RID, DOMAIN_ALIAS_RID_USERS, 0, 0, 0, 0, 0, 0, prosoft::handle(s));
+    return s;
+}
+
+inline sid_ptr make_authenticated_users_group_sid() {
+    SID_IDENTIFIER_AUTHORITY auth = SECURITY_NT_AUTHORITY;
+    sid_ptr s;
+    (void)::AllocateAndInitializeSid(&auth, 1, SECURITY_AUTHENTICATED_USER_RID, 0, 0, 0, 0, 0, 0, 0, prosoft::handle(s));
+    return s;
+}
+
 inline sid_ptr make_everyone_group_sid() {
     SID_IDENTIFIER_AUTHORITY auth = SECURITY_WORLD_SID_AUTHORITY;
     sid_ptr s;
     (void)::AllocateAndInitializeSid(&auth, 1, SECURITY_WORLD_RID, 0, 0, 0, 0, 0, 0, 0, prosoft::handle(s));
     return s;
 }
+#endif //notyet
 
 class SIDProperties {
     prosoft::native_string_type m_name;
@@ -537,8 +553,8 @@ prosoft::system::identity identity::thread_user() {
     }
 }
 
-const prosoft::system::identity& identity::everyone_group() {
-    static const identity eid{make_everyone_group_sid().get()};
+const prosoft::system::identity& identity::admin_group() {
+    static const identity eid{make_admin_group_sid().get()};
     return eid;
 }
 

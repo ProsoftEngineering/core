@@ -57,7 +57,7 @@ TEST_CASE("system_identity") {
             CHECK_FALSE(i.account_name().empty());
 
 #if _WIN32
-            i = identity::everyone_group();
+            i = identity::admin_group();
             CHECK(i);
             CHECK(exists(i));
             CHECK_FALSE(i.account_name().empty());

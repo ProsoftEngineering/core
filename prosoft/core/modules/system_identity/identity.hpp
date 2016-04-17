@@ -165,7 +165,7 @@ public:
 
 #if _WIN32
     static identity thread_user();
-    static const identity& everyone_group();
+    static const identity& admin_group();
 #endif
 
     // Invalid identities
