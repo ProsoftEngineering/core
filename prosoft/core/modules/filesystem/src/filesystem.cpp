@@ -106,6 +106,10 @@ inline file_status link_stat(const path& p, error_code& ec) noexcept {
 
 #else
 
+inline bool is_device_path(const path& p) {
+    return prosoft::starts_with(p.native(), ifilesystem::unc_prefix_device<path::string_type>());
+}
+
 struct to_file_type {
     file_type operator()(const ifilesystem::native_path_type& p, DWORD attrs) const noexcept { // resolve reparse points
         auto ft = file_type::unknown; // default to unknown
@@ -118,6 +122,8 @@ struct to_file_type {
                     ft = file_type::directory;
                 }
             }
+        } else if (is_device_path(p)) {
+            ft = file_type::character;
         } else {
             ft = operator()(attrs);
         }
@@ -248,7 +254,7 @@ file_status file_stat(const path& p, error_code& ec, bool link) noexcept {
         return file_status{!link ? get_type(np, attrs) : get_type(attrs), ap, std::move(o)};
     } else {
         ifilesystem::system_error(ec);
-        if (prosoft::starts_with(p.native(), ifilesystem::unc_prefix_device<path::string_type>())) {
+        if (is_device_path(p)) {
             return file_status{to_file_type{}(FILE_ATTRIBUTE_DEVICE)}; // We know the type from the path, so return it.
         } else {
             return file_status{to_file_type{}(ec)};
