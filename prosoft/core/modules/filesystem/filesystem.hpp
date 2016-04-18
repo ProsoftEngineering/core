@@ -517,23 +517,6 @@ inline bool is_other(const path& p, error_code& ec) noexcept {
     return is_other(status(p, ec));
 }
 
-// Extensions
-
-// FreeBSD dropped block devices a while ago, Windows never supported block devices and Linux does not have disk char devices.
-// Therefore in most cases all you should care about is if the file is a device file and not what type of device.
-
-inline bool is_device_file(file_status s) noexcept {
-    return is_character_file(s) || is_block_file(s);
-}
-inline bool is_device_file(const path& p) {
-    return is_device_file(status(p));
-}
-inline bool is_device_file(const path& p, error_code& ec) noexcept {
-    return is_device_file(status(p, ec));
-}
-
-// Extensions
-
 // dir entry ops
 inline file_status directory_entry::status() const {
     return prosoft::filesystem::status(get_path());
@@ -552,13 +535,35 @@ path temp_directory_path();
 path temp_directory_path(error_code&);
 
 // Extensions
+
+// FreeBSD dropped block devices a while ago, Windows never supported block devices and Linux does not have disk char devices.
+// Therefore in most cases all you should care about is if the file is a device file and not what type of device.
+
+inline bool is_device_file(file_status s) noexcept {
+    return is_character_file(s) || is_block_file(s);
+}
+inline bool is_device_file(const path& p) {
+    return is_device_file(status(p));
+}
+inline bool is_device_file(const path& p, error_code& ec) noexcept {
+    return is_device_file(status(p, ec));
+}
+
+bool is_mountpoint(const path&);
+bool is_mountpoint(const path&, error_code&);
+
 namespace ifilesystem {
 path home_directory_path(const access_control_identity&, error_code&); // private as Windows only supports the current user
 } // ifilesystem
+
 path home_directory_path(); // XXX: UNIX daemon users may not have a home dir.
 inline path home_directory_path(error_code& ec) {
     return ifilesystem::home_directory_path(access_control_identity::process_user(), ec);
 }
+
+// The filesystem mount point for the given path. This may differ from path.root_path().
+path mount_path(const path&);
+path mount_path(const path&, error_code&);
 
 enum class domain {
     user, // XXX: UNIX daemon users may not have a home dir for relative sub-paths.

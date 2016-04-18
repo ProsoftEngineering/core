@@ -190,6 +190,7 @@ TEST_CASE("filesystem") {
         p = path{R"(C:\Users\Default User)"}; // junction (ditto)
         CHECK_FALSE(is_symlink(p));
         CHECK(is_directory(p));
+        CHECK(is_mountpoint(p));
 #endif
     }
     
@@ -324,7 +325,60 @@ TEST_CASE("filesystem") {
     }
 #endif
 
-    WHEN("getting cache dir path") {
+    WHEN("getting the mount path for an empty path") {
+        CHECK_THROWS(mount_path(""_p));
+        CHECK_THROWS(is_mountpoint(""_p));
+    }
+    
+    WHEN("getting the mount path for a non-existant path") {
+        auto p = temp_directory_path() / uniqueName;
+        error_code ec;
+        REQUIRE_FALSE(exists(p, ec));
+        CHECK_THROWS(mount_path(p));
+        CHECK_THROWS(is_mountpoint(p));
+        
+        p = ".."_p / uniqueName;
+        REQUIRE_FALSE(exists(p, ec));
+        CHECK_THROWS(mount_path(p));
+        CHECK_THROWS(is_mountpoint(p));
+    }
+    
+    WHEN("getting the mount path for a path") {
+        const auto p = temp_directory_path();
+        error_code ec;
+        REQUIRE(exists(p, ec));
+        
+        const auto mp = mount_path(p, ec);
+        CHECK(ec.value() == 0);
+        REQUIRE_FALSE(mp.empty());
+        CHECK(is_directory(mp));
+        CHECK(is_mountpoint(mp));
+        
+        // Relative path check
+        const auto fp = p / uniqueName;
+        REQUIRE_FALSE(exists(fp, ec));
+        {
+            std::ofstream ts{fp.c_str(), std::ios::binary};
+            REQUIRE(ts);
+        }
+        CHECK_FALSE(is_mountpoint(fp));
+        
+        current_path(temp_directory_path());
+        const auto rp = fp.filename();
+        REQUIRE(equivalent(canonical(rp), fp));
+        CHECK(mount_path(rp, ec) == mp);
+        
+        REQUIRE(remove(fp));
+    };
+    
+    WHEN("getting the mount path for a mount path") {
+        error_code ec;
+        const auto mp = mount_path(temp_directory_path(), ec);
+        REQUIRE_FALSE(mp.empty());
+        CHECK(mount_path(mp, ec) == mp);
+    }
+
+    WHEN("getting the cache dir") {
         error_code ec;
         CHECK_NOTHROW(cache_directory_path());
         const auto p = cache_directory_path(ec);

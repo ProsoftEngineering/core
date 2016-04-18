@@ -46,6 +46,10 @@ target_include_directories(${fs_lib}
     ${PSFS}
 )
 
+if(APPLE)
+    target_link_libraries(${fs_lib} PUBLIC "-framework CoreFoundation")
+endif()
+
 if(WIN32)
     target_link_libraries(${fs_lib} PUBLIC "shell32")
 endif()
