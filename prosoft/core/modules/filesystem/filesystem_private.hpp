@@ -74,7 +74,44 @@ inline windows::Handle open(const path& p, DWORD accessMode, error_code& ec) {
     return open(p, accessMode, FILE_SHARE_READ|FILE_SHARE_WRITE, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, ec);
 }
 
-inline bool finfo(const path&s, ::BY_HANDLE_FILE_INFORMATION*, error_code& ec);
+bool finfo(const path&, ::BY_HANDLE_FILE_INFORMATION*, error_code&);
+
+struct FAttrs {
+    DWORD attrs;
+    
+    FAttrs() noexcept : attrs(0) {}
+    FAttrs(DWORD a) noexcept : attrs(a) {}
+    PS_DEFAULT_COPY(FAttrs);
+    
+    explicit operator bool() const noexcept {
+        return INVALID_FILE_ATTRIBUTES != attrs;
+    }
+    
+    operator DWORD() const noexcept {
+        return attrs;
+    }
+};
+
+inline FAttrs fattrs(const path& p, error_code& ec) {
+    auto&& np = ifilesystem::to_native_path{}(p.native());
+    const DWORD attrs = ::GetFileAttributesW(np.c_str());
+    if (INVALID_FILE_ATTRIBUTES != attrs) {
+        ;
+    } else {
+        system_error(ec);
+    }
+    return {attrs};
+}
+
+inline bool fattrs(const path& p, DWORD flags, error_code& ec) {
+    PSASSERT(flags != 0, "BUG");
+    return flags == (fattrs(p, ec) & flags);
+}
+
+inline bool fattrs(const path& p, DWORD flags) {
+    error_code ec;
+    return fattrs(p, flags, ec);
+}
 #endif
 
 } // ifilesystem

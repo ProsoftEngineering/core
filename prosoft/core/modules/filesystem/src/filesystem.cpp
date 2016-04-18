@@ -244,13 +244,12 @@ private:
 };
 
 file_status file_stat(const path& p, error_code& ec, bool link) noexcept {
-    auto&& np = ifilesystem::to_native_path{}(p.native());
-    const auto attrs = ::GetFileAttributesW(np.c_str());
-    if (INVALID_FILE_ATTRIBUTES != attrs) {
+    if (const auto attrs = ifilesystem::fattrs(p, ec)) {
         ec.clear();
         const auto get_type = to_file_type{};
         auto o = owner::invalid_owner();
         auto ap = to_perms{}(p, o, ec);
+        auto&& np = ifilesystem::to_native_path{}(p.native());
         return file_status{!link ? get_type(np, attrs) : get_type(attrs), ap, std::move(o)};
     } else {
         ifilesystem::system_error(ec);
@@ -380,7 +379,7 @@ bool finfo(const path& p, ::BY_HANDLE_FILE_INFORMATION* info, error_code& ec) {
 }
 
 } // ifilesystem
-#endif
+#endif // _WIN32
 
 } // v1
 } // filesystem
