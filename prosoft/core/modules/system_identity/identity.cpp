@@ -60,14 +60,18 @@ inline bool is_unknown(const identity& lhs) noexcept {
 struct to_identity_type {
     identity_type operator()(::SID_NAME_USE t) {
         switch (t) {
-            case SidTypeUser: return identity_type::user;
+            case SidTypeUser:
+                return identity_type::user;
+            case SidTypeAlias: // A local group aliased to a BUILTIN group.
             case SidTypeGroup:
-            case SidTypeWellKnownGroup: return identity_type::group;
+            case SidTypeWellKnownGroup:
+                return identity_type::group;
             case SidTypeDeletedAccount:
             case SidTypeUnknown:
                 return identity_type::unknown;
             //XXX: TokenLogonSid has an unlisted type of 11
-            default: return identity_type::other;
+            default:
+                return identity_type::other;
         }
     }
 
