@@ -67,7 +67,8 @@ public:
     // XXX: -3: assuming we never see this in the wild. OS X uses -2 for user nobody that.
     static constexpr const auto unknown_system_identity = invalid_system_identity - 2;
 
-    explicit identity(identity_type t, system_identity_type sid) noexcept : m_type(t), m_sid(sid) {}
+    explicit identity(identity_type t, system_identity_type sid) noexcept
+        : m_type(t), m_sid(sid) {}
 #if __APPLE__
     explicit identity(const guid_t*);
     explicit identity(const guid_t& g)
@@ -166,7 +167,13 @@ public:
 
 #if _WIN32
     static identity thread_user();
+#else
+    static identity root_user() {
+        return identity(identity_type::user, 0);
+    }
 #endif
+
+    static const identity& admin_group();
 
     // Invalid identities
     static identity invalid_user() {
@@ -177,8 +184,6 @@ public:
         aci.m_type = identity_type::user;
         return aci;
     }
-    
-    static const identity& admin_group();
 
     static identity invalid_group() {
         identity aci;
@@ -215,7 +220,7 @@ private:
     }
 
 #if __APPLE__
-    bool equal_sid(const guid_t& guid) const {
+    bool equal_sid(const guid_t& guid) const noexcept {
         return 0 == std::memcmp(&m_guid, &guid, sizeof(guid_t));
     }
 #endif

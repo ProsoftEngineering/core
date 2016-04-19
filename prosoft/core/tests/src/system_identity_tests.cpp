@@ -194,4 +194,18 @@ TEST_CASE("system_identity") {
             CHECK((i == i2));
         }
     }
+    
+    WHEN("checking membership for the invalid user") {
+        CHECK_THROWS(is_member(identity::invalid_user(), identity::admin_group()));
+    }
+    
+    WHEN("checking membership in the invalid group") {
+        CHECK_THROWS(is_member(identity::effective_user(), identity::invalid_user()));
+    }
+    
+#if !_WIN32
+    WHEN("checking membership of root in the admin group") {
+        CHECK(is_member(identity::root_user(), identity::admin_group()));
+    }
+#endif
 }

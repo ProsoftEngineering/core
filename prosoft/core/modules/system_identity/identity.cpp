@@ -33,6 +33,7 @@
 #include <stdlib.h>
 #include <stdlib.h>
 #include <sys/types.h>
+#include <cstring>
 #include <vector>
 #else
 #include <prosoft/core/config/config_windows.h>
@@ -428,9 +429,17 @@ public:
             return (*group())->gr_name;
         }
     }
+    
+    identity::system_identity_type primary_group() const {
+        if (user()) {
+            return (*m_pwd)->pw_gid;
+        } else {
+            return (*group())->gr_gid;
+        }
+    }
 };
 
-inline constexpr gid_t make_admin_group_sid() { return 0; }
+inline constexpr gid_t make_admin_group_sid() { return 0; } // wheel for *BSD, root for modern linux (of which root user is the only member)
 #endif // _WIN32
 
 } // anon
@@ -671,7 +680,7 @@ prosoft::system::identity prosoft::system::identity::console_user() {
 }
 
 const prosoft::system::identity& identity::admin_group() {
-    static const identity eid{
+    static const identity eid {
 #if _WIN32
         make_admin_group_sid().get()
 #else
@@ -689,7 +698,13 @@ bool prosoft::system::is_member(const identity& user, const identity& group) {
 }
 
 bool prosoft::system::is_member(const identity& user, const identity& group, std::error_code& ec) {
+    if (!user || !group) {
+        ec.assign(EINVAL, posix_category());
+        return false;
+    }
+    
     ec.clear();
+    
 #if _WIN32
     // Should we use NetLocalGroupGetMembers? Or is there some Nt sub-system function?
     if (user != identity::effective_user()) {
@@ -704,8 +719,38 @@ bool prosoft::system::is_member(const identity& user, const identity& group, std
         system_error(ec);
     }
 #else
-    ec.assign(ENOTSUP, error_category());
-#endif
+    const auto u = SIDProperties(user);
+    const auto g = SIDProperties(group);
+    if (u && g) {
+#if __APPLE__
+        return static_cast<bool>(::CSIdentityIsMemberOfGroup(u, g));
+#else
+        using group_list = std::vector<identity::system_identity_type>;
+        static constexpr size_t ngroups = 16;
+        group_list groups(ngroups);
+        const auto uname = u.account_name();
+        int totalCount = ngroups;
+        int count = ::getgrouplist(uname.c_str(), u.primary_group(), groups.data(), &totalCount);
+        if (count > 0 && totalCount > count) {
+            groups.resize(totalCount);
+            count = ::getgrouplist(uname.c_str(), u.primary_group(), groups.data(), &totalCount);
+        }
+        if (count < 0) {
+            system_error(ec);
+            return false;
+        }
+        
+        for (int i = 0; i < count; ++i) {
+            if (groups[i] == g.primary_group()) {
+                return true;
+            }
+        }
+        return false; // not found, return without error
+#endif // __APPLE__
+    } else {
+        ec.assign(ENOENT, error_category());
+    }
+#endif // _WIN32
     return false;
 }
 
