@@ -166,7 +166,6 @@ public:
 
 #if _WIN32
     static identity thread_user();
-    static const identity& admin_group();
 #endif
 
     // Invalid identities
@@ -178,6 +177,8 @@ public:
         aci.m_type = identity_type::user;
         return aci;
     }
+    
+    static const identity& admin_group();
 
     static identity invalid_group() {
         identity aci;

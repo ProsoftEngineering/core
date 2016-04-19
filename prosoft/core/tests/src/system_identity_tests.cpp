@@ -55,20 +55,12 @@ TEST_CASE("system_identity") {
             CHECK(i);
             CHECK(exists(i));
             CHECK_FALSE(i.account_name().empty());
-
-#if _WIN32
+            
             i = identity::admin_group();
-            CHECK(i);
-            CHECK(exists(i));
-            CHECK_FALSE(i.account_name().empty());
-#else
-            // Group test
-            i = identity{identity_type::group, 0};
             CHECK(i);
             CHECK(is_group(i));
             CHECK(exists(i));
             CHECK_FALSE(i.account_name().empty());
-#endif
         }
     }
 

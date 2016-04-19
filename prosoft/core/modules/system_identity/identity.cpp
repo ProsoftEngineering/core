@@ -186,6 +186,17 @@ public:
             }
         }
     }
+    SIDProperties(CFStringRef name, identity_type t) {
+        const auto csclass = identity_type::user == t ? kCSIdentityClassUser : kCSIdentityClassGroup;
+        CSIdentityQuery_t query{::CSIdentityQueryCreateForName(kCFAllocatorDefault, name, kCSIdentityQueryStringEquals,
+            csclass, ::CSGetDefaultIdentityAuthority())};
+        if (query) {
+            if (CSIdentityQueryExecute(query.get(), kCSIdentityQueryIncludeHiddenIdentities, nullptr)) {
+                m_results.reset(::CSIdentityQueryCopyResults(query.get()));
+            }
+        }
+    }
+    
     PS_DEFAULT_DESTRUCTOR(SIDProperties);
     PS_DISABLE_COPY(SIDProperties);
     PS_DEFAULT_MOVE(SIDProperties);
@@ -221,7 +232,19 @@ public:
     prosoft::native_string_type account_name() const {
         return prosoft::from_CFString<prosoft::native_string_type>{}(AccountName());
     }
+    
+    identity::system_identity_type system_identity() const {
+        return ::CSIdentityGetPosixID(*this);
+    }
 };
+
+gid_t make_admin_group_sid() {
+    if (const auto sid = SIDProperties(CFSTR("admin"), identity_type::group)) {
+        return sid.system_identity();
+    } else {
+        return 0; // wheel, by default root is the only member
+    }
+}
 #else
 #define PS_USING_PASSWD_API
 
@@ -406,6 +429,8 @@ public:
         }
     }
 };
+
+inline constexpr gid_t make_admin_group_sid() { return 0; }
 #endif // _WIN32
 
 } // anon
@@ -553,11 +578,6 @@ prosoft::system::identity identity::thread_user() {
     }
 }
 
-const prosoft::system::identity& identity::admin_group() {
-    static const identity eid{make_admin_group_sid().get()};
-    return eid;
-}
-
 #endif // !_WIN32
 
 prosoft::native_string_type prosoft::system::identity::name() const {
@@ -648,6 +668,17 @@ prosoft::system::identity prosoft::system::identity::console_user() {
 #endif
 
     return invalid_user(); // lookup has failed
+}
+
+const prosoft::system::identity& identity::admin_group() {
+    static const identity eid{
+#if _WIN32
+        make_admin_group_sid().get()
+#else
+        identity_type::group, make_admin_group_sid()
+#endif
+    };
+    return eid;
 }
 
 bool prosoft::system::is_member(const identity& user, const identity& group) {
