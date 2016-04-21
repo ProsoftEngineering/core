@@ -295,7 +295,6 @@ file_status file_stat(const path& p, error_code& ec, bool link) noexcept {
         auto&& np = ifilesystem::to_native_path{}(p.native());
         return file_status{!link ? get_type(np, attrs) : get_type(attrs), ap, std::move(o), times()};
     } else {
-        ifilesystem::system_error(ec);
         if (is_device_path(p)) {
             return file_status{to_file_type{}(FILE_ATTRIBUTE_DEVICE)}; // We know the type from the path, so return it.
         } else {
