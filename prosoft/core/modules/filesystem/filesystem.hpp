@@ -28,6 +28,7 @@
 #ifndef PS_CORE_FILESYSTEM_HPP
 #define PS_CORE_FILESYSTEM_HPP
 
+#include <chrono>
 #include <functional>
 #include <iomanip>
 #include <iostream>
@@ -47,6 +48,8 @@ using error_code = std::error_code; // Extension
 namespace prosoft {
 namespace filesystem {
 inline namespace v1 {
+
+using file_time_type = std::chrono::time_point<std::chrono::system_clock>;
 
 inline void swap(path& lhs, path& rhs) noexcept(noexcept(std::declval<path>().swap(std::declval<path&>()))) {
     lhs.swap(rhs);
@@ -269,20 +272,88 @@ inline bool operator!=(const owner& lhs, const owner& rhs) {
     return !lhs.operator==(rhs);
 }
 
+class times {
+    file_time_type m_modifyTime;
+    file_time_type m_changeTime;
+    file_time_type m_accessTime;
+    file_time_type m_createTime;
+    
+    static constexpr file_time_type m_invalidTime = file_time_type::min();
+    
+public:
+    times()
+        : m_modifyTime(m_invalidTime)
+        , m_changeTime(m_invalidTime)
+        , m_accessTime(m_invalidTime)
+        , m_createTime(m_invalidTime) {}
+    PS_DEFAULT_COPY(times);
+    PS_DEFAULT_MOVE(times);
+    
+    const file_time_type& modified() const noexcept {
+        return m_modifyTime;
+    }
+    
+    void modified(const file_time_type& val) {
+        m_modifyTime = val;
+    }
+    
+    bool has_modified() const noexcept {
+        return m_modifyTime != m_invalidTime;
+    }
+    
+    const file_time_type& metadata_modified() const noexcept {
+        return m_changeTime;
+    }
+    
+    void metadata_modified(const file_time_type& val) {
+        m_changeTime = val;
+    }
+    
+    bool has_metadata_modified() const noexcept {
+        return m_changeTime != m_invalidTime;
+    }
+    
+    const file_time_type& accessed() const noexcept {
+        return m_accessTime;
+    }
+    
+    void accessed(const file_time_type& val) {
+        m_accessTime = val;
+    }
+    
+    bool has_accessed() const noexcept {
+        return m_accessTime != m_invalidTime;
+    }
+    
+    const file_time_type& created() const noexcept {
+        return m_createTime;
+    }
+    
+    void created(const file_time_type& val) {
+        m_createTime = val;
+    }
+    
+    bool has_created() const noexcept {
+        return m_createTime != m_invalidTime;
+    }
+};
+
 // Extensions
 
 class file_status {
     using owner_type = filesystem::owner;
-
+    using times_type = filesystem::times;
+    
 public:
-    file_status(file_type ft, perms p, owner_type&& o)
+    file_status(file_type ft, perms p, owner_type&& o, const times_type& t)
         : m_owner(std::move(o))
+        , m_times(t)
         , m_type(ft)
         , m_perms(p) {}
-    file_status(file_type ft, perms p, const owner_type& o)
-        : file_status(ft, p, owner_type{o}) {}
+    file_status(file_type ft, perms p, const owner_type& o, const times_type& t)
+        : file_status(ft, p, owner_type{o}, t) {}
     explicit file_status(file_type ft = file_type::none, perms p = perms::unknown)
-        : file_status(ft, p, owner_type::invalid_owner()) {}
+        : file_status(ft, p, owner_type::invalid_owner(), times_type()) {}
     PS_DEFAULT_DESTRUCTOR(file_status);
     PS_DEFAULT_COPY(file_status);
     PS_DEFAULT_MOVE(file_status);
@@ -303,6 +374,8 @@ public:
         m_perms = p;
     }
 
+    // Extensions
+
     const owner_type& owner() const noexcept {
         return m_owner;
     }
@@ -314,9 +387,18 @@ public:
     void owner(owner_type&& o) {
         m_owner = std::move(o);
     }
+    
+    const times_type& times() const noexcept {
+        return m_times;
+    }
+    
+    void times(const times_type& val) {
+        m_times = val;
+    }
 
 private:
     owner_type m_owner;
+    times_type m_times;
     file_type m_type;
     perms m_perms;
 };
@@ -435,6 +517,14 @@ inline bool exists(const path& p) {
 }
 inline bool exists(const path& p, error_code& ec) noexcept {
     return exists(status(p, ec));
+}
+
+inline file_time_type last_write_time(const path& p) {
+    return status(p).times().modified();
+}
+
+inline file_time_type last_write_time(const path& p, error_code& ec) {
+    return status(p, ec).times().modified();
 }
 
 inline bool is_block_file(file_status s) noexcept {

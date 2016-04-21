@@ -25,6 +25,8 @@
 
 #include <prosoft/core/config/config.h>
 
+#include "fsconfig.h"
+
 #if !_WIN32
 #include <sys/errno.h>
 #include <sys/stat.h>
@@ -85,22 +87,63 @@ struct to_owner {
     }
 };
 
-file_status file_stat(decltype(::stat) statcall, const path& p, error_code& ec) noexcept {
+struct to_times {
+#if PS_FS_HAVE_BSD_STATFS
+    #define PS_ST_MTIME st_mtimespec
+    #define PS_ST_CTIME st_ctimespec
+    #define PS_ST_ATIME st_atimespec
+#if defined(st_birthtime)
+    #define PS_ST_BTIME st_birthtimespec
+#endif
+    file_time_type from(const struct timespec& ts) const {
+        using namespace std::chrono;
+        using fduration = typename file_time_type::duration;
+        return file_time_type{ duration_cast<fduration>(seconds{ts.tv_sec}) + duration_cast<fduration>(nanoseconds{ts.tv_nsec}) };
+    }
+#else
+    #define PS_ST_MTIME st_mtime
+    #define PS_ST_CTIME st_ctime
+    #define PS_ST_ATIME st_atime
+    file_time_type from(::time_t t) const {
+        return file_time_type::clock::from_time_t(t);
+    }
+#endif
+    
+    times operator()(const stat_buf& sb) const {
+        times t;
+        t.modified(from(sb.PS_ST_MTIME));
+        t.metadata_modified(from(sb.PS_ST_CTIME));
+        t.accessed(from(sb.PS_ST_ATIME));
+#if defined(PS_ST_BTIME)
+        t.created(from(sb.PS_ST_BTIME));
+#endif
+        return t;
+    }
+    
+    #undef PS_ST_MTIME
+    #undef PS_ST_CTIME
+    #undef PS_ST_ATIME
+#if defined(PS_ST_BTIME)
+    #undef PS_ST_BTIME
+#endif
+};
+
+file_status file_stat(decltype(::stat) statcall, const path& p, error_code& ec) {
     stat_buf sb;
     if (0 == statcall(p.c_str(), &sb)) {
         ec.clear();
-        return file_status{to_file_type{}(sb), to_perms{}(sb), to_owner{}(sb)};
+        return file_status{to_file_type{}(sb), to_perms{}(sb), to_owner{}(sb), to_times{}(sb)};
     } else {
         ifilesystem::system_error(ec);
         return file_status{to_file_type{}(ec)};
     }
 }
 
-inline file_status file_stat(const path& p, error_code& ec) noexcept {
+inline file_status file_stat(const path& p, error_code& ec) {
     return file_stat(::stat, p, ec);
 }
 
-inline file_status link_stat(const path& p, error_code& ec) noexcept {
+inline file_status link_stat(const path& p, error_code& ec) {
     return file_stat(::lstat, p, ec);
 }
 
@@ -250,7 +293,7 @@ file_status file_stat(const path& p, error_code& ec, bool link) noexcept {
         auto o = owner::invalid_owner();
         auto ap = to_perms{}(p, o, ec);
         auto&& np = ifilesystem::to_native_path{}(p.native());
-        return file_status{!link ? get_type(np, attrs) : get_type(attrs), ap, std::move(o)};
+        return file_status{!link ? get_type(np, attrs) : get_type(attrs), ap, std::move(o), times()};
     } else {
         ifilesystem::system_error(ec);
         if (is_device_path(p)) {
@@ -276,6 +319,8 @@ inline file_status link_stat(const path& p, error_code& ec) noexcept {
 namespace prosoft {
 namespace filesystem {
 inline namespace v1 {
+
+constexpr file_time_type times::m_invalidTime;
 
 bool equivalent(const path& p1, const path& p2) {
     error_code ec;
