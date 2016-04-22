@@ -396,7 +396,7 @@ file_status symlink_status(const path& p, error_code& ec) noexcept {
 namespace ifilesystem { // private API
 
 windows::Handle open(const path& p, DWORD accessMode, DWORD shareMode, DWORD createMode, DWORD flags, error_code& ec) {
-    if (is_directory(p, ec)) {
+    if (fattrs(p, FILE_ATTRIBUTE_DIRECTORY)) {
         flags |= FILE_FLAG_BACKUP_SEMANTICS; // Required to open a dir handle. Can also bypass security restrictions.
         flags &= ~FILE_ATTRIBUTE_NORMAL;
         // http://stackoverflow.com/questions/10198420/open-directory-using-createfile
