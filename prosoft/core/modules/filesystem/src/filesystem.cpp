@@ -286,14 +286,50 @@ private:
     }
 };
 
+struct to_times {
+    file_time_type from(const ::FILETIME& ft) {
+        ::SYSTEMTIME st;
+        if ((ft.dwLowDateTime > 0 || ft.dwHighDateTime > 0) && ::FileTimeToSystemTime(&ft, &st)) {
+            struct tm tmt;
+            tmt.tm_year = st.wYear - 1900;
+            tmt.tm_mon = st.wMonth - 1;
+            tmt.tm_mday = st.wDay;
+            tmt.tm_hour = st.wHour;
+            tmt.tm_min = st.wMinute;
+            tmt.tm_sec = st.wSecond;
+            tmt.tm_wday = 0;
+            tmt.tm_yday = 0;
+            tmt.tm_isdst = -1;
+            using namespace std::chrono;
+            using clock = file_time_type::clock;
+            return file_time_type{clock::from_time_t(::mktime(&tmt)).time_since_epoch() + duration_cast<clock::duration>(milliseconds{st.wMilliseconds})};
+        } else {
+            return times::make_invalid();
+        }
+    }
+
+    times operator()(const path& p, error_code& ec) {
+        times t;
+        ::BY_HANDLE_FILE_INFORMATION info;
+        if (ifilesystem::finfo(p, &info, ec)) {
+            t.modified(from(info.ftLastWriteTime));
+            t.metadata_modified(t.modified());
+            t.accessed(from(info.ftLastAccessTime));
+            t.created(from(info.ftCreationTime));
+        }
+        return t;
+    }
+};
+
 file_status file_stat(const path& p, error_code& ec, bool link) noexcept {
     if (const auto attrs = ifilesystem::fattrs(p, ec)) {
         ec.clear();
+        error_code lec; // ignored
         const auto get_type = to_file_type{};
         auto o = owner::invalid_owner();
-        auto ap = to_perms{}(p, o, ec);
+        auto ap = to_perms{}(p, o, lec);
         auto&& np = ifilesystem::to_native_path{}(p.native());
-        return file_status{!link ? get_type(np, attrs) : get_type(attrs), ap, std::move(o), times()};
+        return file_status{!link ? get_type(np, attrs) : get_type(attrs), ap, std::move(o), to_times{}(np, lec)};
     } else {
         if (is_device_path(p)) {
             return file_status{to_file_type{}(FILE_ATTRIBUTE_DEVICE)}; // We know the type from the path, so return it.

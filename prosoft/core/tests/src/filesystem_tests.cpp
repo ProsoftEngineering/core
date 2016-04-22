@@ -151,10 +151,12 @@ TEST_CASE("filesystem") {
             CHECK_THROWS_AS(status(p), filesystem_error);
             CHECK_THROWS_AS(symlink_status(p), filesystem_error);
         }
-        AND_THEN("the file type is not_found") {
+        AND_THEN("the file type is not_found and last write is invalid") {
             error_code ec;
             const auto s = status(p, ec);
             CHECK((s.type() == file_type::not_found));
+
+            CHECK(last_write_time(p, ec) == times::make_invalid());
         }
         AND_THEN("the file does not exist") {
             error_code ec;
@@ -177,6 +179,8 @@ TEST_CASE("filesystem") {
         CHECK_FALSE(is_socket(st));
         CHECK_FALSE(is_fifo(st));
         CHECK_FALSE(is_device_file(st));
+
+        CHECK(last_write_time(p) > times::make_invalid());
         
         REQUIRE(remove(p));
     }

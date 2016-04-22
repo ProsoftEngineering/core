@@ -336,6 +336,10 @@ public:
     bool has_created() const noexcept {
         return m_createTime != m_invalidTime;
     }
+
+    static constexpr file_time_type make_invalid() {
+        return m_invalidTime;
+    }
 };
 
 // Extensions
