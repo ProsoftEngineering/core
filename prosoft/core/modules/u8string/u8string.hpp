@@ -285,11 +285,16 @@ public:
     PS_EXPORT bool has_bom() const;
 
     // ==
+    
+    enum class find_options {
+        none,
+        case_insensitive
+    };
 
-    PS_EXPORT size_type find(const u8string&, size_type pos = 0) const;
-    PS_EXPORT size_type find(value_type, size_type pos = 0) const;
+    PS_EXPORT size_type find(const u8string&, size_type pos = 0, find_options opts = find_options::none) const;
+    PS_EXPORT size_type find(value_type, size_type pos = 0, find_options opts = find_options::none) const;
     // type conversions -- more expensive
-    PS_EXPORT size_type find(const std::string&, size_type pos = 0) const;
+    PS_EXPORT size_type find(const std::string&, size_type pos = 0, find_options opts = find_options::none) const;
 
     PS_EXPORT size_type rfind(const u8string&, size_type pos = npos) const;
     PS_EXPORT size_type rfind(value_type, size_type pos = npos) const;
