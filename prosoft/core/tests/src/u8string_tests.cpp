@@ -891,7 +891,7 @@ TEST_CASE("u8string") {
         CHECK_FALSE(u8string("abc").has_bom());
 
         u16string u16(u16test);
-        u16.insert(0, 1, 0xFEFF);
+        u16.insert(0, 1, static_cast<u16string::value_type>(0xFEFF));
         s = u16;
         // TODO: should remove u16 BOM
         CHECK(s.length() == 5);
