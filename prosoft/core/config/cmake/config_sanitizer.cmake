@@ -90,13 +90,16 @@ macro(ps_core_config_sanitizer TARGET_NAME)
     #
     # break on __asan_report_error to catch ASan asserts in the debugger.
     
-    # ASan on PPC is broken (internal crash) as of GCC 4.8.1. It may be fixed in 4.8.2 or 4.9.
-    # HOST_SYSTEM_PROCESSOR may technically not be the same as the target CPU, but it's the best we have.
-    if(NOT ${CMAKE_HOST_SYSTEM_PROCESSOR} MATCHES "(ppc|powerpc)(32|64)?")
-        ps_core_config_asan(${TARGET_NAME})
-    endif()
+    # Xcode 8.0 has a few different linker errors when turning on the sanitizer, so disable until it's fixed
+    if(NOT CMAKE_GENERATOR STREQUAL "Xcode" OR "${XCODE_VERSION}" VERSION_LESS "8.0")
+        # ASan on PPC is broken (internal crash) as of GCC 4.8.1. It may be fixed in 4.8.2 or 4.9.
+        # HOST_SYSTEM_PROCESSOR may technically not be the same as the target CPU, but it's the best we have.
+        if(NOT ${CMAKE_HOST_SYSTEM_PROCESSOR} MATCHES "(ppc|powerpc)(32|64)?")
+            ps_core_config_asan(${TARGET_NAME})
+        endif()
     
-    ps_core_config_ubsan(${TARGET_NAME})
+        ps_core_config_ubsan(${TARGET_NAME})
+    endif()
     
     # tsan is not currently enabled
 endmacro()

@@ -494,6 +494,14 @@ TEST_CASE("u8string") {
         CHECK(7 == s.find("o", 5));
         CHECK(2 == s.find("l"));
         CHECK(3 == s.find("l", 3));
+        CHECK(u8string::npos == s.find("hello"));
+        CHECK(0 == s.find("Hello"));
+        CHECK(6 == s.find("World"));
+        CHECK(0 == s.find("hello", 0, u8string::find_options::case_insensitive));
+        CHECK(6 == s.find("wOrLd", 0, u8string::find_options::case_insensitive));
+        CHECK(1 == s.find('e'));
+        CHECK(u8string::npos == s.find('E'));
+        CHECK(1 == s.find('E', 0, u8string::find_options::case_insensitive));
 
         s = u8string("ttest\xEF\xA3\xBF");
         CHECK(0 == s.find("t"));
@@ -501,6 +509,10 @@ TEST_CASE("u8string") {
         CHECK(5 == s.find("\xEF\xA3\xBF"));
         CHECK(1 == s.find("t", 1));
         CHECK(4 == s.find("t", 2));
+        CHECK(5 == s.find("\xEF\xA3\xBF", 0, u8string::find_options::case_insensitive));
+        CHECK(2 == s.find('e'));
+        CHECK(u8string::npos == s.find('E'));
+        CHECK(2 == s.find('E', 0, u8string::find_options::case_insensitive));
     }
 
     SECTION("substr") {
@@ -887,7 +899,7 @@ TEST_CASE("u8string") {
         CHECK_FALSE(u8string("abc").has_bom());
 
         u16string u16(u16test);
-        u16.insert(0, 1, 0xFEFF);
+        u16.insert(0, 1, static_cast<u16string::value_type>(0xFEFF));
         s = u16;
         // TODO: should remove u16 BOM
         CHECK(s.length() == 5);

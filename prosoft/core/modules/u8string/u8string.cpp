@@ -600,8 +600,8 @@ bool u8string::has_bom() const {
     return (_u8._s.length() >= sizeof(utf8::bom) && utf8::starts_with_bom(start, start + sizeof(utf8::bom)));
 }
 
-u8string::size_type u8string::find(const u8string& other, size_type pos) const {
-    if (ascii() && other.ascii()) {
+u8string::size_type u8string::find(const u8string& other, size_type pos, find_options opts) const {
+    if (ascii() && other.ascii() && opts == find_options::none) {
         return str().find(other.str(), pos);
     }
 
@@ -609,14 +609,19 @@ u8string::size_type u8string::find(const u8string& other, size_type pos) const {
     advance(i, pos, length());
 
     auto fin = cend();
-    auto where = std::search(i, fin, other.cbegin(), other.cend(), is_equal_pre_normalized());
+    u8string::const_iterator where;
+    if (opts == find_options::case_insensitive) {
+        where = std::search(i, fin, other.cbegin(), other.cend(), is_equal_icase());
+    } else {
+        where = std::search(i, fin, other.cbegin(), other.cend(), is_equal_pre_normalized());
+    }
     // Further tuning:
     // 2) could also optimize by caching the decoded code points so we don't have to decode with each loop iter
     return (where != fin ? (pos + udistance(i, where)) : npos);
 }
 
-u8string::size_type u8string::find(value_type c, size_type pos) const {
-    if (ascii()) {
+u8string::size_type u8string::find(value_type c, size_type pos, find_options opts) const {
+    if (ascii() && opts == find_options::none) {
         return str().find(static_cast<container_type::value_type>(c), pos);
     }
 
@@ -625,15 +630,15 @@ u8string::size_type u8string::find(value_type c, size_type pos) const {
 
     auto fin = cend();
     for (; i != fin; ++i, ++pos) {
-        if (0 == compare(*i, c)) { // have to use compare to make sure 'c' is normalized
+        if (0 == compare(*i, c, opts == find_options::case_insensitive)) { // have to use compare to make sure 'c' is normalized
             return pos;
         }
     }
     return npos;
 }
 
-u8string::size_type u8string::find(const std::string& s, size_type pos) const {
-    return (is_valid(s) ? find(u8string(s), pos) : npos);
+u8string::size_type u8string::find(const std::string& s, size_type pos, find_options opts) const {
+    return (is_valid(s) ? find(u8string(s), pos, opts) : npos);
 }
 
 u8string::size_type u8string::rfind(const u8string& other, size_type pos) const {

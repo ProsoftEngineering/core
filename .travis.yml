@@ -20,6 +20,11 @@ matrix:
         compiler: clang
         env: PSCC=clang PSCXX=clang++
 
+      - os: osx
+        osx_image: xcode8
+        compiler: clang
+        env: PSCC=clang PSCXX=clang++
+
         # Linux
       - os: linux
         compiler: gcc
