@@ -64,7 +64,7 @@ public:
     typedef ::uid_t system_identity_type;
     // -1
     static constexpr const auto invalid_system_identity = std::numeric_limits<system_identity_type>::max();
-    // XXX: -3: assuming we never see this in the wild. OS X uses -2 for user nobody that.
+    // XXX: -3: assuming we never see this in the wild. OS X uses -2 for user nobody.
     static constexpr const auto unknown_system_identity = invalid_system_identity - 2;
 
     explicit identity(identity_type t, system_identity_type sid) noexcept
