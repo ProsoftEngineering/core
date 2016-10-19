@@ -302,7 +302,7 @@ TEST_CASE("filesystem") {
     
     WHEN("resolving a tilde-prefixed path") {
         const auto tilde  = path{PS_TEXT("~")};
-        const auto home = home_directory_path();
+        const auto home = canonical(home_directory_path()); // home path may be a symlink
         CHECK(canonical(tilde) == home);
         const auto subp = path{PS_TEXT("a/b/c/d")}.make_preferred();
         CHECK(canonical(tilde / subp) == home / subp);
