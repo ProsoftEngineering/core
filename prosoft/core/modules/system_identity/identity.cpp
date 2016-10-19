@@ -734,8 +734,9 @@ bool prosoft::system::is_member(const identity& user, const identity& group, std
         group_list groups(ngroups);
         const auto uname = u.account_name();
         int totalCount = ngroups;
+        // Linux returns ngroups on success, while *BSD (including OSX) returns 0 on success.
         int count = ::getgrouplist(uname.c_str(), u.primary_group(), groups.data(), &totalCount);
-        if (count > 0 && totalCount > count) {
+        if (-1 == count) {
             groups.resize(totalCount);
             count = ::getgrouplist(uname.c_str(), u.primary_group(), groups.data(), &totalCount);
         }
@@ -743,6 +744,10 @@ bool prosoft::system::is_member(const identity& user, const identity& group, std
             system_error(ec);
             return false;
         }
+        // Use returned value as some versions of glibc are buggy and can return 0 while leaving ngroups as junk.
+#ifndef __linux__
+        count = totalCount;
+#endif
         
         for (int i = 0; i < count; ++i) {
             if (groups[i] == g.primary_group()) {
