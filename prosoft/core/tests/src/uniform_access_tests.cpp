@@ -58,5 +58,28 @@ TEST_CASE("uniform_access") {
         CHECK(data_size(v) == 5);
         CHECK(bytes(v) == reinterpret_cast<access_traits_base::const_byte_pointer>(v.data()));
         CHECK(byte_size(v) == 5*sizeof(int));
+        
+        constexpr auto cs = "hello";
+        CHECK(data(cs) == cs);
+        CHECK(data_size(cs) == 5);
+        CHECK(bytes(cs) == cs);
+        CHECK(byte_size(cs) == 5);
+        
+        constexpr auto nullcs = "abc\0def";
+        CHECK(data(nullcs) == nullcs);
+        CHECK(data_size(nullcs) == 3);
+        CHECK(bytes(nullcs) == nullcs);
+        CHECK(byte_size(nullcs) == 3);
+        
+        constexpr auto wcs = L"hello";
+        CHECK(data(wcs) == wcs);
+        CHECK(data_size(wcs) == 5);
+        CHECK(bytes(wcs) == reinterpret_cast<access_traits_base::const_byte_pointer>(wcs));
+        CHECK(byte_size(wcs) == 5*sizeof(wchar_t));
+        
+        // check constexpr -- compilation will fail if function is not constexpr
+        constexpr auto p = data("");
+        constexpr auto sz = data_size(p);
+        (void)sz;
     }
 }
