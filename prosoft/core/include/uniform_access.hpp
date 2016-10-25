@@ -42,11 +42,13 @@ struct access_traits_base {
 
 template <class T>
 struct access_traits : public access_traits_base {
+    using const_value_pointer = const typename T::value_type*;
+    
     PS_CONSTEXPR size_t data_size(const T& t) const {
         return t.size();
     }
     
-    const typename T::value_type* data(const T& t) const {
+    const_value_pointer data(const T& t) const {
         return t.data();
     }
     
@@ -60,7 +62,7 @@ struct access_traits : public access_traits_base {
 };
 
 template <class T>
-inline const typename T::value_type* data(const T& t) {
+inline typename access_traits<T>::const_value_pointer data(const T& t) {
     return access_traits<T>{}.data(t);
 }
 

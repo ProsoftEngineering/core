@@ -481,12 +481,15 @@ PS_EXPORT u8string::unicode_type toupper(u8string::unicode_type);
 // Uniform access specializations
 
 template<>
-struct access_traits<u8string> : access_traits_base {
+struct access_traits<u8string> {
+    using const_byte_pointer = const char*;
+    using const_value_pointer = const_byte_pointer; // there's no direct access to the u32 codepoints
+
     size_t data_size(const u8string& s) const {
         return s.data_size();
     }
     
-    u8string::const_data_pointer data(const u8string& s) const {
+    const_value_pointer data(const u8string& s) const {
         return s.data();
     }
 
