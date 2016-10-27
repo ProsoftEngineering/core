@@ -92,6 +92,9 @@ public:
     explicit u8string(const std::string& other) {
         _init(other);
     }
+    explicit u8string(std::string&& other) {
+        _init(std::move(other));
+    }
     PS_EXPORT explicit u8string(const char*, size_type nbytes = 0);
 
     // not explicit to allow for automatic conversion during assignment
@@ -365,8 +368,9 @@ private:
     bool ascii() const {
         return _u8._ascii;
     }
-
+    
     PS_EXPORT void _init(const std::string&);
+    PS_EXPORT void _init(std::string&&);
 
     void _invalidate_cache() {
         _u8.invalidate();

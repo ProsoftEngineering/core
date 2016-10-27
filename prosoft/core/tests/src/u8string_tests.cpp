@@ -176,6 +176,14 @@ TEST_CASE("u8string") {
         CHECK_FALSE(s.is_ascii());
 #endif
     }
+    
+    WHEN("construction from a temporary std::string") {
+        std::string s{"abcd"};
+        u8string u8(std::move(s));
+        CHECK(u8.is_ascii());
+        CHECK(u8 == "abcd");
+        CHECK(s.empty());
+    }
 
     SECTION("assignment") {
         u8string s(u8test);

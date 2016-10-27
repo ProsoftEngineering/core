@@ -209,16 +209,29 @@ struct is_equal_icase : public std::unary_function<u8string::unicode_type, bool>
     }
 };
 
+template <class U8Store, class String>
+void initialize(U8Store& u8, String&& string) {
+    bool normalized = false;
+    auto i = find_invalid(string.begin(), string.end(), u8._ascii, &normalized);
+    if (i == string.end()) {
+        if (u8._ascii || normalized) {
+            u8._s =  std::forward<String>(string); // avoid conversion for ascii (which should be the most common case)
+        } else {
+            u8._s = normalize(string);
+        }
+    } else {
+        throw u8string::invalid_utf8(*i);
+    }
+};
+
 } // anon
 
 void u8string::_init(const std::string& other) {
-    bool normalized = false;
-    auto i = find_invalid(other.begin(), other.end(), _u8._ascii, &normalized);
-    if (i == other.end()) {
-        _u8._s = ascii() || normalized ? other : normalize(other); // avoid conversion for ascii (which should be the most common case)
-    } else {
-        throw invalid_utf8(*i);
-    }
+    initialize(_u8, other);
+}
+
+void u8string::_init(std::string&& other) {
+    initialize(_u8, std::move(other));
 }
 
 u8string::u8string(const_iterator& start, const_iterator& fin)
