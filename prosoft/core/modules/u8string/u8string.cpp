@@ -39,9 +39,8 @@ enum class validate_flags {
 };
 PS_ENUM_BITMASK_OPS(validate_flags);
 
-namespace prosoft {
-
 namespace {
+using namespace prosoft;
 
 PS_CONSTEXPR const u8string::unicode_type nbounds = 0xffffffff; // value returned for invalid indexes -- u32 valid range is {0,0x7fffffff}
 PS_CONSTEXPR const size_t seq_size = 8; // unicode codepoint sequence size -- 8 for alignment and NULL term
@@ -259,6 +258,8 @@ void initialize(U8Store& u8, StringIterator first, StringIterator last) {
 }
 
 } // anon
+
+namespace prosoft {
 
 void u8string::_init(const std::string& other) {
     initialize(_u8, other);
