@@ -191,6 +191,9 @@ SECTION("replace_all") {
     CHECK(s == "a.b.c");
 }
 
+#undef PS_PREFERRED_CPP14
+#define PS_PREFERRED_CPP14 0
+
 SECTION("for_each_line") {
 #if !PS_PREFERRED_CPP14
     using iterator_type = decltype(S{}.begin());
@@ -221,10 +224,6 @@ SECTION("for_each_line") {
     
     clear();
     for_each_line(s, cb);
-    CHECK(results == "");
-    CHECK(count == 0);
-    
-    for_each_line((char*)0, (char*)0, cb);
     CHECK(results == "");
     CHECK(count == 0);
     
@@ -270,10 +269,14 @@ SECTION("for_each_line") {
     
 #if PS_PREFERRED_CPP14
     clear();
+    for_each_line((char*)0, (char*)0, cb);
+    CHECK(results == "");
+    CHECK(count == 0);
+
+    clear();
     const S cs{s};
     for_each_line(cs, cb, for_each_options::none, '\r');
     CHECK(results == s);
     CHECK(count == 1);
-// #else // const iterators cannot be converted to non-const
 #endif
 }
