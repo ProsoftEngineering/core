@@ -96,6 +96,11 @@ public:
         _init(std::move(other));
     }
     PS_EXPORT explicit u8string(const char*, size_type nbytes = 0);
+    
+    template <class Iterator>
+    explicit u8string(Iterator first, Iterator last) {
+        _init(first, last);
+    }
 
     // not explicit to allow for automatic conversion during assignment
     u8string(const uint8_t* other, size_type nbytes = 0)
@@ -371,6 +376,11 @@ private:
     
     PS_EXPORT void _init(const std::string&);
     PS_EXPORT void _init(std::string&&);
+    PS_EXPORT void _init(const char*, const char*);
+    PS_EXPORT void _init(container_type::iterator, container_type::iterator);
+    PS_EXPORT void _init(container_type::const_iterator, container_type::const_iterator);
+    PS_EXPORT void _init(container_type::reverse_iterator, container_type::reverse_iterator);
+    PS_EXPORT void _init(container_type::const_reverse_iterator, container_type::const_reverse_iterator);
 
     void _invalidate_cache() {
         _u8.invalidate();

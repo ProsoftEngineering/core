@@ -184,6 +184,54 @@ TEST_CASE("u8string") {
         CHECK(u8 == "abcd");
         CHECK(s.empty());
     }
+    
+    WHEN("constructing from char* iterators") {
+        auto first = "abcd";
+        auto last = first + strlen(first);
+        u8string u8{first, last};
+        CHECK(u8 == first);
+        CHECK(u8.is_ascii());
+        
+        first = "\xC3\xA1\xC3\xA1";
+        last = first + strlen(first);
+        u8 = u8string{first, last};
+        CHECK(u8 == first);
+        CHECK_FALSE(u8.is_ascii());
+    }
+    
+    WHEN("constructing from std::string iterators") {
+        std::string s{"abcd"};
+        u8string u8{s.begin(), s.end()};
+        CHECK(u8 == s);
+        CHECK(u8.is_ascii());
+        
+        u8 = u8string{s.cbegin(), s.cend()};
+        CHECK(u8 == s);
+        CHECK(u8.is_ascii());
+        
+        u8 = u8string{s.rbegin(), s.rend()};
+        CHECK(u8 == "dcba");
+        CHECK(u8.is_ascii());
+        
+        u8 = u8string{s.crbegin(), s.crend()};
+        CHECK(u8 == "dcba");
+        CHECK(u8.is_ascii());
+        
+        // UTF
+        
+        s = std::string{"\xC3\xA1\xC3\xA1"};
+        u8 = u8string{s.begin(), s.end()};
+        CHECK(u8 == s);
+        CHECK_FALSE(u8.is_ascii());
+        
+        u8 = u8string{s.cbegin(), s.cend()};
+        CHECK(u8 == s);
+        CHECK_FALSE(u8.is_ascii());
+        
+        CHECK_THROWS_AS(u8string(s.rbegin(), s.rend()), u8string::invalid_utf8); // reverse is invalid UTF8
+        
+        CHECK_THROWS_AS(u8string(s.crbegin(), s.crend()), u8string::invalid_utf8);
+    }
 
     SECTION("assignment") {
         u8string s(u8test);

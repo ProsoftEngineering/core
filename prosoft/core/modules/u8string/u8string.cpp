@@ -32,6 +32,13 @@
 
 #include "u8string.hpp"
 
+enum class validate_flags {
+    none,
+    ascii,
+    normalized,
+};
+PS_ENUM_BITMASK_OPS(validate_flags);
+
 namespace prosoft {
 
 namespace {
@@ -209,20 +216,47 @@ struct is_equal_icase : public std::unary_function<u8string::unicode_type, bool>
     }
 };
 
-template <class U8Store, class String>
-void initialize(U8Store& u8, String&& string) {
+template <class Iterator>
+validate_flags validate_or_throw(Iterator first, Iterator last) {
     bool normalized = false;
-    auto i = find_invalid(string.begin(), string.end(), u8._ascii, &normalized);
-    if (i == string.end()) {
-        if (u8._ascii || normalized) {
-            u8._s =  std::forward<String>(string); // avoid conversion for ascii (which should be the most common case)
-        } else {
-            u8._s = normalize(string);
+    bool ascii = false;
+    auto i = find_invalid(first, last, ascii, &normalized);
+    validate_flags flags{};
+    if (i == last) {
+        if (ascii) {
+            flags |= validate_flags::ascii;
+        }
+        if (normalized) {
+            flags |= validate_flags::normalized;
         }
     } else {
         throw u8string::invalid_utf8(*i);
     }
+    return flags;
+}
+
+template <class U8Store, class String>
+void initialize(U8Store& u8, String&& string) {
+    const auto flags = validate_or_throw(string.begin(), string.end());
+    if (is_set(flags & (validate_flags::ascii|validate_flags::normalized))) {
+        u8._s =  std::forward<String>(string); // avoid conversion for ascii (which should be the most common case)
+    } else {
+        u8._s = normalize(string);
+    }
+    u8._ascii = is_set(flags & validate_flags::ascii);
 };
+
+template <class U8Store, class StringIterator>
+void initialize(U8Store& u8, StringIterator first, StringIterator last) {
+    const auto flags = validate_or_throw(first, last);
+    auto str = std::string{first, last};
+    if (is_set(flags & (validate_flags::ascii|validate_flags::normalized))) {
+        u8._s =  std::move(str); // avoid conversion
+    } else {
+        u8._s = normalize(str); // double copy -- not sure sure how to avoid it though
+    }
+    u8._ascii = is_set(flags & validate_flags::ascii);
+}
 
 } // anon
 
@@ -232,6 +266,32 @@ void u8string::_init(const std::string& other) {
 
 void u8string::_init(std::string&& other) {
     initialize(_u8, std::move(other));
+}
+
+void u8string::_init(const char* first, const char* last) {
+    const auto flags = validate_or_throw(first, last);
+    if (is_set(flags & (validate_flags::ascii|validate_flags::normalized))) {
+        _u8._s =  container_type{first, last}; // avoid conversion
+    } else {
+        _u8._s = normalize(first, std::distance(first, last));
+    }
+    _u8._ascii = is_set(flags & validate_flags::ascii);
+}
+
+void u8string::_init(container_type::iterator first, container_type::iterator last) {
+    initialize(_u8, first, last);
+}
+
+void u8string::_init(container_type::const_iterator first, container_type::const_iterator last) {
+    initialize(_u8, first, last);
+}
+
+void u8string::_init(container_type::reverse_iterator first, container_type::reverse_iterator last) {
+    initialize(_u8, first, last);
+}
+
+void u8string::_init(container_type::const_reverse_iterator first, container_type::const_reverse_iterator last) {
+    initialize(_u8, first, last);
 }
 
 u8string::u8string(const_iterator& start, const_iterator& fin)
