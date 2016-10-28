@@ -191,9 +191,6 @@ SECTION("replace_all") {
     CHECK(s == "a.b.c");
 }
 
-#undef PS_PREFERRED_CPP14
-#define PS_PREFERRED_CPP14 0
-
 SECTION("for_each_line") {
 #if !PS_PREFERRED_CPP14
     using iterator_type = decltype(S{}.begin());
