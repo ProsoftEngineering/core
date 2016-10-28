@@ -41,7 +41,7 @@ ps_core_module_config(${regex_lib})
 
 target_include_directories(${regex_lib}
 	PRIVATE
-    ${PSREGEX}/vendor/onig/onig
+    ${PSREGEX}/vendor/onig/onig/src
     PUBLIC
     ${PSREGEX}
 )

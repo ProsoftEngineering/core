@@ -1,5 +1,53 @@
 History
 
+2016/09/02: Version 6.1.1
+
+2016/08/31: fix segfault /W.?{888}{888}{888}\x00/ (found by libfuzzer)
+2016/08/31: fix error unmatched close parenthesis for %{(.*?)} #23
+
+2016/08/29: Version 6.1.0
+
+2016/08/28: add contributed/libfuzzer-onig.cpp  (thanks hannob)
+2016/08/28: update LTVERSION 4:0:0
+2016/08/28: NEW API: onigenc_is_valid_mbc_string().
+2016/08/27: add is_valid_mbc_string() member into OnigEncodingType.
+2016/08/27: fix out of bounds read.
+2016/08/26: fix out of bounds read.
+2016/08/25: disable USE_INVALID_CODE_SCHEME.
+2016/08/24: fix out of bounds read.
+2016/08/23: doc/RE improved.
+2016/08/22: add onig_scan() into doc/API.
+2016/08/22: fix bug: Out of bounds read in onig_strcpy() #17
+2016/08/21: fix bug: infinite loop of backreference and group.
+2016/08/21: fix out of bounds read in mbc_to_code() #16
+2016/08/18: doc/RE refinements.
+2016/08/16: add onig_scan() (NEW API)
+2016/08/16: reimplement match stack allocation for case too many repeat
+            and too many captures in regexp.
+2016/08/15: number of captures <= 32767 for bytecode representation.
+2016/07/17: don't use int_map_backward for thread-safe.
+2016/07/04: fix case of enclosed option in look-behind.
+2016/07/04: fix ignore case in look-behind.
+2016/05/23: fix memory leak in onig_unicode_define_user_property()
+2016/05/20: declare variables at the top of scope.  (thanks nmaya)
+
+2016/05/09: Version 6.0.0
+
+2016/05/05: add NEW API: onig_unicode_define_user_property()
+2016/05/04: update Unicode data to 8.0.0
+2016/05/02: change OnigCodePoint type to unsigned int.
+2016/05/02: add doc/UNICODE_PROPERTIES.
+2016/04/19: add error code ONIGERR_FAIL_TO_INITIALIZE.
+2016/04/18: add make_win64/32.bat.
+2016/04/18: fix bug of uninitialized regex_t value on error.
+2016/04/16: reimplement Unicode case folding.
+2016/04/11: update LTVERSION = 3.0.0
+2016/04/05: remove all THREAD_ macro.
+2016/04/05: add init member into OnigEncoding. (add onig_initialize())
+2016/03/28: remove state member of regex.
+2016/03/25: move source files into src/
+2016/03/23: rename configre.in to configure.ac.
+2015/11/17: fix memory leak. (thanks pigzang)
 2015/07/13: change mail address.
 
 2014/12/12: Version 5.9.6

@@ -1,4 +1,4 @@
-# Copyright © 2013-2015, Prosoft Engineering, Inc. (A.K.A "Prosoft")
+# Copyright © 2013-2016, Prosoft Engineering, Inc. (A.K.A "Prosoft")
 # All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
@@ -28,7 +28,7 @@
 cmake_minimum_required(VERSION 3.1)
 project(onig)
 
-set(ONIG ${CMAKE_CURRENT_SOURCE_DIR}/onig)
+set(ONIG ${CMAKE_CURRENT_SOURCE_DIR}/onig/src)
 
 include(CheckIncludeFiles)
 include(CheckFunctionExists)
@@ -62,6 +62,7 @@ endif()
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/config.h.cmakein ${CMAKE_CURRENT_BINARY_DIR}/config.h)
 
 set (onig_lib_src
+    ${ONIG}/onig_init.c
     ${ONIG}/regerror.c
     ${ONIG}/regparse.c
     ${ONIG}/regext.c
@@ -80,11 +81,15 @@ set (onig_lib_src
 
 # only UTF enodings are supported.
 set (onig_enc_src
-    ${ONIG}/enc/ascii.c
-    ${ONIG}/enc/unicode.c
-    ${ONIG}/enc/utf8.c
-    ${ONIG}/enc/utf16_le.c
-    ${ONIG}/enc/utf16_be.c
+    ${ONIG}/ascii.c
+    ${ONIG}/unicode.c
+    ${ONIG}/utf8.c
+    ${ONIG}/utf16_le.c
+    ${ONIG}/utf16_be.c
+    ${ONIG}/unicode_unfold_key.c
+    ${ONIG}/unicode_fold1_key.c
+    ${ONIG}/unicode_fold2_key.c
+    ${ONIG}/unicode_fold3_key.c
 )
 
 if(MSVC AND CMAKE_SIZEOF_VOID_P EQUAL 8)
