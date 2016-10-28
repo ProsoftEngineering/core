@@ -1,4 +1,5 @@
 /*
+ * Copyright (c) 2015 Steven G. Johnson, Jiahao Chen, Peter Colberg, Tony Kelman, Scott P. Jones, and other contributors.
  * Copyright (c) 2009 Public Software Group e. V., Berlin, Germany
  *
  * Permission is hereby granted, free of charge, to any person obtaining a
@@ -21,13 +22,13 @@
  */
 
 
-/** 
+/**
  * @mainpage
  *
  * utf8proc is a free/open-source (MIT/expat licensed) C library
  * providing Unicode normalization, case-folding, and other operations
  * for strings in the UTF-8 encoding, supporting Unicode version
- * 7.0.0.  See the utf8proc home page (http://julialang.org/utf8proc/)
+ * 8.0.0.  See the utf8proc home page (http://julialang.org/utf8proc/)
  * for downloads and other information, or the source code on github
  * (https://github.com/JuliaLang/utf8proc).
  *
@@ -53,7 +54,7 @@
 #define UTF8PROC_H
 
 /** @name API version
- *  
+ *
  * The utf8proc API version MAJOR.MINOR.PATCH, following
  * semantic-versioning rules (http://semver.org) based on API
  * compatibility.
@@ -62,16 +63,17 @@
  * runtime version may append a string like "-dev" to the version number
  * for prerelease versions.
  *
- * @note The shared-library version number in the Makefile may be different,
+ * @note The shared-library version number in the Makefile
+ *       (and CMakeLists.txt, and MANIFEST) may be different,
  *       being based on ABI compatibility rather than API compatibility.
  */
 /** @{ */
 /** The MAJOR version number (increased when backwards API compatibility is broken). */
-#define UTF8PROC_VERSION_MAJOR 1
+#define UTF8PROC_VERSION_MAJOR 2
 /** The MINOR version number (increased when new functionality is added in a backwards-compatible manner). */
-#define UTF8PROC_VERSION_MINOR 3
+#define UTF8PROC_VERSION_MINOR 0
 /** The PATCH version (increased for fixes that do not change the API). */
-#define UTF8PROC_VERSION_PATCH 0
+#define UTF8PROC_VERSION_PATCH 2
 /** @} */
 
 #include <stdlib.h>
@@ -129,6 +131,10 @@ extern "C" {
 
 #ifndef SSIZE_MAX
 #define SSIZE_MAX ((size_t)SIZE_MAX/2)
+#endif
+
+#ifndef UINT16_MAX
+#  define UINT16_MAX ~(utf8proc_uint16_t)0
 #endif
 
 /**
@@ -237,13 +243,12 @@ typedef struct utf8proc_property_struct {
    * @see utf8proc_decomp_type_t.
    */
   utf8proc_propval_t decomp_type;
-  const utf8proc_int32_t *decomp_mapping;
-  const utf8proc_int32_t *casefold_mapping;
-  utf8proc_int32_t uppercase_mapping;
-  utf8proc_int32_t lowercase_mapping;
-  utf8proc_int32_t titlecase_mapping;
-  utf8proc_int32_t comb1st_index;
-  utf8proc_int32_t comb2nd_index;
+  utf8proc_uint16_t decomp_seqindex;
+  utf8proc_uint16_t casefold_seqindex;
+  utf8proc_uint16_t uppercase_seqindex;
+  utf8proc_uint16_t lowercase_seqindex;
+  utf8proc_uint16_t titlecase_seqindex;
+  utf8proc_uint16_t comb_index;
   unsigned bidi_mirrored:1;
   unsigned comp_exclusion:1;
   /**
@@ -254,13 +259,14 @@ typedef struct utf8proc_property_struct {
    */
   unsigned ignorable:1;
   unsigned control_boundary:1;
+  /** The width of the codepoint. */
+  unsigned charwidth:2;
+  unsigned pad:2;
   /**
    * Boundclass.
    * @see utf8proc_boundclass_t.
    */
-  unsigned boundclass:4;
-  /** The width of the codepoint. */
-  unsigned charwidth:2;
+  unsigned boundclass:8;
 } utf8proc_property_t;
 
 /** Unicode categories. */
@@ -344,7 +350,7 @@ typedef enum {
   UTF8PROC_DECOMP_TYPE_COMPAT   = 16, /**< Compat */
 } utf8proc_decomp_type_t;
 
-/** Boundclass property. */
+/** Boundclass property. (TR29) */
 typedef enum {
   UTF8PROC_BOUNDCLASS_START              =  0, /**< Start */
   UTF8PROC_BOUNDCLASS_OTHER              =  1, /**< Other */
@@ -359,6 +365,12 @@ typedef enum {
   UTF8PROC_BOUNDCLASS_LVT                = 10, /**< Lvt */
   UTF8PROC_BOUNDCLASS_REGIONAL_INDICATOR = 11, /**< Regional indicator */
   UTF8PROC_BOUNDCLASS_SPACINGMARK        = 12, /**< Spacingmark */
+  UTF8PROC_BOUNDCLASS_PREPEND            = 13, /**< Prepend */
+  UTF8PROC_BOUNDCLASS_ZWJ                = 14, /**< Zero Width Joiner */
+  UTF8PROC_BOUNDCLASS_E_BASE             = 15, /**< Emoji Base */
+  UTF8PROC_BOUNDCLASS_E_MODIFIER         = 16, /**< Emoji Modifier */
+  UTF8PROC_BOUNDCLASS_GLUE_AFTER_ZWJ     = 17, /**< Glue_After_ZWJ */
+  UTF8PROC_BOUNDCLASS_E_BASE_GAZ         = 18, /**< E_BASE + GLUE_AFTER_ZJW */
 } utf8proc_boundclass_t;
 
 /**
@@ -508,8 +520,26 @@ UTF8PROC_DLLEXPORT utf8proc_ssize_t utf8proc_reencode(utf8proc_int32_t *buffer, 
 /**
  * Given a pair of consecutive codepoints, return whether a grapheme break is
  * permitted between them (as defined by the extended grapheme clusters in UAX#29).
+ *
+ * @param state Beginning with Version 29 (Unicode 9.0.0), this algorithm requires
+ *              state to break graphemes. This state can be passed in as a pointer
+ *              in the `state` argument and should initially be set to 0. If the
+ *              state is not passed in (i.e. a null pointer is passed), UAX#29 rules
+ *              GB10/12/13 which require this state will not be applied, essentially
+ *              matching the rules in Unicode 8.0.0.
+ *
+ * @warning If the state parameter is used, `utf8proc_grapheme_break_stateful` must
+ *          be called IN ORDER on ALL potential breaks in a string.
  */
-UTF8PROC_DLLEXPORT utf8proc_bool utf8proc_grapheme_break(utf8proc_int32_t codepoint1, utf8proc_int32_t codepoint2);
+UTF8PROC_DLLEXPORT utf8proc_bool utf8proc_grapheme_break_stateful(
+    utf8proc_int32_t codepoint1, utf8proc_int32_t codepoint2, utf8proc_int32_t *state);
+
+/**
+ * Same as @ref utf8proc_grapheme_break_stateful, except without support for the
+ * Unicode 9 additions to the algorithm. Supported for legacy reasons.
+ */
+UTF8PROC_DLLEXPORT utf8proc_bool utf8proc_grapheme_break(
+    utf8proc_int32_t codepoint1, utf8proc_int32_t codepoint2);
 
 
 /**
@@ -525,6 +555,13 @@ UTF8PROC_DLLEXPORT utf8proc_int32_t utf8proc_tolower(utf8proc_int32_t c);
  * variant, or if `c` is not a valid codepoint) return `c`.
  */
 UTF8PROC_DLLEXPORT utf8proc_int32_t utf8proc_toupper(utf8proc_int32_t c);
+
+/**
+ * Given a codepoint `c`, return the codepoint of the corresponding
+ * title-case character, if any; otherwise (if there is no title-case
+ * variant, or if `c` is not a valid codepoint) return `c`.
+ */
+UTF8PROC_DLLEXPORT utf8proc_int32_t utf8proc_totitle(utf8proc_int32_t c);
 
 /**
  * Given a codepoint, return a character width analogous to `wcwidth(codepoint)`,

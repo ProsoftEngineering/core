@@ -9,11 +9,8 @@ RUBY=ruby
 PERL=perl
 MAKE=make
 JULIA=julia
+FONTFORGE=fontforge
 CURLFLAGS = --retry 5 --location
-
-# use JuliaLang caching (https://github.com/staticfloat/cache.julialang.org)
-# so that Travis builds do not depend on anyone's flaky servers but our own
-URLCACHE=https://cache.e.ip.saba.us/
 
 .PHONY: clean
 
@@ -23,40 +20,47 @@ utf8proc_data.c.new: data_generator.rb UnicodeData.txt GraphemeBreakProperty.txt
 	$(RUBY) data_generator.rb < UnicodeData.txt > $@
 
 # GNU Unifont version for font metric calculations:
-UNIFONT_VERSION=8.0.01
+UNIFONT_VERSION=9.0.01
 
-unifont-$(UNIFONT_VERSION).ttf:
-	$(CURL) $(CURLFLAGS) -o $@ $(URLCACHE)http://unifoundry.com/pub/unifont-$(UNIFONT_VERSION)/font-builds/unifont-$(UNIFONT_VERSION).ttf
+unifont.ttf:
+	$(CURL) $(CURLFLAGS) -o $@ $(URLCACHE)https://mirrors.kernel.org/gnu/unifont/unifont-$(UNIFONT_VERSION)/unifont-$(UNIFONT_VERSION).ttf
 
-unifont_upper-$(UNIFONT_VERSION).ttf:
-	$(CURL) $(CURLFLAGS) -o $@ $(URLCACHE)http://unifoundry.com/pub/unifont-$(UNIFONT_VERSION)/font-builds/unifont_upper-$(UNIFONT_VERSION).ttf
+unifont_upper.ttf:
+	$(CURL) $(CURLFLAGS) -o $@ $(URLCACHE)https://mirrors.kernel.org/gnu/unifont/unifont-$(UNIFONT_VERSION)/unifont_upper-$(UNIFONT_VERSION).ttf
 
-CharWidths.txt: charwidths.jl unifont-$(UNIFONT_VERSION).ttf unifont_upper-$(UNIFONT_VERSION).ttf EastAsianWidth.txt
-	UNIFONT_VERSION=$(UNIFONT_VERSION) $(JULIA) charwidths.jl > $@
+%.sfd: %.ttf
+	$(FONTFORGE) -lang=ff -c "Open(\"$<\");Save(\"$@\");Quit(0);"
+
+CharWidths.txt: charwidths.jl unifont.sfd unifont_upper.sfd EastAsianWidth.txt
+	$(JULIA) charwidths.jl > $@
+
+# Unicode data version
+UNICODE_VERSION=9.0.0
 
 UnicodeData.txt:
-	$(CURL) $(CURLFLAGS) -o $@ -O $(URLCACHE)http://www.unicode.org/Public/UNIDATA/UnicodeData.txt
+	$(CURL) $(CURLFLAGS) -o $@ -O $(URLCACHE)http://www.unicode.org/Public/$(UNICODE_VERSION)/ucd/UnicodeData.txt
 
 EastAsianWidth.txt:
-	$(CURL) $(CURLFLAGS) -o $@ -O $(URLCACHE)http://www.unicode.org/Public/UNIDATA/EastAsianWidth.txt
+	$(CURL) $(CURLFLAGS) -o $@ -O $(URLCACHE)http://www.unicode.org/Public/$(UNICODE_VERSION)/ucd/EastAsianWidth.txt
 
 GraphemeBreakProperty.txt:
-	$(CURL) $(CURLFLAGS) -o $@ -O $(URLCACHE)http://www.unicode.org/Public/UCD/latest/ucd/auxiliary/GraphemeBreakProperty.txt
+	$(CURL) $(CURLFLAGS) -o $@ -O $(URLCACHE)http://www.unicode.org/Public/$(UNICODE_VERSION)/ucd/auxiliary/GraphemeBreakProperty.txt
 
 DerivedCoreProperties.txt:
-	$(CURL) $(CURLFLAGS) -o $@ -O $(URLCACHE)http://www.unicode.org/Public/UNIDATA/DerivedCoreProperties.txt
+	$(CURL) $(CURLFLAGS) -o $@ -O $(URLCACHE)http://www.unicode.org/Public/$(UNICODE_VERSION)/ucd/DerivedCoreProperties.txt
 
 CompositionExclusions.txt:
-	$(CURL) $(CURLFLAGS) -o $@ -O $(URLCACHE)http://www.unicode.org/Public/UNIDATA/CompositionExclusions.txt
+	$(CURL) $(CURLFLAGS) -o $@ -O $(URLCACHE)http://www.unicode.org/Public/$(UNICODE_VERSION)/ucd/CompositionExclusions.txt
 
 CaseFolding.txt:
-	$(CURL) $(CURLFLAGS) -o $@ -O $(URLCACHE)http://www.unicode.org/Public/UNIDATA/CaseFolding.txt
+	$(CURL) $(CURLFLAGS) -o $@ -O $(URLCACHE)http://www.unicode.org/Public/$(UNICODE_VERSION)/ucd/CaseFolding.txt
 
 NormalizationTest.txt:
-	$(CURL) $(CURLFLAGS) -o $@ -O $(URLCACHE)http://www.unicode.org/Public/UNIDATA/NormalizationTest.txt
+	$(CURL) $(CURLFLAGS) -o $@ -O $(URLCACHE)http://www.unicode.org/Public/$(UNICODE_VERSION)/ucd/NormalizationTest.txt
 
 GraphemeBreakTest.txt:
-	$(CURL) $(CURLFLAGS) $(URLCACHE)http://www.unicode.org/Public/UCD/latest/ucd/auxiliary/GraphemeBreakTest.txt | $(PERL) -pe 's,÷,/,g;s,×,+,g' > $@
+	$(CURL) $(CURLFLAGS) $(URLCACHE)http://www.unicode.org/Public/$(UNICODE_VERSION)/ucd/auxiliary/GraphemeBreakTest.txt | $(PERL) -pe 's,÷,/,g;s,×,+,g' > $@
 
 clean:
-	rm -f UnicodeData.txt EastAsianWidth.txt DerivedCoreProperties.txt CompositionExclusions.txt CaseFolding.txt NormalizationTest.txt GraphemeBreakTest.txt CharWidths.txt unifont*.ttf unifont*.sfd
+	rm -f UnicodeData.txt EastAsianWidth.txt GraphemeBreakProperty.txt DerivedCoreProperties.txt CompositionExclusions.txt CaseFolding.txt NormalizationTest.txt GraphemeBreakTest.txt CharWidths.txt unifont*.ttf unifont*.sfd
+	rm -f utf8proc_data.c.new

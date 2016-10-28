@@ -1,5 +1,56 @@
 # utf8proc release history #
 
+## Version 2.0.2 ##
+
+2016-07-27:
+
+- Move `-Wmissing-prototypes` warning flag from `Makefile` to `.travis.yml`
+  since MSVC does not understand this flag and it is occasionally useful to
+  build using MSVC through the `Makefile` ([#79]).
+
+- Use a different variable name for a nested loop in `bench/bench.c`, and
+  declare it in a C89 way rather than inside the `for` to avoid "error:
+  'for' loop initial declarations are only allowed in C99 mode" ([#80]).
+
+## Version 2.0.1 ##
+
+2016-07-13:
+
+- Bug fix in `utf8proc_grapheme_break_stateful` ([#77]).
+
+- Tests now use versioned Unicode files, so they will no longer
+  break when a new version of Unicode is released ([#78]).
+
+## Version 2.0 ##
+
+2016-07-13:
+
+- Updated for Unicode 9.0 ([#70]).
+
+- New `utf8proc_grapheme_break_stateful` to handle the complicated
+  grapheme-breaking rules in Unicode 9.  The old `utf8proc_grapheme_break`
+  is still provided, but may incorrectly identify grapheme breaks
+  in some Unicode-9 sequences.
+
+- Smaller Unicode tables ([#62], [#68]).  This required changes
+  in the `utf8proc_property_t` structure, which breaks backward
+  compatibility if you access this `struct` directly.  The
+  functions in the API remain backward-compatible, however.
+
+- Buffer overrun fix ([#66]).
+
+## Version 1.3.1 ##
+
+2015-11-02:
+
+- Do not export symbol for internal function `unsafe_encode_char()` ([#55]).
+
+- Install relative symbolic links for shared libraries ([#58]).
+
+- Enable and fix compiler warnings ([#55], [#58]).
+
+- Add missing files to `make clean` ([#58]).
+
 ## Version 1.3 ##
 
 2015-07-06:
@@ -211,7 +262,18 @@ Release of version 1.0.1
 [#27]: https://github.com/JuliaLang/utf8proc/issues/27
 [#28]: https://github.com/JuliaLang/utf8proc/issues/28
 [#29]: https://github.com/JuliaLang/utf8proc/issues/29
+[#32]: https://github.com/JuliaLang/utf8proc/issues/32
+[#35]: https://github.com/JuliaLang/utf8proc/issues/35
+[#40]: https://github.com/JuliaLang/utf8proc/issues/40
 [#43]: https://github.com/JuliaLang/utf8proc/issues/43
 [#45]: https://github.com/JuliaLang/utf8proc/issues/45
 [#47]: https://github.com/JuliaLang/utf8proc/issues/47
 [#51]: https://github.com/JuliaLang/utf8proc/issues/51
+[#55]: https://github.com/JuliaLang/utf8proc/issues/55
+[#58]: https://github.com/JuliaLang/utf8proc/issues/58
+[#62]: https://github.com/JuliaLang/utf8proc/issues/62
+[#66]: https://github.com/JuliaLang/utf8proc/issues/66
+[#68]: https://github.com/JuliaLang/utf8proc/issues/68
+[#70]: https://github.com/JuliaLang/utf8proc/issues/70
+[#77]: https://github.com/JuliaLang/utf8proc/issues/77
+[#78]: https://github.com/JuliaLang/utf8proc/issues/78
