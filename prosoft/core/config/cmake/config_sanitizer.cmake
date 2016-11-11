@@ -57,6 +57,12 @@ macro(ps_core_config_asan TARGET_NAME)
     endif()
     
     set(CMAKE_REQUIRED_FLAGS ${SAVED_CMAKE_REQUIRED_FLAGS})
+
+    include(CheckIncludeFiles)
+    check_include_files(sanitizer/lsan_interface.h HAVE_LSAN_INTERFACE)
+    if(HAVE_ADDRESS_SANITIZER AND HAVE_LSAN_INTERFACE)
+        target_compile_definitions(${TARGET_NAME} PRIVATE PS_HAVE_LSAN_INTERFACE_H=1)
+    endif()
 endmacro()
 
 macro(ps_core_config_ubsan TARGET_NAME)
@@ -84,7 +90,7 @@ endmacro()
 
 macro(ps_core_config_sanitizer TARGET_NAME)
     # Clang (3.1+) and GCC (4.8+) support these. For Apple, Xcode 7 is required. (See notes above.)
-    # The leak sanitizer is mutally exclusive with address and thread sanitizers.
+    # The leak sanitizer is part of ASAN in recent versions.
     # The general advise to get decent runtime performance with ASan is to use at least -O1.
     # But these should probably only be enabled for debug builds.
     #
