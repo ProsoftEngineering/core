@@ -50,7 +50,7 @@ done
 
 # Could not find a link/feed to automatically find the latest version, so we just hardcode it.
 if [ -z $CMAKE_VER ]; then
-CMAKE_VER=3.5.1
+CMAKE_VER=3.7.0
 fi
 
 VROOT=`echo ${CMAKE_VER} | grep -oE '[0-9]\.[0-9]'`
