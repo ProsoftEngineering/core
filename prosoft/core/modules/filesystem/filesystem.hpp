@@ -91,11 +91,11 @@ inline path operator/(const path& lhs, const path& rhs) {
 template <class CharT, class Traits>
 std::basic_ostream<CharT, Traits>& operator<<(std::basic_ostream<CharT, Traits>& os, const path& p) {
     os <<
-#if __ps_cpp14_stdlib
+#if PS_CPP14_STDLIB
         std::quoted(
 #endif
             ifilesystem::to_string_type<std::basic_string<CharT, Traits>, path::string_type>{}(p.native())
-#if __ps_cpp14_stdlib
+#if PS_CPP14_STDLIB
                 )
 #endif
         ;
@@ -106,11 +106,11 @@ template <class CharT, class Traits>
 std::basic_istream<CharT, Traits>& operator>>(std::basic_istream<CharT, Traits>& is, path& p) {
     std::basic_string<CharT, Traits> s;
     is >>
-#if __ps_cpp14_stdlib
+#if PS_CPP14_STDLIB
         std::quoted(
 #endif
             s
-#if __ps_cpp14_stdlib
+#if PS_CPP14_STDLIB
             )
 #endif
         ;

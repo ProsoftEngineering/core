@@ -462,13 +462,13 @@ u8string::iterator u8string::insert(iterator i, const_iterator start, const_iter
 
     const bool emptySequence = start == fin;
 // Neither GCC 4.x nor MSVC 2013 return an iterator as required by C++11.
-#if !__ps_complete_cpp11_stdlib
+#if !PS_COMPLETE_CPP11_STDLIB
     const auto bytePos = i.base() - _u8._s.begin();
 #else
     auto where =
 #endif
     _u8._s.insert(i.base(), start.base(), fin.base());
-#if !__ps_complete_cpp11_stdlib
+#if !PS_COMPLETE_CPP11_STDLIB
     auto where = _u8._s.begin() + bytePos;
     PSASSERT(emptySequence || *where == *(start.base()), "Broken assumption");
 #endif
