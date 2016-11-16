@@ -37,9 +37,9 @@ WHEN("creating a default iterator") {
 }
 
 WHEN("creating an iterator with an invalid path") {
-    CHECK_THROWS(iterator_type(""));
+    CHECK_THROWS(iterator_type(PS_TEXT("")));
     error_code ec;
-    iterator_type i{"", ec};
+    iterator_type i{PS_TEXT(""), ec};
     CHECK(i == end(i));
     
     const auto p = create_file(temp_directory_path() / PS_TEXT("fs17test"));
