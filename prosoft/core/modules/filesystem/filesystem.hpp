@@ -40,10 +40,11 @@ using error_code = std::error_code; // Extension
 }}}
 // clang-format on
 
-#include "filesystem_path.hpp"
-#include "filesystem_acl.hpp"
-
 #include <prosoft/core/include/system_error.hpp>
+
+#include "filesystem_path.hpp"
+#include "filesystem_iterator.hpp"
+#include "filesystem_acl.hpp"
 
 namespace prosoft {
 namespace filesystem {
@@ -129,11 +130,9 @@ inline path u8path(InputIterator first, InputIterator last) {
     return path{u8string{std::string{first, last}}};
 }
 
-// Extensions
-inline const std::error_category& filesystem_category() noexcept {
+inline const std::error_category& filesystem_category() noexcept { // Extension
     return system::error_category();
 }
-// Extensions
 
 class filesystem_error : public std::system_error {
 public:
@@ -407,67 +406,6 @@ private:
     perms m_perms;
 };
 
-class directory_entry {
-    // C++ states that a name within a scope must have a unique meaning.
-    // Therefore path() conflicts with the use of the 'path' type from our namespace and is ambigous.
-    // GCC warns about this, clang does not.
-    using path_type = prosoft::filesystem::path;
-    path_type m_path;
-    const path_type& get_path() const {
-        return m_path;
-    }
-
-public:
-    PS_DEFAULT_CLASS(directory_entry);
-    explicit directory_entry(const path_type& p)
-        : m_path(p) {}
-    // Extensions //
-    explicit directory_entry(path_type&& p) noexcept(std::is_nothrow_move_constructible<path_type>::value)
-        : m_path(std::move(p)) {}
-    // Extensions //
-
-    void assign(const path_type& p) {
-        m_path = p;
-    }
-
-    void replace_filename(const path_type& p) {
-        m_path.replace_filename(p);
-    }
-
-    operator const path_type&() const noexcept {
-        return get_path();
-    }
-
-    const path_type& path() const noexcept {
-        return get_path();
-    }
-
-    file_status status() const;
-    file_status status(error_code&) const noexcept;
-
-    file_status symlink_status() const;
-    file_status symlink_status(error_code&) const noexcept;
-
-    bool operator==(const directory_entry& other) const noexcept {
-        return get_path() == other.get_path();
-    }
-    bool operator!=(const directory_entry& other) const noexcept {
-        return get_path() != other.get_path();
-    }
-    bool operator<(const directory_entry& other) const noexcept {
-        return get_path() < other.get_path();
-    }
-    bool operator<=(const directory_entry& other) const noexcept {
-        return get_path() <= other.get_path();
-    }
-    bool operator>(const directory_entry& other) const noexcept {
-        return get_path() > other.get_path();
-    }
-    bool operator>=(const directory_entry& other) const noexcept {
-        return get_path() >= other.get_path();
-    }
-};
-
 // operations
 path current_path();
 path current_path(error_code&);
@@ -611,6 +549,9 @@ inline bool is_other(const path& p, error_code& ec) noexcept {
     return is_other(status(p, ec));
 }
 
+path temp_directory_path();
+path temp_directory_path(error_code&);
+
 // dir entry ops
 inline file_status directory_entry::status() const {
     return prosoft::filesystem::status(get_path());
@@ -625,8 +566,43 @@ inline file_status directory_entry::symlink_status(error_code& ec) const noexcep
     return prosoft::filesystem::symlink_status(get_path(), ec);
 }
 
-path temp_directory_path();
-path temp_directory_path(error_code&);
+inline bool operator==(const directory_entry& lhs, const directory_entry& rhs) {
+    return rhs.path() == lhs.path();
+}
+inline bool operator!=(const directory_entry& lhs, const directory_entry& rhs) {
+    return rhs.path() != lhs.path();
+}
+inline bool operator<(const directory_entry& lhs, const directory_entry& rhs) {
+    return rhs.path() < lhs.path();
+}
+inline bool operator<=(const directory_entry& lhs, const directory_entry& rhs) {
+    return rhs.path() <= lhs.path();
+}
+inline bool operator>(const directory_entry& lhs, const directory_entry& rhs) {
+    return rhs.path() > lhs.path();
+}
+inline bool operator>=(const directory_entry& lhs, const directory_entry& rhs) {
+    return rhs.path() >= lhs.path();
+}
+
+// iterators
+template <class Traits>
+basic_iterator<Traits>& basic_iterator<Traits>::operator++() {
+    error_code ec;
+    increment(ec);
+    PS_THROW_IF(ec.value() != 0, filesystem_error("Could not increment iterator", root_or_empty(), ec));
+    return *this;
+}
+
+template <class Traits>
+basic_iterator<Traits>::basic_iterator(const path& p, directory_options opts) {
+    error_code ec;
+    m_i = ifilesystem::make_iterator_state(p, ifilesystem::make_options<Traits>(opts), ec, Traits{});
+    PS_THROW_IF(ec.value() != 0, filesystem_error("Could not create iterator", p, ec));
+}
+
+using directory_iterator = basic_iterator<ifilesystem::iterator_traits>;
+using recursive_directory_iterator = basic_iterator<ifilesystem::recursive_iterator_traits>;
 
 // Extensions
 

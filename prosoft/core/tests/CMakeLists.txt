@@ -44,6 +44,7 @@ set(SRCTESTS
     ${CORETESTS}/src/case_convert_tests.cpp
     ${CORETESTS}/src/filesystem_tests.cpp
     ${CORETESTS}/src/filesystem_acl_tests.cpp
+    ${CORETESTS}/src/filesystem_iterator_tests.cpp
     ${CORETESTS}/src/filesystem_path_tests.cpp
     ${CORETESTS}/src/path_utils_tests.cpp
     ${CORETESTS}/src/regex_tests.cpp
