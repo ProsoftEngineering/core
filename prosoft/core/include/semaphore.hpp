@@ -174,14 +174,14 @@ public:
         }
     }
 
-    template <typename = typename std::enable_if<std::is_same<Value, isemaphore::binary_semaphore_value>::value>>
-    void reset() {
+    template <typename Reset = void>
+    void reset(typename std::enable_if<std::is_same<Value, isemaphore::binary_semaphore_value>::value, Reset>::type* = 0) {
         std::lock_guard<std::mutex> l(m_lck);
         m_val.reset();
     }
 
-    template <typename = typename std::enable_if<std::is_same<Value, isemaphore::event_semaphore_value>::value>>
-    void reset(integral_type count) {
+    template <typename Reset = void>
+    void reset(integral_type count, typename std::enable_if<std::is_same<Value, isemaphore::event_semaphore_value>::value, Reset>::type* = 0) {
         std::lock_guard<std::mutex> l(m_lck);
         m_val.reset(count);
     }
