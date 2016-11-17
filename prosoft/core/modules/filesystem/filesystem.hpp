@@ -567,22 +567,22 @@ inline file_status directory_entry::symlink_status(error_code& ec) const noexcep
 }
 
 inline bool operator==(const directory_entry& lhs, const directory_entry& rhs) {
-    return rhs.path() == lhs.path();
+    return lhs.path() == rhs.path();
 }
 inline bool operator!=(const directory_entry& lhs, const directory_entry& rhs) {
-    return rhs.path() != lhs.path();
+    return lhs.path() != rhs.path();
 }
 inline bool operator<(const directory_entry& lhs, const directory_entry& rhs) {
-    return rhs.path() < lhs.path();
+    return lhs.path() < rhs.path();
 }
 inline bool operator<=(const directory_entry& lhs, const directory_entry& rhs) {
-    return rhs.path() <= lhs.path();
+    return lhs.path() <= rhs.path();
 }
 inline bool operator>(const directory_entry& lhs, const directory_entry& rhs) {
-    return rhs.path() > lhs.path();
+    return lhs.path() > rhs.path();
 }
 inline bool operator>=(const directory_entry& lhs, const directory_entry& rhs) {
-    return rhs.path() >= lhs.path();
+    return lhs.path() >= rhs.path();
 }
 
 // iterators
