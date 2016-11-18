@@ -29,7 +29,7 @@
 #include <type_traits>
 
 #include <filesystem/filesystem.hpp>
-#include <filesystem/filesystem_private.hpp>
+#include <filesystem/src/filesystem_private.hpp>
 
 #include "catch.hpp"
 
