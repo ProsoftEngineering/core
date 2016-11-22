@@ -111,8 +111,8 @@ struct cf_delete {
 };
 } // iunique
 
-template <typename CFRefType>
-using unique_cftype = std::unique_ptr<typename std::remove_pointer<CFRefType>::type, iunique::cf_delete>;
+template <typename CFRefType, class Deleter = iunique::cf_delete>
+using unique_cftype = std::unique_ptr<typename std::remove_pointer<CFRefType>::type, Deleter>;
 
 namespace CF {
 // Common CF type aliases
