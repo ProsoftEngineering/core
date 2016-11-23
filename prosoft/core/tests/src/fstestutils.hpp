@@ -26,12 +26,25 @@
 #include <fstream>
 
 namespace {
-    const path& create_file(const path& p, std::ios::openmode mode = std::ios::binary) {
-        std::ofstream{p.c_str(), mode};
+    template<typename T>
+    const T& create_file(const T& p, std::ios::openmode mode = std::ios::binary) {
+        std::ofstream stream(p, mode);
+        REQUIRE(stream);
         return p;
     }
     
-    path create_file(path&& p, std::ios::openmode mode = std::ios::binary) {
+    // Microsoft's compiler offers std::ofstream with wide character support as an extension, but Mingw posix does not.
+    // Since Mingw is currently only for compiling, always fail. Could use CreateFile() instead for both compilers.
+#ifdef __MINGW32__
+    template<>
+    const filesystem::basic_path<prosoft::u16string>& create_file(const filesystem::basic_path<prosoft::u16string>& p, std::ios::openmode) {
+        REQUIRE(false); // always fail
+        return p;
+    }
+#endif
+
+    template<typename T>
+    T create_file(T&& p, std::ios::openmode mode = std::ios::binary) {
         create_file(p, mode);
         return p;
     }

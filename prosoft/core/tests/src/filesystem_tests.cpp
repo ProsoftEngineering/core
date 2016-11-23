@@ -36,6 +36,8 @@
 using namespace prosoft;
 using namespace prosoft::filesystem;
 
+#include "fstestutils.hpp"
+
 TEST_CASE("filesystem") {
 
     SECTION("filesystem_error") {
@@ -167,8 +169,7 @@ TEST_CASE("filesystem") {
     WHEN("path is a file") {
         const auto p = temp_directory_path() / PS_TEXT("fs17test");
         {
-            std::ofstream ts{p.c_str(), std::ios::binary};
-            REQUIRE(ts);
+            create_file(p);
         }
         const auto st = status(p);
         CHECK(is_regular_file(p));
@@ -362,8 +363,7 @@ TEST_CASE("filesystem") {
         const auto fp = p / uniqueName;
         REQUIRE_FALSE(exists(fp, ec));
         {
-            std::ofstream ts{fp.c_str(), std::ios::binary};
-            REQUIRE(ts);
+            create_file(fp);
         }
         CHECK_FALSE(is_mountpoint(fp));
         
@@ -426,8 +426,7 @@ TEST_CASE("filesystem") {
             error_code ec;
             REQUIRE_FALSE(is_directory(p, ec));
             {
-                std::ofstream ts{p.c_str(), std::ios::binary};
-                REQUIRE(ts);
+                create_file(p);
             }
             CHECK_THROWS(create_directory(p));
             REQUIRE(remove(p));
@@ -448,8 +447,7 @@ TEST_CASE("filesystem") {
             // Check fails with existing non-dir
             REQUIRE(remove(np));
             {
-                std::ofstream ts{np.c_str(), std::ios::binary};
-                REQUIRE(ts);
+                create_file(np);
             }
             CHECK_THROWS(create_directory(np, p));
 
@@ -486,8 +484,7 @@ TEST_CASE("filesystem") {
             const auto fp = p / PS_TEXT("1") / PS_TEXT("2");
             const auto ndp = fp.parent_path();
             {
-                std::ofstream ts{ndp.c_str(), std::ios::binary};
-                REQUIRE(ts);
+                create_file(ndp);
             }
             CHECK_THROWS(create_directories(fp));
             
