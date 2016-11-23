@@ -49,7 +49,7 @@ TEST_CASE("system_error") {
     
     CHECK_NOTHROW(prosoft::system::posix_category());
 
-#if !WIN32
+#if !_WIN32
     CHECK(prosoft::system::system_error().value() == EINVAL);
 #else
     set_error(ERROR_INVALID_HANDLE);
