@@ -28,7 +28,7 @@
 namespace {
     template<typename T>
     const T& create_file(const T& p, std::ios::openmode mode = std::ios::binary) {
-        std::ofstream stream(p, mode);
+        std::ofstream stream(p.c_str(), mode);
         REQUIRE(stream);
         return p;
     }
@@ -42,10 +42,4 @@ namespace {
         return p;
     }
 #endif
-
-    template<typename T>
-    T create_file(T&& p, std::ios::openmode mode = std::ios::binary) {
-        create_file(p, mode);
-        return p;
-    }
 }
