@@ -43,7 +43,7 @@ inline int acl_get_perm_np(acl_permset_t pset, acl_perm_t p) {
 #include "filesystem.hpp"
 #include "filesystem_private.hpp"
 
-// Notes: UNIX model includes mirrors of the owner/group/other perms and mask entry as ell.
+// Notes: UNIX model includes mirrors of the owner/group/other perms and mask entry as well.
 // The current implementation ignores these. If a set is attempted for the owner/group then it will go through chmod().
 // http://www.qnx.com/developers/docs/qnxcar2/index.jsp?topic=%2Fcom.qnx.doc.neutrino.user_guide%2Ftopic%2Ffiles_acls.html
 
