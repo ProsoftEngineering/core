@@ -126,8 +126,13 @@ NativeSearchType search(domain, standard_directory sd, error_code& ec) {
         {standard_directory::app_data, NSApplicationSupportDirectory},
         {standard_directory::cache, NSCachesDirectory}
 #elif _WIN32
+#ifdef __MINGW32__
+        {standard_directory::app_data, CSIDL_APPDATA},
+        {standard_directory::cache, CSIDL_LOCAL_APPDATA}
+#else
         {standard_directory::app_data, FOLDERID_RoamingAppData},
         {standard_directory::cache, FOLDERID_LocalAppData}
+#endif
 #else
         {standard_directory::app_data, "~/.config"},
         {standard_directory::cache, "~/.caches"}
@@ -153,7 +158,11 @@ typedef
 #if __APPLE__
     NSSearchPathDirectory
 #elif _WIN32
+#ifdef __MINGW32__
+    int
+#else
     REFKNOWNFOLDERID
+#endif
 #else
     const char*
 #endif
@@ -211,10 +220,20 @@ path standard_directory_path(domain d, standard_directory sd, standard_directory
     }
     return {};
 #elif _WIN32
+#ifdef __MINGW32__
+    // Mingw posix doesn't yet define SHGetKnownFolderPath()
+    WCHAR buf[MAX_PATH+1];
+    const auto err = ::SHGetFolderPathW(nullptr, nsd, nullptr, SHGFP_TYPE_CURRENT, buf);
+#else
     windows::unique_taskmem<wchar_t> buf;
     const auto err = ::SHGetKnownFolderPath(nsd, 0, nullptr, handle(buf));
+#endif
     if (S_OK == err) {
+#ifdef __MINGW32__
+        return post_process(buf, d, sdo, ec);
+#else
         return post_process(buf.get(), d, sdo, ec);
+#endif
     } else {
         ifilesystem::error(err, ec);
     }

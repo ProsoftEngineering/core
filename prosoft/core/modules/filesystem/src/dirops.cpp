@@ -366,17 +366,36 @@ path ifilesystem::home_directory_path(const access_control_identity& cid, error_
     }
 #else
     (void)cid; // TODO?
-    static auto system_directory = [](REFKNOWNFOLDERID t, error_code& ec) -> path {
+#ifdef __MINGW32__
+    using folder_path_id = int;
+#else
+    using folder_path_id = REFKNOWNFOLDERID;
+#endif
+    static auto system_directory = [](folder_path_id t, error_code& ec) -> path {
+#ifdef __MINGW32__
+        // Mingw posix doesn't yet define SHGetKnownFolderPath()
+        WCHAR buf[MAX_PATH+1];
+        const auto err = ::SHGetFolderPathW(nullptr, t, nullptr, SHGFP_TYPE_CURRENT, buf);
+#else
         windows::unique_taskmem<wchar_t> buf;
         const auto err = ::SHGetKnownFolderPath(t, 0, nullptr, handle(buf));
+#endif
         if (S_OK == err) {
+#ifdef __MINGW32__
+            return path{buf};
+#else
             return path{buf.get()};
+#endif
         } else {
             ifilesystem::error(err, ec);
             return {};
         }
     };
+#ifdef __MINGW32__
+    p = system_directory(CSIDL_PROFILE, ec);
+#else
     p = system_directory(FOLDERID_Profile, ec);
+#endif
 #endif
     
     assert_directory_exists(p, ec);
