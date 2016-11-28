@@ -296,6 +296,38 @@ bool remove(const path& p, error_code& ec) noexcept {
     }
 }
 
+void rename(const path& op, const path& np) {
+    error_code ec;
+    rename(op, np, ec);
+    PS_THROW_IF(ec.value() != 0, filesystem_error("rename failed", op, np, ec));
+}
+
+void rename(const path& op, const path& np, error_code& ec) noexcept {
+    ec.clear();
+#if !_WIN32
+    int err = ::rename(op.c_str(), np.c_str());
+    if (-1 == err && EINTR == errno) {
+        err = ::rename(op.c_str(), np.c_str());
+    }
+    if (0 != err) {
+        system::system_error(ec);
+    }
+#else // !_WIN32
+    DWORD flags = MOVEFILE_REPLACE_EXISTING; // files only, dirs have to be handled manually
+    if (is_directory(op, ec)) {
+        if (!remove(op, ec)) {
+            return;
+        }
+        flags = 0;
+    }
+    ec.clear();
+    if (!::MoveFileExW(op.c_str(), np.c_str(), flags)) {
+        system::system_error(ec);
+    }
+#endif
+    
+}
+
 path temp_directory_path() {
     error_code ec;
     auto p = temp_directory_path(ec);

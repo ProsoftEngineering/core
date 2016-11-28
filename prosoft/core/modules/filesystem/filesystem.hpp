@@ -441,6 +441,9 @@ bool equivalent(const path&, const path&, error_code&) noexcept;
 bool remove(const path&);
 bool remove(const path&, error_code&) noexcept;
 
+void rename(const path&, const path&);
+void rename(const path&, const path&, error_code&) noexcept;
+
 file_status status(const path&);
 file_status status(const path&, error_code&) noexcept;
 

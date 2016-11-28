@@ -498,4 +498,91 @@ TEST_CASE("filesystem") {
             CHECK_THROWS(remove(p));
         }
     }
+    
+    SECTION("rename") {
+        const auto op = temp_directory_path() / PS_TEXT("fs171");
+        const auto np = temp_directory_path() / PS_TEXT("fs172");
+        error_code ec;
+        remove(np, ec);
+        REQUIRE_FALSE(exists(np, ec));
+        
+        WHEN("renaming a non-existant path") {
+            remove(op, ec);
+            REQUIRE_FALSE(exists(op, ec));
+            CHECK_THROWS(rename(op, np));
+            REQUIRE_FALSE(exists(np, ec));
+        }
+        
+        WHEN("renaming a file to a non-existant path") {
+            create_file(op);
+            REQUIRE(exists(op));
+            
+            CHECK_NOTHROW(rename(op, np));
+            
+            CHECK_FALSE(exists(op, ec));
+            REQUIRE(remove(np));
+        }
+        
+        WHEN("renaming a file to an existing file") {
+            create_file(op);
+            REQUIRE(exists(op));
+            
+            create_file(np);
+            REQUIRE(exists(np));
+            
+            CHECK_NOTHROW(rename(op, np));
+            
+            CHECK_FALSE(exists(op, ec));
+            REQUIRE(remove(np));
+        }
+        
+        WHEN("renaming a file to an existing directory") {
+            create_file(op);
+            REQUIRE(exists(op));
+            
+            REQUIRE(create_directory(np));
+            REQUIRE(exists(np));
+            
+            CHECK_THROWS(rename(op, np));
+            
+            REQUIRE(remove(op));
+            REQUIRE(remove(np));
+        }
+        
+        WHEN("renaming a dir to a non-existant path") {
+            create_directory(op);
+            REQUIRE(exists(op));
+            
+            CHECK_NOTHROW(rename(op, np));
+            
+            CHECK_FALSE(exists(op, ec));
+            REQUIRE(remove(np));
+        }
+        
+        WHEN("renaming a dir to an existing dir") {
+            create_directory(op);
+            REQUIRE(exists(op));
+            
+            create_directory(np);
+            REQUIRE(exists(np));
+            
+            CHECK_NOTHROW(rename(op, np));
+            
+            CHECK_FALSE(exists(op, ec));
+            REQUIRE(remove(np));
+        }
+        
+        WHEN("renaming a dir to an existing file") {
+            create_directory(op);
+            REQUIRE(exists(op));
+            
+            create_file(np);
+            REQUIRE(exists(np));
+            
+            CHECK_THROWS(rename(op, np));
+            
+            REQUIRE(remove(op));
+            REQUIRE(remove(np));
+        }
+    }
 }
