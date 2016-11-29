@@ -559,6 +559,7 @@ TEST_CASE("filesystem") {
             REQUIRE(remove(np));
         }
         
+#if !_WIN32 // POSIX behavior that Windows does not support
         WHEN("renaming a dir to an existing dir") {
             create_directory(op);
             REQUIRE(exists(op));
@@ -584,5 +585,6 @@ TEST_CASE("filesystem") {
             REQUIRE(remove(op));
             REQUIRE(remove(np));
         }
+#endif // !_WIN32
     }
 }

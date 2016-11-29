@@ -313,19 +313,10 @@ void rename(const path& op, const path& np, error_code& ec) noexcept {
         system::system_error(ec);
     }
 #else // !_WIN32
-    DWORD flags = MOVEFILE_REPLACE_EXISTING; // files only, dirs have to be handled manually
-    if (is_directory(op, ec)) {
-        if (!remove(op, ec)) {
-            return;
-        }
-        flags = 0;
-    }
-    ec.clear();
-    if (!::MoveFileExW(op.c_str(), np.c_str(), flags)) {
+    if (!::MoveFileExW(op.c_str(), np.c_str(), MOVEFILE_REPLACE_EXISTING)) {
         system::system_error(ec);
     }
 #endif
-    
 }
 
 path temp_directory_path() {
