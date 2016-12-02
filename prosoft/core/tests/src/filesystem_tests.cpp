@@ -159,6 +159,7 @@ TEST_CASE("filesystem") {
             CHECK((s.type() == file_type::not_found));
 
             CHECK(last_write_time(p, ec) == times::make_invalid());
+            CHECK_THROWS(last_write_time(p, std::chrono::system_clock::now()));
         }
         AND_THEN("the file does not exist") {
             error_code ec;
@@ -182,6 +183,16 @@ TEST_CASE("filesystem") {
         CHECK_FALSE(is_device_file(st));
 
         CHECK(last_write_time(p) > times::make_invalid());
+        
+        using namespace std::chrono;
+        const auto now = std::chrono::system_clock::now();
+        const auto t = now - duration_cast<file_time_type::duration>(seconds(3600));
+#if !_WIN32
+        CHECK_NOTHROW(last_write_time(p, t));
+        CHECK(last_write_time(p) < now);
+#else
+        CHECK_THROWS(last_write_time(p, t)); // not implemented yet
+#endif
         
         REQUIRE(remove(p));
     }

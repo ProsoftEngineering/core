@@ -468,9 +468,12 @@ inline file_time_type last_write_time(const path& p) {
     return status(p).times().modified();
 }
 
-inline file_time_type last_write_time(const path& p, error_code& ec) {
+inline file_time_type last_write_time(const path& p, error_code& ec) noexcept {
     return status(p, ec).times().modified();
 }
+
+void last_write_time(const path&, file_time_type);
+void last_write_time(const path& p, file_time_type, error_code& ec) noexcept;
 
 inline bool is_block_file(file_status s) noexcept {
     return s.type() == file_type::block;

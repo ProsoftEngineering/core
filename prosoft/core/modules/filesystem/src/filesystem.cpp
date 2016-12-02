@@ -30,6 +30,7 @@
 #if !_WIN32
 #include <sys/errno.h>
 #include <sys/stat.h>
+#include <sys/time.h>
 #include <unistd.h>
 #else
 #include <windows.h>
@@ -88,6 +89,22 @@ struct to_owner {
 };
 
 struct to_times {
+    ::timespec to_timespec(const file_time_type& t) const {
+        auto ns = std::chrono::duration_cast<std::chrono::nanoseconds>(t.time_since_epoch());
+        return ::timespec{
+            .tv_sec = ns.count() / std::chrono::nanoseconds::period::den,
+            .tv_nsec = ns.count() % std::chrono::nanoseconds::period::den,
+        };
+    }
+    
+    // XXX: timeval is platform specific (nsec on BSD and usec on Linux)
+    ::timeval to_timeval(const file_time_type& t) const {
+        ::timeval tv;
+        const auto ts = to_timespec(t);
+        TIMESPEC_TO_TIMEVAL(&tv, &ts);
+        return tv;
+    }
+    
 #if PS_FS_HAVE_BSD_STATFS
     #define PS_ST_MTIME st_mtimespec
     #define PS_ST_CTIME st_ctimespec
@@ -428,6 +445,38 @@ file_status symlink_status(const path& p, error_code& ec) noexcept {
     return link_stat(p, ec);
 }
 
+void last_write_time(const path& p, file_time_type t) {
+    error_code ec;
+    last_write_time(p, t, ec);
+    PS_THROW_IF(ec.value(), filesystem_error("Could not set write time", p, ec));
+}
+
+void last_write_time(const path& p, file_time_type t, error_code& ec) noexcept {
+#if !_WIN32
+    struct stat sb;
+    if (0 == ::stat(p.c_str(), &sb)) {
+        ::timeval utvals[2];
+        utvals[1] = to_times{}.to_timeval(t);
+        #if PS_FS_HAVE_BSD_STATFS
+        TIMESPEC_TO_TIMEVAL(&utvals[0], &sb.st_atimespec);
+        #else
+        utvals[0].tv_sec = sb.st_atime;
+        utvals[0].tv_usec = 0;
+        #endif
+        
+        if (0 != ::utimes(p.c_str(), utvals)) {
+            ec = system::system_error();
+        }
+    } else {
+        ec = system::system_error();
+    }
+#else
+    (void)p;
+    (void)t;
+    ec = error_code(ERROR_NOT_SUPPORTED, std::system_category());
+#endif
+}
+
 #if _WIN32
 namespace ifilesystem { // private API
 
@@ -469,7 +518,7 @@ bool finfo(const path& p, ::BY_HANDLE_FILE_INFORMATION* info, error_code& ec) {
 // Internal tests.
 #include "catch.hpp"
 
-TEST_CASE("filesystem internal") {
+TEST_CASE("filesystem_internal") {
     using namespace prosoft::filesystem;
     
     SECTION("file type") {
@@ -506,6 +555,24 @@ TEST_CASE("filesystem internal") {
         CHECK(tft(error_code{ERROR_TOO_MANY_OPEN_FILES, filesystem_category()}) == file_type::unknown);
         CHECK(tft(error_code{ERROR_BAD_NETPATH, filesystem_category()}) == file_type::unknown);
         CHECK(tft(error_code{ERROR_INVALID_HANDLE, filesystem_category()}) == file_type::none);
+#endif
+    }
+    
+    SECTION("time conversion") {
+#if !_WIN32
+    auto val = to_times{}.to_timespec(file_time_type{});
+    CHECK(val.tv_sec == 0);
+    CHECK(val.tv_nsec == 0);
+    
+    using namespace std::chrono;
+    val = to_times{}.to_timespec(file_time_type{duration_cast<file_time_type::duration>(seconds(1))});
+    CHECK(val.tv_sec == 1);
+    CHECK(val.tv_nsec == 0);
+    
+    val = to_times{}.to_timespec(file_time_type{duration_cast<file_time_type::duration>(milliseconds(10))});
+    CHECK(val.tv_sec == 0);
+    CHECK(val.tv_nsec == 10000000);
+#else
 #endif
     }
 }
