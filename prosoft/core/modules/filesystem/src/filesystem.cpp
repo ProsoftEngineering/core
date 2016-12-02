@@ -377,7 +377,7 @@ constexpr file_time_type times::m_invalidTime;
 bool equivalent(const path& p1, const path& p2) {
     error_code ec;
     auto val = equivalent(p1, p2, ec);
-    PS_THROW_IF(ec.value(), filesystem_error("file equivalence failed", p1, p2, ec));
+    PS_THROW_IF(ec.value(), filesystem_error("Could not determine file equivalence", p1, p2, ec));
     return val;
 }
 
@@ -426,7 +426,7 @@ bool equivalent(const path& p1, const path& p2, error_code& ec) noexcept {
 file_status status(const path& p) {
     error_code ec;
     auto fs = status(p, ec);
-    PS_THROW_IF(ec.value(), filesystem_error("file status failed", p, ec));
+    PS_THROW_IF(ec.value(), filesystem_error("Could not get status", p, ec));
     return fs;
 }
 
@@ -437,7 +437,7 @@ file_status status(const path& p, error_code& ec) noexcept {
 file_status symlink_status(const path& p) {
     error_code ec;
     auto fs = symlink_status(p, ec);
-    PS_THROW_IF(ec.value(), filesystem_error("link status failed", p, ec));
+    PS_THROW_IF(ec.value(), filesystem_error("Could not get symlink status", p, ec));
     return fs;
 }
 

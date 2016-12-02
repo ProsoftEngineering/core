@@ -184,7 +184,7 @@ inline namespace v1 {
 bool create_directories(const path& p, perms perm) {
     error_code ec;
     const auto good = create_directories(p, perm, ec);
-    PS_THROW_IF(!good, filesystem_error("create dirs failed", p, ec));
+    PS_THROW_IF(!good, filesystem_error("Could not create directories", p, ec));
     return good;
 }
 
@@ -210,7 +210,7 @@ bool create_directories(const path& p, perms perm, error_code& ec) noexcept {
 bool create_directory(const path& p, perms perm) {
     error_code ec;
     const auto good = create_directory(p, perm, ec);
-    PS_THROW_IF(!good, filesystem_error("create dir failed", p, ec));
+    PS_THROW_IF(!good, filesystem_error("Could not create directory", p, ec));
     return good;
 }
 
@@ -228,7 +228,7 @@ bool create_directory(const path& p, perms perm, error_code& ec) noexcept {
 bool create_directory(const path& p, const path& cloneFrom) {
     error_code ec;
     const auto good = create_directory(p, cloneFrom, ec);
-    PS_THROW_IF(!good, filesystem_error("clone dir failed", p, cloneFrom, ec));
+    PS_THROW_IF(!good, filesystem_error("Could not clone directory", p, cloneFrom, ec));
     return good;
 }
 
@@ -262,7 +262,7 @@ bool create_directory(const path& p, const path& cloneFrom, error_code& ec) noex
 bool remove(const path& p) {
     error_code ec;
     const auto good = remove(p, ec);
-    PS_THROW_IF(!good, filesystem_error("remove failed", p, ec));
+    PS_THROW_IF(!good, filesystem_error("Could not remove path", p, ec));
     return good;
 }
 
@@ -299,7 +299,7 @@ bool remove(const path& p, error_code& ec) noexcept {
 void rename(const path& op, const path& np) {
     error_code ec;
     rename(op, np, ec);
-    PS_THROW_IF(ec.value() != 0, filesystem_error("rename failed", op, np, ec));
+    PS_THROW_IF(ec.value() != 0, filesystem_error("Coulnd not rename path", op, np, ec));
 }
 
 void rename(const path& op, const path& np, error_code& ec) noexcept {
@@ -322,7 +322,7 @@ void rename(const path& op, const path& np, error_code& ec) noexcept {
 path temp_directory_path() {
     error_code ec;
     auto p = temp_directory_path(ec);
-    PS_THROW_IF(ec.value(), filesystem_error("temporary dir failed", p, ec));
+    PS_THROW_IF(ec.value(), filesystem_error("Could not get temporary directory", p, ec));
     return p;
 }
 
@@ -366,7 +366,7 @@ path temp_directory_path(error_code& ec) {
 path home_directory_path() {
     error_code ec;
     auto p = home_directory_path(ec);
-    PS_THROW_IF(ec.value(), filesystem_error("home dir failed", p, ec));
+    PS_THROW_IF(ec.value(), filesystem_error("Could not get home directory", p, ec));
     return p;
 }
 
@@ -428,7 +428,7 @@ path ifilesystem::home_directory_path(const access_control_identity& cid, error_
 bool is_mountpoint(const path& p) {
     error_code ec;
     auto val = is_mountpoint(p, ec);
-    PS_THROW_IF(ec.value(), filesystem_error("mount point failed", p, ec));
+    PS_THROW_IF(ec.value(), filesystem_error("Could not get mount point", p, ec));
     return val;
 }
 
@@ -446,7 +446,7 @@ bool is_mountpoint(const path& p, error_code& ec) {
 path mount_path(const path& p) {
     error_code ec;
     auto mp = mount_path(p, ec);
-    PS_THROW_IF(ec.value(), filesystem_error("mount path failed", p, ec));
+    PS_THROW_IF(ec.value(), filesystem_error("Could not get mount path", p, ec));
     return mp;
 }
 
