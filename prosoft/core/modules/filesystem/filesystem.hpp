@@ -450,11 +450,11 @@ file_status status(const path&, error_code&) noexcept;
 file_status symlink_status(const path&);
 file_status symlink_status(const path&, error_code&) noexcept;
 
-inline bool status_known(file_status s) noexcept {
+inline bool status_known(const file_status& s) noexcept {
     return s.type() != file_type::none;
 }
 
-inline bool exists(file_status s) noexcept {
+inline bool exists(const file_status& s) noexcept {
     return status_known(s) && s.type() != file_type::not_found;
 }
 inline bool exists(const path& p) {
@@ -475,7 +475,7 @@ inline file_time_type last_write_time(const path& p, error_code& ec) noexcept {
 void last_write_time(const path&, file_time_type);
 void last_write_time(const path& p, file_time_type, error_code& ec) noexcept;
 
-inline bool is_block_file(file_status s) noexcept {
+inline bool is_block_file(const file_status& s) noexcept {
     return s.type() == file_type::block;
 }
 inline bool is_block_file(const path& p) {
@@ -485,7 +485,7 @@ inline bool is_block_file(const path& p, error_code& ec) noexcept {
     return is_block_file(status(p, ec));
 }
 
-inline bool is_character_file(file_status s) noexcept {
+inline bool is_character_file(const file_status& s) noexcept {
     return s.type() == file_type::character;
 }
 inline bool is_character_file(const path& p) {
@@ -495,7 +495,7 @@ inline bool is_character_file(const path& p, error_code& ec) noexcept {
     return is_character_file(status(p, ec));
 }
 
-inline bool is_directory(file_status s) noexcept {
+inline bool is_directory(const file_status& s) noexcept {
     return s.type() == file_type::directory;
 }
 inline bool is_directory(const path& p) {
@@ -505,7 +505,7 @@ inline bool is_directory(const path& p, error_code& ec) noexcept {
     return is_directory(status(p, ec));
 }
 
-inline bool is_fifo(file_status s) noexcept {
+inline bool is_fifo(const file_status& s) noexcept {
     return s.type() == file_type::fifo;
 }
 inline bool is_fifo(const path& p) {
@@ -515,7 +515,7 @@ inline bool is_fifo(const path& p, error_code& ec) noexcept {
     return is_fifo(status(p, ec));
 }
 
-inline bool is_regular_file(file_status s) noexcept {
+inline bool is_regular_file(const file_status& s) noexcept {
     return s.type() == file_type::regular;
 }
 inline bool is_regular_file(const path& p) {
@@ -525,7 +525,7 @@ inline bool is_regular_file(const path& p, error_code& ec) noexcept {
     return is_regular_file(status(p, ec));
 }
 
-inline bool is_socket(file_status s) noexcept {
+inline bool is_socket(const file_status& s) noexcept {
     return s.type() == file_type::socket;
 }
 inline bool is_socket(const path& p) {
@@ -535,7 +535,7 @@ inline bool is_socket(const path& p, error_code& ec) noexcept {
     return is_socket(status(p, ec));
 }
 
-inline bool is_symlink(file_status s) noexcept {
+inline bool is_symlink(const file_status& s) noexcept {
     return s.type() == file_type::symlink;
 }
 inline bool is_symlink(const path& p) {
@@ -545,7 +545,7 @@ inline bool is_symlink(const path& p, error_code& ec) noexcept {
     return is_symlink(status(p, ec));
 }
 
-inline bool is_other(file_status s) noexcept {
+inline bool is_other(const file_status& s) noexcept {
     return exists(s) && !is_regular_file(s) && !is_directory(s) && !is_symlink(s);
 }
 inline bool is_other(const path& p) {
@@ -615,7 +615,7 @@ using recursive_directory_iterator = basic_iterator<ifilesystem::recursive_itera
 // FreeBSD dropped block devices a while ago, Windows never supported block devices and Linux does not have disk char devices.
 // Therefore in most cases all you should care about is if the file is a device file and not what type of device.
 
-inline bool is_device_file(file_status s) noexcept {
+inline bool is_device_file(const file_status& s) noexcept {
     return is_character_file(s) || is_block_file(s);
 }
 inline bool is_device_file(const path& p) {
