@@ -30,6 +30,20 @@
 #include <unique_resource.hpp>
 #endif
 
+namespace fs = prosoft::filesystem::v1;
+
+namespace {
+    inline std::error_code einval() {
+        return std::error_code{
+    #if !_WIN32
+            EINVAL,
+    #else
+            ERROR_INVALID_PARAMETER,
+    #endif
+            std::system_category()};
+    }
+} // anon
+
 namespace prosoft {
 namespace filesystem {
 inline namespace v1 {
@@ -115,6 +129,7 @@ inline bool fattrs(const path& p, DWORD flags) {
 #endif
 
 } // ifilesystem
+
 } // v1
 } // filesystem
 } // prosoft

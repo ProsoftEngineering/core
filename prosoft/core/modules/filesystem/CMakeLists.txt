@@ -33,6 +33,7 @@ include("${CMAKE_CURRENT_LIST_DIR}/../config_module.cmake")
 set(fs_lib ${PROJECT_NAME})
 add_library(${fs_lib}
     ${PSFS}/src/dirops.cpp
+    ${PSFS}/src/fsmonitor.cpp
     ${PSFS}/src/iterator.cpp
     ${PSFS}/src/pathops.cpp
     ${PSFS}/src/filesystem.cpp
@@ -48,7 +49,10 @@ target_include_directories(${fs_lib}
 )
 
 if(APPLE)
-    target_link_libraries(${fs_lib} PUBLIC "-framework CoreFoundation")
+    target_sources(${fs_lib} PRIVATE
+        ${PSFS}/src/fsevents_monitor.cpp
+    )
+    target_link_libraries(${fs_lib} PUBLIC "-framework CoreFoundation -framework CoreServices")
 endif()
 
 if(WIN32)
