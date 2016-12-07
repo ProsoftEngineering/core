@@ -241,7 +241,7 @@ struct change_config {
     change_event events;
     unsigned reserved_flags;
     
-    constexpr change_config()
+    constexpr change_config() noexcept
         : state()
         , notification_latency(1000)
         , events(change_event::all)
