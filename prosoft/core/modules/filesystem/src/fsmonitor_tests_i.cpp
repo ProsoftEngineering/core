@@ -64,4 +64,16 @@ SECTION("notification") {
     note = change_manager::make_notification(PS_TEXT(""), PS_TEXT(""), nullptr, change_event::rescan_required);
     CHECK(rescan(note));
     CHECK(canceled(note));
+    
+    // test copy/move into vector
+    change_notifications notes;
+// Xcode 7&8 ASAN both fire "heap buffer overflow" for change_manager default copy and move if we use reserve.
+// The output seems to point to some memory allocated by Catch, it may be the trigger as I cannot reproduce the problem with a simple test binary.
+#if 0
+    notes.reserve(2);
+#endif
+    note = change_manager::make_notification(PS_TEXT("test"), path{}, nullptr, change_event::rescan_required);
+    notes.push_back(note);
+    notes.emplace_back(change_manager::make_notification(PS_TEXT("test"), path{}, nullptr, change_event::rescan_required));
+    CHECK(notes.size() == 2);
 }

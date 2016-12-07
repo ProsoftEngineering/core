@@ -207,7 +207,7 @@ void fsevents_callback(ConstFSEventStreamRef, void* info, size_t nevents, void* 
         PSASSERT_NOTNULL(state);
         
         auto notes = std::make_unique<fs::change_notifications>();
-        notes->reserve(nevents);
+        // Don't use reserve for now. There's an Xcode ASAN overflow (possibly related to Catch).
         
         FSEventStreamEventId lastID = 0;
         auto paths = reinterpret_cast<const char* *>(evpaths);
