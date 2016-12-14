@@ -25,15 +25,15 @@
 
 #include <string>
 
-#include <string/string_convert.hpp>
+#include <string/unicode_convert.hpp>
 
 #include "catch.hpp"
 
 TEST_CASE("string_convert") {
-    using string = std::string;
-    using to_string = prosoft::to_string<string, string>;
-    
     SECTION("default") {
+        using string = std::string;
+        using to_string = prosoft::to_string<string, string>;
+    
         string test{"test"};
         
         WHEN("default conversion is performed on an lvalue") {
@@ -53,6 +53,21 @@ TEST_CASE("string_convert") {
                 CHECK(test.empty());
             }
         }
+    }
+    
+    WHEN("u8string is converted to a std::string") {
+        prosoft::u8string u8{"\xC3\xA1\xC3\xA1"};
+        CHECK_FALSE(u8.empty());
+        auto s = prosoft::to_string<std::string, prosoft::u8string>{}(u8);
+        CHECK_FALSE(s.empty());
+        CHECK_FALSE(u8.empty());
+        
+        s.clear();
+        CHECK(s.empty());
+        
+        s = prosoft::to_string<std::string, prosoft::u8string>{}(std::move(u8));
+        CHECK_FALSE(s.empty());
+        CHECK(u8.empty());
     }
     
     // see case_convert_tests for tolower/toupper

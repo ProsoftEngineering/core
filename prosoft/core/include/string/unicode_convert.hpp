@@ -43,6 +43,10 @@ public:
     result_type operator()(const argument_type& us) {
         return us.str();
     }
+    
+    result_type operator()(argument_type&& us) {
+        return result_type{std::move(us).str()};
+    }
 };
 
 template <>
