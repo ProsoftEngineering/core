@@ -103,6 +103,13 @@ TEST_CASE("filesystem_path") {
         }
     }
     
+    WHEN("path is an rvalue") {
+        path p{"aaa"};
+        auto native = std::move(p).native();
+        CHECK(native == PS_TEXT("aaa"));
+        CHECK(p.empty());
+    }
+    
     SECTION("assign") {
         path p{"aaa"};
         

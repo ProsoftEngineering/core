@@ -129,7 +129,8 @@ public:
     basic_path& replace_extension(const basic_path& replacement = basic_path());
     void swap(basic_path&) noexcept(noexcept(std::swap(std::declval<string_type&>(), std::declval<string_type&>())));
 
-    const string_type& native() const noexcept;
+    const string_type& native() const & noexcept;
+    string_type native() && noexcept(std::is_nothrow_constructible<string_type>::value); // XXX: not-spec
     const const_pointer c_str() const noexcept(noexcept(std::declval<string_type>().c_str()));
     operator string_type() const;
 
@@ -190,13 +191,6 @@ public:
     iterator end() const;
 
 private:
-    const string_type& raw() const& noexcept {
-        return native();
-    }
-    string_type raw() && noexcept(std::is_nothrow_move_assignable<string_type>::value) {
-        return std::move(m_pathname);
-    }
-
     string_type m_pathname;
 }; // path
 
@@ -727,7 +721,7 @@ inline basic_path<String>& basic_path<String>::make_preferred() {
 
 template <class String>
 inline basic_path<String>& basic_path<String>::remove_filename() {
-    m_pathname = parent_path().raw();
+    m_pathname = parent_path().native();
     return *this;
 }
 
@@ -766,8 +760,13 @@ void basic_path<String>::swap(basic_path& other) noexcept(noexcept(std::swap(std
 // observers //
 
 template <class String>
-inline const typename basic_path<String>::string_type& basic_path<String>::native() const noexcept {
-    return m_pathname;
+inline const typename basic_path<String>::string_type& basic_path<String>::native() const & noexcept {
+     return m_pathname;
+}
+
+template <class String>
+inline typename basic_path<String>::string_type basic_path<String>::native() && noexcept(std::is_nothrow_constructible<String>::value) {
+    return string_type{std::move(m_pathname)};
 }
 
 template <class String>
