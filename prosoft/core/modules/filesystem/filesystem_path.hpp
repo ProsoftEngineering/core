@@ -130,7 +130,7 @@ public:
     void swap(basic_path&) noexcept(noexcept(std::swap(std::declval<string_type&>(), std::declval<string_type&>())));
 
     const string_type& native() const & noexcept;
-    string_type native() && noexcept(std::is_nothrow_constructible<string_type>::value); // XXX: not-spec
+    string_type native() && noexcept(std::is_nothrow_move_constructible<string_type>::value); // XXX: not-spec
     const const_pointer c_str() const noexcept(noexcept(std::declval<string_type>().c_str()));
     operator string_type() const;
 
@@ -765,7 +765,7 @@ inline const typename basic_path<String>::string_type& basic_path<String>::nativ
 }
 
 template <class String>
-inline typename basic_path<String>::string_type basic_path<String>::native() && noexcept(std::is_nothrow_constructible<String>::value) {
+inline typename basic_path<String>::string_type basic_path<String>::native() && noexcept(std::is_nothrow_move_constructible<String>::value) {
     return string_type{std::move(m_pathname)};
 }
 
