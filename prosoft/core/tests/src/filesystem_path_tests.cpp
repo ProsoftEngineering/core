@@ -39,7 +39,7 @@ prosoft::filesystem::path operator+(const prosoft::filesystem::path& p1, const p
 
 using namespace prosoft;
 
-TEST_CASE("filesystem path") {
+TEST_CASE("filesystem_path") {
     using path = filesystem::path;
     using string = path::string_type;
     
@@ -106,8 +106,7 @@ TEST_CASE("filesystem path") {
     SECTION("assign") {
         path p{"aaa"};
         
-        WHEN("path is assigned another path")
-        {
+        WHEN("path is assigned another path") {
             path p2;
             p2 = p;
             THEN("path contains contents of input path") {
@@ -135,7 +134,7 @@ TEST_CASE("filesystem path") {
             }
         }
         
-        WHEN("path assign() is given a string") {
+        WHEN("path assign is given a string") {
             p.assign(test_string);
             THEN("path contains contents of string") {
                 CHECK(p.native() == test_string);
