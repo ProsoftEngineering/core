@@ -744,7 +744,7 @@ basic_path<String>& basic_path<String>::replace_extension(const basic_path& e) /
     operator/=(basename);
 
     if (!e.empty()) {
-        const auto dot = static_cast<value_type>('.');
+        constexpr auto dot = static_cast<value_type>('.');
         if (e.native()[0] != dot) {
             operator+=(dot);
         }
