@@ -93,14 +93,13 @@ enum class directory_options : unsigned {
     // Extensions
     skip_subdirectory_descendants = 1U<<20,
     skip_hidden_descendants = 1U<<21,
-    follow_mountpoints = 1U<<22,
-    postorder_directories = 1U<<23,
-    // MacOS
-    skip_package_descendants = 1U<<24,
+    skip_package_descendants = 1U<<22, // macOS
+    follow_mountpoints = 1U<<23,
+    include_postorder_directories = 1U<<24,
     // By default, we mimic the behavior of NSDirectoryEnumerator and skip "._" files.
     // However, unlike NSDE, we only skip "._" files that have a sibling of the same name. Orphan "._" files are always returned.
     // If for some reason you want paired "._" files too, set this. Normally it should not be set as the system automatically handles pairs.
-    include_apple_double_files = 1U<<25,
+    include_apple_double_files = 1U<<25, // macOS
 
     // Internal state
     reserved_state_skip_descendants = 1U<<30,
