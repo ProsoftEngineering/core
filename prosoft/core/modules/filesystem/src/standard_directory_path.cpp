@@ -135,7 +135,7 @@ NativeSearchType search(domain, standard_directory sd, error_code& ec) {
 #endif
 #else
         {standard_directory::app_data, "~/.config"},
-        {standard_directory::cache, "~/.caches"}
+        {standard_directory::cache, "~/.cache"}
 #endif
     };
     const auto i = sdmap.find(sd);
