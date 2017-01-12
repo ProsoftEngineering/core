@@ -568,7 +568,7 @@ struct equal_to<prosoft::u8string> {
     typedef prosoft::u8string second_argument_type;
     typedef bool result_type;
     result_type operator()(const first_argument_type& s1, const second_argument_type& s2) const {
-        return (s1 == s2);
+        return s1 == s2;
     }
 };
 }
