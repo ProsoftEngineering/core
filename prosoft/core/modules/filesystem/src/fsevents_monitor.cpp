@@ -172,7 +172,7 @@ void dispatch_events::callout_to_client(platform_state* state, fs::change_notifi
             // Before the callback so the client can archive the state with the correct id.
             ss->m_lastid = lastNoteID;
         }
-        PSIgnoreCppException(fs::change_manager::process_renames(*n); ss->m_callback(*n));
+        PSIgnoreCppException(fs::change_manager::process_renames(*n); ss->m_callback(std::move(*n)));
     }
 }
 
@@ -637,7 +637,7 @@ TEST_CASE("filesystem_monitor_internal") {
         auto p = ss.get();
         
         set_monitor_runloop_guard rlg{CFRunLoopGetCurrent()}; // ignore the actual runloop
-        auto reg = register_events_monitor(std::move(ss), [](auto&){}, ec);
+        auto reg = register_events_monitor(std::move(ss), [](auto){}, ec);
         CHECK(reg);
         CHECK_FALSE(ss);
         ss = get_shared_state(p);
@@ -656,7 +656,7 @@ TEST_CASE("filesystem_monitor_internal") {
         auto p = ss.get();
         
         set_monitor_runloop_guard rlg{nullptr}; // Force FSEventStreamStart to fail (will print console messages)
-        auto reg = register_events_monitor(std::move(ss), [](auto&){}, ec);
+        auto reg = register_events_monitor(std::move(ss), [](auto){}, ec);
         CHECK_FALSE(reg);
         CHECK(ec.value() == platform_error::monitor_start);
         CHECK_FALSE(get_shared_state(p));

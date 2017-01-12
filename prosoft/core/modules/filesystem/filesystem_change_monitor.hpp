@@ -174,7 +174,7 @@ inline bool canceled(const change_notification& n) noexcept {
 }
 
 using change_notifications = std::vector<change_notification>;
-using change_callback = std::function<void (const change_notifications&)>;
+using change_callback = std::function<void (change_notifications&&)>;
 
 // System specific state.
 struct change_state {
