@@ -1627,4 +1627,24 @@ TEST_CASE("filesystem_path") {
             }
         }
     }
+    
+    SECTION("std::") {
+        std::hash<path> hash;
+        std::equal_to<path> equal_to;
+        
+        WHEN("paths are the same") {
+            const auto p = path{PS_TEXT("abcdefg")};
+            const auto p2 = p;
+            
+            CHECK(hash(p) == hash(p2));
+            CHECK(equal_to(p, p2));
+        }
+        
+        WHEN("paths are different") {
+            const auto p = path{PS_TEXT("abcdefg")};
+            const auto p2 = path{PS_TEXT("mnlopqrstuvwxyz")};
+            CHECK_FALSE(hash(p) == hash(p2)); // assuming a decent implementation
+            CHECK_FALSE(equal_to(p, p2));
+        }
+    }
 }

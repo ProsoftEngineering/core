@@ -27,6 +27,7 @@
 #define PS_CORE_FILESYSTEM_PATH_HPP
 
 #include <algorithm>
+#include <functional>
 #include <iterator>
 #include <locale>
 #include <stdexcept>
@@ -1112,5 +1113,29 @@ inline path operator"" _p(const char* s, size_t len) { // TEXT() macro does not 
 } // v1
 } // filesystem
 } // prosoft
+
+
+// std specializations
+namespace std {
+template <>
+struct hash<prosoft::filesystem::path> {
+    typedef prosoft::filesystem::path argument_type;
+    typedef std::size_t result_type;
+    result_type operator()(const argument_type& p) const
+        noexcept(noexcept(hash<argument_type::string_type>()(std::declval<argument_type>().native()))) {
+        return hash<argument_type::string_type>{}(p.native());
+    };
+};
+
+template <>
+struct equal_to<prosoft::filesystem::path> {
+    typedef prosoft::filesystem::path first_argument_type;
+    typedef prosoft::filesystem::path second_argument_type;
+    typedef bool result_type;
+    result_type operator()(const first_argument_type& s1, const second_argument_type& s2) const {
+        return s1 == s2;
+    }
+};
+}
 
 #endif // PS_CORE_FILESYSTEM_PATH_HPP
