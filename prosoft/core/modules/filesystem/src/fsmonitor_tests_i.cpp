@@ -37,7 +37,7 @@ SECTION("notification") {
     CHECK(note == reg);
     CHECK_FALSE(type_known(note));
     
-    auto p = note.export_path();
+    auto p = note.extract_path();
     CHECK(p.native() == PS_TEXT("test"));
     CHECK(note.path().empty());
     CHECK(note.event() == change_event::none);
