@@ -1,4 +1,4 @@
-# Copyright © 2015-2016, Prosoft Engineering, Inc. (A.K.A "Prosoft")
+# Copyright © 2015-2017, Prosoft Engineering, Inc. (A.K.A "Prosoft")
 # All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
@@ -50,6 +50,7 @@ set(SRCTESTS
     ${CORETESTS}/src/path_utils_tests.cpp
     ${CORETESTS}/src/regex_tests.cpp
     ${CORETESTS}/src/semaphore_tests.cpp
+    ${CORETESTS}/src/stable_hash_wrapper_tests.cpp
     ${CORETESTS}/src/string_component_tests.cpp
     ${CORETESTS}/src/string_convert_tests.cpp
     ${CORETESTS}/src/system_error_tests.cpp
