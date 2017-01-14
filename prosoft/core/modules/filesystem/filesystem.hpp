@@ -1,4 +1,4 @@
-// Copyright © 2015-2016, Prosoft Engineering, Inc. (A.K.A "Prosoft")
+// Copyright © 2015-2017, Prosoft Engineering, Inc. (A.K.A "Prosoft")
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without
@@ -57,8 +57,7 @@ inline void swap(path& lhs, path& rhs) noexcept(noexcept(std::declval<path>().sw
 }
 
 inline size_t hash_value(const path& p) {
-    using hash = std::hash<typename path::string_type>;
-    return hash{}(p);
+    return std::hash<path>{}(p);
 }
 
 inline bool operator<(const path& lhs, const path& rhs) {
