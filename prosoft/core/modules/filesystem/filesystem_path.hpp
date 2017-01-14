@@ -1,4 +1,4 @@
-// Copyright © 2015-2016, Prosoft Engineering, Inc. (A.K.A "Prosoft")
+// Copyright © 2015-2017, Prosoft Engineering, Inc. (A.K.A "Prosoft")
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without
@@ -1132,8 +1132,8 @@ struct equal_to<prosoft::filesystem::path> {
     typedef prosoft::filesystem::path first_argument_type;
     typedef prosoft::filesystem::path second_argument_type;
     typedef bool result_type;
-    result_type operator()(const first_argument_type& s1, const second_argument_type& s2) const {
-        return s1 == s2;
+    result_type operator()(const first_argument_type& lhs, const second_argument_type& rhs) const {
+        return lhs.compare(rhs) == 0;
     }
 };
 }
