@@ -71,8 +71,12 @@ public:
         return this->path();
     }
 
-    const path_type& path() const noexcept {
+    const path_type& path() const & noexcept {
         return m_path;
+    }
+    
+    path_type path() && noexcept(std::is_nothrow_move_constructible<path_type>::value) {
+        return path_type{std::move(m_path)};
     }
 
     file_status status() const;
