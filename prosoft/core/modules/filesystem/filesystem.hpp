@@ -559,16 +559,16 @@ path temp_directory_path(error_code&);
 
 // dir entry ops
 inline file_status directory_entry::status() const {
-    return prosoft::filesystem::status(get_path());
+    return prosoft::filesystem::status(this->path());
 }
 inline file_status directory_entry::status(error_code& ec) const noexcept {
-    return prosoft::filesystem::status(get_path(), ec);
+    return prosoft::filesystem::status(this->path(), ec);
 }
 inline file_status directory_entry::symlink_status() const {
-    return prosoft::filesystem::symlink_status(get_path());
+    return prosoft::filesystem::symlink_status(this->path());
 }
 inline file_status directory_entry::symlink_status(error_code& ec) const noexcept {
-    return prosoft::filesystem::symlink_status(get_path(), ec);
+    return prosoft::filesystem::symlink_status(this->path(), ec);
 }
 
 inline bool operator==(const directory_entry& lhs, const directory_entry& rhs) {

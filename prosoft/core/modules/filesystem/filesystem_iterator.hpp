@@ -1,4 +1,4 @@
-// Copyright © 2016, Prosoft Engineering, Inc. (A.K.A "Prosoft")
+// Copyright © 2016-2017, Prosoft Engineering, Inc. (A.K.A "Prosoft")
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without
@@ -42,9 +42,6 @@ class directory_entry {
     // GCC warns about this, clang does not.
     using path_type = prosoft::filesystem::path;
     path_type m_path;
-    const path_type& get_path() const noexcept {
-        return m_path;
-    }
 
 public:
     directory_entry() noexcept(std::is_nothrow_constructible<path_type>::value) : m_path() {}
@@ -71,11 +68,11 @@ public:
     }
 
     operator const path_type&() const noexcept {
-        return get_path();
+        return this->path();
     }
 
     const path_type& path() const noexcept {
-        return get_path();
+        return m_path;
     }
 
     file_status status() const;
