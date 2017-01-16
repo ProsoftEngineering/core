@@ -1,4 +1,4 @@
-// Copyright © 2016, Prosoft Engineering, Inc. (A.K.A "Prosoft")
+// Copyright © 2016-2017, Prosoft Engineering, Inc. (A.K.A "Prosoft")
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without
@@ -575,6 +575,53 @@ void change_manager::process_renames(fs::change_notifications& notes) {
 
 using namespace prosoft::filesystem;
 #include "src/fstestutils.hpp"
+
+// Xcode 8.2.1: using a vector the following test will crash either with EXC_BAD_ACCESS or an ASAN violation in vector::emplace_back.
+// Which crash depends on how many events are present. I reduced the callback to a an empty emplace and the crash still occurred.
+// I can find no reason in code for the crash so can only surmise there's an issue in std::vector.
+//
+// In the EXC_BAD_ACCESS scenerio, emplace_back ends with a bad std::forward arg that looks to be due to stack corruption.
+//
+// However I did create a unique type that was a duplicate of change_notification that was used for testing only
+// and there was no crash with that type. The only difference being that nothing else referenced the test type.
+// After many, many hours of debugging, I have no idea what is going on.
+TEST_CASE("fsevents_vector_crash") {
+    struct TestDispatcher {
+        void operator()(platform_state*, std::unique_ptr<fs::change_notifications>, FSEventStreamEventId) {
+        }
+    };
+    
+    std::vector<const char*> paths;
+    std::vector<FSEventStreamEventFlags> flags;
+    std::vector<FSEventStreamEventId> ids;
+    const path::string_type p1{"/private/var/folders/bs/b0d7mq1x7gb73k66lvxgfcsm0000gn/T/fs17test/1"};
+    const path::string_type p2{"/private/var/folders/bs/b0d7mq1x7gb73k66lvxgfcsm0000gn/T/fs17test/2"};
+    const path::string_type p3{"/private/var/folders/bs/b0d7mq1x7gb73k66lvxgfcsm0000gn/T/fs17test/2/1"};
+    const path::string_type p4{"/private/var/folders/bs/b0d7mq1x7gb73k66lvxgfcsm0000gn/T/fs17test/2/2"};
+    
+    paths.push_back(p1.c_str());
+    flags.push_back(kFSEventStreamEventFlagItemCreated|kFSEventStreamEventFlagItemIsFile);
+    ids.push_back(18158642889452409530ULL);
+    
+    paths.push_back(p2.c_str());
+    flags.push_back(kFSEventStreamEventFlagItemCreated|kFSEventStreamEventFlagItemIsDir);
+    ids.push_back(18158642889452409533ULL);
+    
+    paths.push_back(p3.c_str());
+    flags.push_back(kFSEventStreamEventFlagItemRenamed|kFSEventStreamEventFlagItemXattrMod|kFSEventStreamEventFlagItemIsFile);
+    ids.push_back(18158642889452409539ULL);
+    
+    paths.push_back(p4.c_str());
+    flags.push_back(kFSEventStreamEventFlagItemRenamed|kFSEventStreamEventFlagItemIsFile);
+    ids.push_back(18158642889452409540ULL);
+    
+    paths.push_back(p1.c_str());
+    flags.push_back(kFSEventStreamEventFlagItemRemoved|kFSEventStreamEventFlagItemIsFile);
+    ids.push_back(18158642889452409541ULL);
+    
+    platform_state state;
+    fsevents_callback<TestDispatcher>(nullptr, &state, paths.size(), paths.data(), flags.data(), ids.data());
+}
 
 class set_monitor_runloop_guard {
     CFRunLoopRef oldval;

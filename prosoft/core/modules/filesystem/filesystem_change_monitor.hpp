@@ -1,4 +1,4 @@
-// Copyright © 2016, Prosoft Engineering, Inc. (A.K.A "Prosoft")
+// Copyright © 2016-2017, Prosoft Engineering, Inc. (A.K.A "Prosoft")
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without
@@ -39,10 +39,10 @@
 
 #include <chrono>
 #include <cstdint>
+#include <deque>
 #include <iostream>
 #include <functional>
 #include <memory>
-#include <vector>
 
 #include <prosoft/core/config/config.h>
 
@@ -173,6 +173,7 @@ inline bool canceled(const change_notification& n) noexcept {
     return is_set(n.event() & change_event::canceled);
 }
 
+// XXX: see "fsevents_vector_crash" test for why vector is not used.
 using change_notifications = std::vector<change_notification>;
 using change_callback = std::function<void (change_notifications&&)>;
 
