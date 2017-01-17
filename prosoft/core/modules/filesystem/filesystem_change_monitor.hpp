@@ -174,7 +174,7 @@ inline bool canceled(const change_notification& n) noexcept {
 }
 
 // XXX: see "fsevents_vector_crash" test for why vector is not used.
-using change_notifications = std::vector<change_notification>;
+using change_notifications = std::deque<change_notification>;
 using change_callback = std::function<void (change_notifications&&)>;
 
 // System specific state.
