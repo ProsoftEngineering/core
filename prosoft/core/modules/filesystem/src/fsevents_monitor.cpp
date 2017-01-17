@@ -576,14 +576,22 @@ using namespace prosoft::filesystem;
 #include "src/fstestutils.hpp"
 
 // Xcode 8.2.1: using a vector the following test will crash either with EXC_BAD_ACCESS or an ASAN violation in vector::emplace_back.
-// Which crash depends on how many events are present. I reduced the callback to a an empty emplace and the crash still occurred.
+// Which crash depends on how many events are present. I reduced the callback to an empty emplace and the crash still occurred.
 // I can find no reason in code for the crash so can only surmise there's an issue in std::vector.
 //
-// In the EXC_BAD_ACCESS scenerio, emplace_back ends with a bad std::forward arg that looks to be due to stack corruption.
+// In the EXC_BAD_ACCESS scenerio, emplace_back ends up with a bad std::forward arg that looks to be due to stack corruption (address of 0x04, 0x01, etc).
 //
 // However I did create a unique type that was a duplicate of change_notification that was used for testing only
 // and there was no crash with that type. The only difference being that nothing else referenced the test type.
 // After many, many hours of debugging, I have no idea what is going on.
+
+void reduced_fsevents_callback_crash(ConstFSEventStreamRef, void*, size_t nevents, void*, const FSEventStreamEventFlags[], const FSEventStreamEventId[]) {
+    fs::change_notifications notes;
+    for (size_t i = 0; i < nevents; ++i) {
+        notes.emplace_back(fs::path{}, fs::path{}, 0ULL, fs::change_event{}, fs::file_type{});
+    }
+}
+
 TEST_CASE("fsevents_vector_crash") {
     struct TestDispatcher {
         void operator()(platform_state*, std::unique_ptr<fs::change_notifications>, FSEventStreamEventId) {
@@ -617,6 +625,8 @@ TEST_CASE("fsevents_vector_crash") {
     paths.push_back(p1.c_str());
     flags.push_back(kFSEventStreamEventFlagItemRemoved|kFSEventStreamEventFlagItemIsFile);
     ids.push_back(18158642889452409541ULL);
+    
+    reduced_fsevents_callback_crash(nullptr, nullptr, paths.size(), paths.data(), flags.data(), ids.data());
     
     platform_state state;
     fsevents_callback<TestDispatcher>(nullptr, &state, paths.size(), paths.data(), flags.data(), ids.data());
