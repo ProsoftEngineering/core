@@ -1,4 +1,4 @@
-// Copyright © 2016, Prosoft Engineering, Inc. (A.K.A "Prosoft")
+// Copyright © 2016-2017, Prosoft Engineering, Inc. (A.K.A "Prosoft")
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without
@@ -37,14 +37,14 @@ class change_manager {
     using evid_type = change_notification::platform_event_id_type;
 public:
     static change_notification make_notification(path&& p, path&& np, const change_state* reg, change_event event, file_type ft = file_type::none, evid_type evid = {}) {
-        change_notification n;
-        n.m_path = std::move(p);
-        n.m_newpath = std::move(np);
+        change_notification n(std::move(p), std::move(np), evid, event, ft);
         n.m_regid = reinterpret_cast<std::uintptr_t>(reg);
-        n.m_eventid = evid;
-        n.m_event = event;
-        n.m_type = ft;
         return n;
+    }
+    
+    static void emplace_back(change_notifications& notes, path&& p, path&& np, const change_state* reg, evid_type evid, change_event event, file_type ft) {
+        notes.emplace_back(std::move(p), std::move(np), evid, event, ft);
+        notes.back().m_regid = reinterpret_cast<std::uintptr_t>(reg);
     }
     
     static change_registration make_registration(std::shared_ptr<change_state> const & s) {

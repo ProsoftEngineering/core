@@ -101,9 +101,16 @@ class change_notification {
     change_event m_event;
     file_type m_type;
     
-    change_notification() = default;
     friend change_manager;
 public:
+    change_notification(path_type&& p, path_type&& np, platform_event_id_type peid, change_event ev, file_type ft)
+        : m_path(std::move(p))
+        , m_newpath(std::move(np))
+        , m_regid()
+        , m_eventid(peid)
+        , m_event(ev)
+        , m_type(ft) {
+    }
     ~change_notification() = default;
     PS_DEFAULT_COPY(change_notification);
     PS_DEFAULT_MOVE(change_notification);

@@ -237,7 +237,7 @@ void fsevents_callback(ConstFSEventStreamRef, void* info, size_t nevents, void* 
                     rp = fs::path{paths[i]};
                 }
                 
-                notes->emplace_back(fs::change_manager::make_notification(std::move(rp), std::move(np), state, ev, fs::file_type::directory, evids[i]));
+                fs::change_manager::emplace_back(*notes, std::move(rp), std::move(np), state, evids[i], ev, fs::file_type::directory);
                 
                 PSASSERT(is_set(ev & fs::change_event::canceled), "Broken assumption");
                 if (state->m_stream) { // can be null in test harness
@@ -267,7 +267,7 @@ void fsevents_callback(ConstFSEventStreamRef, void* info, size_t nevents, void* 
             }
             
             lastID = evids[i];
-            notes->emplace_back(fs::change_manager::make_notification(fs::path{paths[i]}, fs::path{}, state, to_event(flags & ~negated_flags), to_type(flags), evids[i]));
+            fs::change_manager::emplace_back(*notes, fs::path{paths[i]}, fs::path{}, state, evids[i], to_event(flags & ~negated_flags), to_type(flags));
 #if 0 && PSTEST_HARNESS
             std::cout << evids[i] << "," << paths[i] << "," << flags << "," << (flags & ~negated_flags) << "\n";
 #endif
