@@ -589,6 +589,14 @@ inline bool operator>(const directory_entry& lhs, const directory_entry& rhs) {
 inline bool operator>=(const directory_entry& lhs, const directory_entry& rhs) {
     return lhs.path() >= rhs.path();
 }
+// Extensions //
+inline bool operator==(const directory_entry& lhs, const path& rhs) {
+    return lhs.path() == rhs;
+}
+inline bool operator==(const path& lhs, const directory_entry& rhs) {
+    return operator==(rhs, lhs);
+}
+// Extensions //
 
 // iterators
 template <class Traits>

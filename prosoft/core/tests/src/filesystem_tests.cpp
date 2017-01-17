@@ -138,6 +138,8 @@ TEST_CASE("filesystem") {
             const auto de = directory_entry{path{"a"}};
             THEN("compare result is the expected value") {
                 CHECK((de == directory_entry{path{"a"}}));
+                CHECK(de == path("a"));
+                CHECK(path("a") == de);
                 CHECK((de != directory_entry{path{"b"}}));
                 CHECK((de < directory_entry{path{"b"}}));
                 CHECK((de <= directory_entry{path{"b"}}));
