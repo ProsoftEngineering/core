@@ -600,9 +600,9 @@ basic_iterator<Traits>& basic_iterator<Traits>::operator++() {
 }
 
 template <class Traits>
-basic_iterator<Traits>::basic_iterator(const path& p, directory_options opts) {
+basic_iterator<Traits>::basic_iterator(const path& p, directory_options opts, configuration_type&& t) {
     error_code ec;
-    m_i = ifilesystem::make_iterator_state(p, ifilesystem::make_options<Traits>(opts), ec, Traits{});
+    m_i = ifilesystem::make_iterator_state(p, ifilesystem::make_options<Traits>(opts), std::move(t), ec, traits_type{});
     PS_THROW_IF(ec.value() != 0, filesystem_error("Could not create iterator", p, ec));
 }
 

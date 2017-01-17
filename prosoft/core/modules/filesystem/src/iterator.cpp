@@ -102,7 +102,8 @@ bool ifilesystem::iterator_state::equal_to(const ifilesystem::iterator_state* ot
     return make_public(m_opts) == make_public(other->m_opts) && m_root == other->m_root && m_current == other->m_current;
 }
 
-ifilesystem::iterator_state_ptr ifilesystem::make_iterator_state(const path& p, directory_options opts, error_code& ec, iterator_traits) {
+ifilesystem::iterator_state_ptr
+ifilesystem::make_iterator_state(const path& p, directory_options opts, iterator_traits::configuration_type, error_code& ec, iterator_traits) {
     auto s = std::make_shared<state>(p, opts, ec);
     if (ec) {
         s.reset(); // null is the end iterator
@@ -110,7 +111,7 @@ ifilesystem::iterator_state_ptr ifilesystem::make_iterator_state(const path& p, 
     return s;
 }
 
-const error_code& ifilesystem::permission_denied_error(iterator_traits) {
+const error_code& ifilesystem::permission_denied_error() {
 #if !_WIN32
     constexpr int ec = EACCES;
 #else

@@ -173,16 +173,20 @@ public:
 
 using iterator_state_ptr = std::shared_ptr<ifilesystem::iterator_state>;
 
+struct null_iterator_options {};
+
 struct iterator_traits {
     static constexpr directory_options required = directory_options::skip_subdirectory_descendants;
     static constexpr directory_options not_supported = directory_options::none;
     static constexpr directory_options defaults = required;
+    using configuration_type = null_iterator_options;
 };
 
 struct recursive_iterator_traits {
     static constexpr directory_options required = directory_options::none;
     static constexpr directory_options not_supported = directory_options::skip_subdirectory_descendants;
     static constexpr directory_options defaults = required;
+    using configuration_type = null_iterator_options;
 };
 
 template <class Traits>
@@ -193,10 +197,11 @@ struct is_recursive {
 static_assert(!is_recursive<iterator_traits>::value, "WTF?");
 static_assert(is_recursive<recursive_iterator_traits>::value, "WTF?");
 
-iterator_state_ptr make_iterator_state(const path&, directory_options, error_code&, iterator_traits);
+iterator_state_ptr make_iterator_state(const path&, directory_options, iterator_traits::configuration_type, error_code&, iterator_traits);
 
-inline iterator_state_ptr make_iterator_state(const path& p, directory_options opts, error_code& ec, recursive_iterator_traits) {
-    return make_iterator_state(p, opts, ec, iterator_traits{});
+inline iterator_state_ptr
+make_iterator_state(const path& p, directory_options opts, recursive_iterator_traits::configuration_type, error_code& ec, recursive_iterator_traits) {
+    return make_iterator_state(p, opts, iterator_traits::configuration_type{}, ec, iterator_traits{});
 }
 
 const error_code& permission_denied_error(iterator_traits);
@@ -229,6 +234,8 @@ class basic_iterator {
     using recurse_only_t = typename resurse_only<Recurse>::type;
     
 public:
+    using traits_type = Traits;
+    using configuration_type = typename traits_type::configuration_type;
     using value_type = directory_entry;
     using difference_type = ptrdiff_t;
     using pointer = const value_type*;
@@ -237,9 +244,11 @@ public:
     
     basic_iterator() noexcept(std::is_nothrow_constructible<decltype(m_i)>::value) = default;
     explicit basic_iterator(const path&);
-    basic_iterator(const path& p, directory_options options);
-    basic_iterator(const path& p, directory_options options, error_code& ec);
-    basic_iterator(const path& p, error_code& ec);
+    basic_iterator(const path&, error_code&);
+    basic_iterator(const path&, directory_options);
+    basic_iterator(const path&, directory_options, error_code&);
+    basic_iterator(const path&, directory_options, configuration_type&&);
+    basic_iterator(const path&, directory_options, configuration_type&&, error_code&);
     basic_iterator(const basic_iterator&) = default;
     basic_iterator(basic_iterator&&) noexcept(std::is_nothrow_move_constructible<decltype(m_i)>::value) = default;
     ~basic_iterator() = default;
@@ -294,15 +303,25 @@ inline basic_iterator<Traits>::basic_iterator(const path& p)
 }
 
 template <class Traits>
-inline basic_iterator<Traits>::basic_iterator(const path& p, directory_options opts, error_code& ec)
-    : m_i(ifilesystem::make_iterator_state(p, ifilesystem::make_options<Traits>(opts), ec, Traits{})) {
-    increment(ec);
-    clear_if_denied(ec);
+inline basic_iterator<Traits>::basic_iterator(const path& p, error_code& ec)
+    : basic_iterator<Traits>::basic_iterator(p, default_options(), ec) {
 }
 
 template <class Traits>
-inline basic_iterator<Traits>::basic_iterator(const path& p, error_code& ec)
-    : basic_iterator<Traits>::basic_iterator(p, default_options(), ec) {
+basic_iterator<Traits>::basic_iterator(const path& p, directory_options opts)
+    : basic_iterator<Traits>::basic_iterator(p, opts, configuration_type{}) {
+}
+
+template <class Traits>
+inline basic_iterator<Traits>::basic_iterator(const path& p, directory_options opts, error_code& ec)
+    : basic_iterator<Traits>::basic_iterator(p, opts, configuration_type{}, ec) {
+}
+
+template <class Traits>
+inline basic_iterator<Traits>::basic_iterator(const path& p, directory_options opts, configuration_type&& t, error_code& ec)
+    : m_i(ifilesystem::make_iterator_state(p, ifilesystem::make_options<Traits>(opts), std::move(t), ec, traits_type{})) {
+    increment(ec);
+    clear_if_denied(ec);
 }
 
 template <class Traits>
