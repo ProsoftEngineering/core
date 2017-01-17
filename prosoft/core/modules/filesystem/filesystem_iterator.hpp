@@ -204,10 +204,11 @@ make_iterator_state(const path& p, directory_options opts, recursive_iterator_tr
     return make_iterator_state(p, opts, iterator_traits::configuration_type{}, ec, iterator_traits{});
 }
 
-const error_code& permission_denied_error(iterator_traits);
+const error_code& permission_denied_error();
 
-inline const error_code& permission_denied_error(recursive_iterator_traits) {
-    return permission_denied_error(iterator_traits{});
+template <class Traits>
+inline const error_code& permission_denied_error(Traits) {
+    return permission_denied_error();
 }
 
 template <class Traits>
@@ -373,7 +374,6 @@ inline basic_iterator<Traits> end(const basic_iterator<Traits>&) {
     return basic_iterator<Traits>{};
 }
 
-// Private
 template <class Traits>
 void basic_iterator<Traits>::clear_if_denied(error_code& ec) const {
     if (is_set(options() & directory_options::skip_permission_denied) && ec == ifilesystem::permission_denied_error(Traits{})) {
