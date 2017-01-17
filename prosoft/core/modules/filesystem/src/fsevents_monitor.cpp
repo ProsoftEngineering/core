@@ -182,7 +182,7 @@ inline bool rescan_required(FSEventStreamEventFlags flags) {
 }
 
 inline bool root_changed(FSEventStreamEventFlags flags) {
-    return (flags & kFSEventStreamEventFlagRootChanged);
+    return (flags & kFSEventStreamEventFlagRootChanged) != 0;
 }
 
 fs::path canonical_root_path(const platform_state* state) {
@@ -207,13 +207,12 @@ void fsevents_callback(ConstFSEventStreamRef, void* info, size_t nevents, void* 
         PSASSERT_NOTNULL(state);
         
         auto notes = std::make_unique<fs::change_notifications>();
-        // Don't use reserve for now. There's an Xcode ASAN overflow (possibly related to Catch).
         
-        FSEventStreamEventId lastID = 0;
+        FSEventStreamEventId lastID{};
         auto paths = reinterpret_cast<const char* *>(evpaths);
         for(size_t i = 0; i < nevents; ++i) {
             const auto flags = evflags[i];
-            auto negated_flags = 0;
+            FSEventStreamEventFlags negated_flags{};
             if (rescan_required(flags)) {
                 fs::path rp;
                 fs::path np;
