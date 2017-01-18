@@ -54,7 +54,9 @@ private:
     hash_type m_hash;
 public:
     template <class... Args>
-    stable_hash_wrapper(Args&&... args) : m_val(std::forward<Args>(args)...), m_hash(std::hash<T>{}(m_val)) {
+    stable_hash_wrapper(Args&&... args)
+        : m_val(std::forward<Args>(args)...)
+        , m_hash(std::hash<T>{}(m_val)) {
     }
     ~stable_hash_wrapper() = default;
     PS_DEFAULT_MOVE(stable_hash_wrapper);
