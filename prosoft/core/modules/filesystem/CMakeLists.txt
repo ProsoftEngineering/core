@@ -1,4 +1,4 @@
-# Copyright © 2016, Prosoft Engineering, Inc. (A.K.A "Prosoft")
+# Copyright © 2016-2017, Prosoft Engineering, Inc. (A.K.A "Prosoft")
 # All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
@@ -33,6 +33,7 @@ include("${CMAKE_CURRENT_LIST_DIR}/../config_module.cmake")
 set(fs_lib ${PROJECT_NAME})
 add_library(${fs_lib}
     ${PSFS}/src/dirops.cpp
+    ${PSFS}/src/change_iterator.cpp
     ${PSFS}/src/fsmonitor.cpp
     ${PSFS}/src/iterator.cpp
     ${PSFS}/src/pathops.cpp

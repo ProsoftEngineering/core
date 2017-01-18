@@ -44,6 +44,7 @@ using error_code = std::error_code; // Extension
 
 #include "filesystem_path.hpp"
 #include "filesystem_iterator.hpp"
+#include "filesystem_change_iterator.hpp"
 #include "filesystem_acl.hpp"
 
 namespace prosoft {
@@ -620,6 +621,10 @@ using directory_iterator = basic_iterator<ifilesystem::iterator_traits>;
 using recursive_directory_iterator = basic_iterator<ifilesystem::recursive_iterator_traits>;
 
 // Extensions
+
+#if PS_HAVE_FILESYSTEM_CHANGE_ITERATOR
+using changed_directory_iterator = basic_iterator<ifilesystem::change_iterator_traits>;
+#endif
 
 // FreeBSD dropped block devices a while ago, Windows never supported block devices and Linux does not have disk char devices.
 // Therefore in most cases all you should care about is if the file is a device file and not what type of device.

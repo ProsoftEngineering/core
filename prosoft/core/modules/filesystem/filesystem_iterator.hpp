@@ -92,6 +92,9 @@ enum class directory_options : unsigned {
     skip_permission_denied,
     
     // Extensions
+    include_created_events = 1U<<16, // change_iterator
+    include_modified_events = 1U<<17, // change_iterator
+    
     skip_subdirectory_descendants = 1U<<20,
     skip_hidden_descendants = 1U<<21,
     skip_package_descendants = 1U<<22, // macOS
@@ -132,6 +135,10 @@ protected:
         m_opts &= ~(opts & directory_options::reserved_state_mask);
     }
     
+    bool is_current_empty() const {
+        return m_current.path().empty();
+    }
+    
 public:
     iterator_state() = default;
     iterator_state(const path& p, directory_options opts, error_code&)
@@ -167,7 +174,7 @@ public:
     virtual void skip_descendants() {}
     
     virtual bool at_end() const {
-        return m_current.path().empty();
+        return is_current_empty();
     }
 };
 
@@ -234,6 +241,7 @@ class basic_iterator {
     template <typename Recurse>
     using recurse_only_t = typename resurse_only<Recurse>::type;
     
+    friend Traits;
 public:
     using traits_type = Traits;
     using configuration_type = typename traits_type::configuration_type;
