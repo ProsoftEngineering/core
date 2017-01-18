@@ -42,4 +42,22 @@ namespace {
         return p;
     }
 #endif
+    
+    class RAII_remove { // cleanup for test cases
+        using path_type = prosoft::filesystem::path;
+        const path_type& m_p;
+    public:
+        RAII_remove(const path_type& p) : m_p(p) {}
+        RAII_remove(path_type&&) = delete;
+        RAII_remove(const RAII_remove&) = delete;
+        RAII_remove(RAII_remove&&) = delete;
+        ~RAII_remove() {
+            prosoft::filesystem::error_code ec;
+            prosoft::filesystem::remove(m_p, ec);
+            CHECK(!ec); // REQUIRE throws an exception on failure
+        }
+    };
+    #define PS_RAII_REMOVE___(p,R,C) RAII_remove  R##C(p)
+    #define PS_RAII_REMOVE__(p,R,C) PS_RAII_REMOVE___(p,R,C)
+    #define PS_RAII_REMOVE(p) PS_RAII_REMOVE__(p, r, __COUNTER__)
 }
