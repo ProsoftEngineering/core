@@ -37,10 +37,12 @@ namespace prosoft {
 namespace filesystem {
 inline namespace v1 {
 
+class change_registration; // forward
+
 struct change_iterator_config {
     // For notification of a change in the iterator (either new content or EOF).
     // Expect the callback on a background thread and remember iterators are NOT thread safe.
-    using callback_type = std::function<void (void)>;
+    using callback_type = std::function<void (const change_registration&)>;
     callback_type callback;
     // Passed on to FS monitor.
     using latency_type = std::chrono::milliseconds;
@@ -66,14 +68,26 @@ struct change_iterator_traits {
     using configuration_type = change_iterator_config;
     
     static bool canceled(const basic_iterator<change_iterator_traits>&);
+    static bool equal_to(const basic_iterator<change_iterator_traits>&, const change_registration&);
 };
 
 iterator_state_ptr make_iterator_state(const path&, directory_options, change_iterator_traits::configuration_type&&, error_code&, change_iterator_traits);
 
+using change_iterator_t = basic_iterator<ifilesystem::change_iterator_traits>;
+
 } // ifilesystem
 
-inline bool canceled(const basic_iterator<ifilesystem::change_iterator_traits>& i) {
+inline bool canceled(const ifilesystem::change_iterator_t& i) {
     return ifilesystem::change_iterator_traits::canceled(i);
+}
+
+// for finding the iterator from a callback
+inline bool operator==(const ifilesystem::change_iterator_t& i, const change_registration& cr) {
+    return ifilesystem::change_iterator_traits::equal_to(i, cr);
+}
+
+inline bool operator!=(const ifilesystem::change_iterator_t& i, const change_registration& cr) {
+    return !operator==(i, cr);
 }
 
 } // v1

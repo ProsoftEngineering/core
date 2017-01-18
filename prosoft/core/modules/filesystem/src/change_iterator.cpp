@@ -85,6 +85,10 @@ public:
         return m_done;
     }
     
+    const fs::change_registration& registration() const noexcept {
+        return m_reg;
+    }
+    
     virtual fs::path next(prosoft::system::error_code&) override;
     virtual bool at_end() const override;
 };
@@ -136,7 +140,7 @@ void state::abort() noexcept {
 
 void state::notify() noexcept {
     if (m_callback) {
-        PSIgnoreCppException(m_callback());
+        PSIgnoreCppException(m_callback(m_reg));
     }
 }
 
@@ -188,6 +192,11 @@ ifilesystem::make_iterator_state(const path& p, directory_options opts, change_i
 bool ifilesystem::change_iterator_traits::canceled(const basic_iterator<change_iterator_traits>& i) {
     auto p = reinterpret_cast<const state*>(i.m_i.get());
     return !p || p->done();
+}
+
+bool ifilesystem::change_iterator_traits::equal_to(const basic_iterator<change_iterator_traits>& i, const change_registration& cr) {
+    auto p = reinterpret_cast<const state*>(i.m_i.get());
+    return p && p->registration() == cr;
 }
 
 } // v1

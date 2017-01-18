@@ -30,6 +30,8 @@
 
 #if PS_HAVE_FILESYSTEM_CHANGE_ITERATOR
 
+#include "filesystem_change_monitor.hpp"
+
 #include "catch.hpp"
 #include "fstestutils.hpp"
 
@@ -51,6 +53,7 @@ TEST_CASE("filesystem_change_iterator") {
         PS_RAII_REMOVE(root);
         
         changed_directory_iterator i{root, traits_type::defaults, config_type{config_type::callback_type{}, config_type::latency_type{0}}};
+        CHECK(i != change_registration());
         
         const auto f1 = create_file( root / PS_TEXT("1") );
         PS_RAII_REMOVE(f1);
