@@ -77,6 +77,13 @@ using change_iterator_t = basic_iterator<ifilesystem::change_iterator_traits>;
 
 } // ifilesystem
 
+// XXX: change iterators will not match end() until canceled.
+// Therefore make sure to check for an empty entry and manually break a loop.
+inline ifilesystem::change_iterator_t begin(ifilesystem::change_iterator_t& i) {
+    // current will pretty much always be empty on construction, therefore we need to increment
+    return (*i).empty() ? ++i : i;
+}
+
 inline bool canceled(const ifilesystem::change_iterator_t& i) {
     return ifilesystem::change_iterator_traits::canceled(i);
 }

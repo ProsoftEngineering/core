@@ -80,6 +80,10 @@ TEST_CASE("filesystem_change_iterator") {
         }
         REQUIRE(canceled(i));
         
+        // Ranged for loop test -- easier to do it here instead of in another section requiring duplicate setup
+        CHECK((*i).empty());
+        CHECK_FALSE(begin(i)->empty());
+        
         std::vector<directory_entry> entries;
         for (auto& e : i) {
             if (!e.path().empty()) {
