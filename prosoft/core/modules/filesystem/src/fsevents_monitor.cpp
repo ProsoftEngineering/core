@@ -195,8 +195,7 @@ fs::path canonical_root_path(const platform_state* state) {
 
 template <class Dispatch = dispatch_events>
 void fsevents_callback(ConstFSEventStreamRef, void* info, size_t nevents, void* evpaths, const FSEventStreamEventFlags evflags[], const FSEventStreamEventId evids[]) {
-    // A bit faster than a full FS::status() call since it's not doing any type conversion.
-    static auto exists = [](const char* p) noexcept {
+    static auto exists = [](const char* p) noexcept { // avoid need for copying string to a path{}
         struct ::stat sb;
         const int err = ::stat(p, &sb);
         return err == 0 || (-1 == err && errno != ENOENT);

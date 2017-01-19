@@ -457,12 +457,8 @@ inline bool status_known(const file_status& s) noexcept {
 inline bool exists(const file_status& s) noexcept {
     return status_known(s) && s.type() != file_type::not_found;
 }
-inline bool exists(const path& p) {
-    return exists(status(p));
-}
-inline bool exists(const path& p, error_code& ec) noexcept {
-    return exists(status(p, ec));
-}
+bool exists(const path&);
+bool exists(const path&, error_code&) noexcept;
 
 inline file_time_type last_write_time(const path& p) {
     return status(p).times().modified();

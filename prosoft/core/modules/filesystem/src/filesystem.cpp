@@ -445,6 +445,33 @@ file_status symlink_status(const path& p, error_code& ec) noexcept {
     return link_stat(p, ec);
 }
 
+bool exists(const path& p) {
+    error_code ec;
+    auto fs = exists(p, ec);
+    PS_THROW_IF(ec.value(), filesystem_error("Could not get status", p, ec));
+    return fs;
+}
+
+bool exists(const path& p, error_code& ec) noexcept {
+#if !_WIN32
+    struct ::stat sb;
+    const int err = ::stat(p.c_str(), &sb);
+    if (err == 0) {
+        return true;
+    } else {
+        ifilesystem::system_error(ec);
+        return ec.value() != ENOENT;
+    }
+#else
+    if (const auto attrs = ifilesystem::fattrs(p, ec)) {
+        ec.clear();
+        return true;
+    } else {
+        return to_file_type{}(ec) != file_type::not_found;
+    }
+#endif
+}
+
 void last_write_time(const path& p, file_time_type t) {
     error_code ec;
     last_write_time(p, t, ec);
