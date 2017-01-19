@@ -228,9 +228,13 @@ template <class Traits>
 class basic_iterator {
     ifilesystem::iterator_state_ptr m_i;
     
+    const directory_entry& empty_entry() const {
+        static const directory_entry empty;
+        return empty;
+    }
+    
     const path& root_or_empty() const {
-        static const path empty;
-        return m_i ? m_i->root() : empty;
+        return m_i ? m_i->root() : empty_entry().path();
     }
     
     void clear_if_denied(error_code& ec) const;
@@ -335,8 +339,7 @@ inline basic_iterator<Traits>::basic_iterator(const path& p, directory_options o
 
 template <class Traits>
 const directory_entry& basic_iterator<Traits>::operator*() const {
-    static const directory_entry empty{};
-    return m_i ? m_i->current() : empty;
+    return m_i ? m_i->current() : empty_entry();
 }
 
 template <class Traits>
