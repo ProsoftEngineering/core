@@ -57,6 +57,10 @@ public:
     void assign(path_type&& p) {
         m_path = std::move(p);
     }
+    
+    bool empty() const noexcept(noexcept(std::declval<path_type>().empty())) {
+        return m_path.empty();
+    }
     // Extensions //
 
     void assign(const path_type& p) {
