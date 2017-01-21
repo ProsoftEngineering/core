@@ -335,13 +335,6 @@ inline basic_iterator<Traits>::basic_iterator(const path& p, directory_options o
 }
 
 template <class Traits>
-inline basic_iterator<Traits>::basic_iterator(const path& p, directory_options opts, configuration_type&& t, error_code& ec)
-    : m_i(ifilesystem::make_iterator_state(p, ifilesystem::make_options<Traits>(opts), std::move(t), ec, traits_type{})) {
-    increment(ec);
-    clear_if_denied(ec);
-}
-
-template <class Traits>
 const directory_entry& basic_iterator<Traits>::operator*() const {
     return m_i ? m_i->current() : empty_entry();
 }

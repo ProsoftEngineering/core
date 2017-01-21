@@ -613,6 +613,13 @@ basic_iterator<Traits>::basic_iterator(const path& p, directory_options opts, co
     operator++();
 }
 
+template <class Traits>
+inline basic_iterator<Traits>::basic_iterator(const path& p, directory_options opts, configuration_type&& t, error_code& ec)
+    : m_i(ifilesystem::make_iterator_state(p, ifilesystem::make_options<Traits>(opts), std::move(t), ec, traits_type{})) {
+    increment(ec);
+    clear_if_denied(ec);
+}
+
 using directory_iterator = basic_iterator<ifilesystem::iterator_traits>;
 using recursive_directory_iterator = basic_iterator<ifilesystem::recursive_iterator_traits>;
 
