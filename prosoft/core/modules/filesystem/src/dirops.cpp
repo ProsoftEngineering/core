@@ -467,7 +467,7 @@ path mount_path(const path& p, error_code& ec) {
         return {};
     }
 #elif PS_FS_HAVE_MNTENT_H
-    // "/proc/mounts" represents the actual state of the system, while /etc/fstab is statically deifned and may not have entries for automount filesystems.
+    // "/proc/mounts" represents the actual state of the system, while /etc/fstab is statically defined and may not have entries for automount filesystems.
     #if __linux__
     constexpr auto mtab = "/proc/mounts";
     #else
