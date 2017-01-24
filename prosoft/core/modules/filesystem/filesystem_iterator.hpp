@@ -167,6 +167,10 @@ public:
         m_current = directory_entry{next(ec)};
     }
     
+    directory_entry extract() noexcept(std::is_nothrow_move_constructible<directory_entry>::value) {
+        return directory_entry{std::move(m_current)};
+    }
+    
     virtual bool equal_to(const iterator_state*) const;
     
     virtual void pop() {}
@@ -309,6 +313,9 @@ public:
     // Extensions
     basic_iterator& operator++(int);
     
+    // moves current entry out -- be careful
+    directory_entry extract() noexcept(std::is_nothrow_move_constructible<directory_entry>::value);
+    
     static constexpr directory_options default_options() {
         return Traits::defaults;
     }
@@ -393,6 +400,11 @@ void basic_iterator<Traits>::clear_if_denied(error_code& ec) const {
 template <class Traits>
 inline basic_iterator<Traits>& basic_iterator<Traits>::operator++(int) {
     return operator++(); // // XXX: Input iter one-pass semantics.
+}
+
+template <class Traits>
+directory_entry basic_iterator<Traits>::extract() noexcept(std::is_nothrow_move_constructible<directory_entry>::value) {
+    return m_i ? m_i->extract() : directory_entry{};
 }
 
 } // v1
