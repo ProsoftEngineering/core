@@ -212,12 +212,15 @@ path standard_directory_path(domain d, standard_directory sd, standard_directory
     
 #if __APPLE__
     char buf[PATH_MAX];
-    auto state = ::NSStartSearchPathEnumeration(nsd, get_domainmask(d));
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wdeprecated-declarations"
+    auto state = ::NSStartSearchPathEnumeration(nsd, get_domainmask(d)); // deprecated in 10.12
     if (::NSGetNextSearchPathEnumeration(state, buf)) {
         return post_process(buf, d, sdo, ec);
     } else {
         ifilesystem::error(ENOENT, ec);
     }
+#pragma clang diagnostic pop
     return {};
 #elif _WIN32
 #ifdef __MINGW32__
