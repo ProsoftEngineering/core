@@ -51,6 +51,16 @@ fs::change_event to_events(fs::directory_options opts) {
     return ev;
 }
 
+inline bool required(fs::change_event ev) {
+    return is_set(ev & fs::change_event::rescan_required);
+}
+
+using notification_ptr = fs::change_notification*;
+
+notification_ptr call_filter(fs::change_iterator_config::filter_type f, notification_ptr p) {
+    return p && !required(p->event()) && f && !f(*p) ? nullptr : p;
+}
+
 using fsiterator_state = fs::ifilesystem::iterator_state;
 
 class state : public fsiterator_state {
@@ -63,12 +73,16 @@ class state : public fsiterator_state {
     std::unordered_set<prosoft::stable_hash_wrapper<fs::path>> m_entries;
     std::atomic_bool m_done{false}; // no more events will be received
     callback_type m_callback;
+    fs::change_iterator_config::filter_type m_filter;
     
-    using notification_ptr = fs::change_notification*;
-    static inline notification_ptr filter(fs::change_notification& n, fs::change_event ev) {
+    static notification_ptr filter(fs::change_notification& n, fs::change_event ev) {
         return is_set(n.event() & ev) ? &n : nullptr;
     }
     static void filter(fs::change_notification&&, fs::change_event) = delete;
+    
+    notification_ptr PS_ALWAYS_INLINE filter(notification_ptr p) {
+        return call_filter(m_filter, p);
+    }
     
     void add(notification_ptr);
     
@@ -97,17 +111,18 @@ state::state(const fs::path& p, fs::directory_options opts, fs::change_iterator_
     : fsiterator_state(p, opts, ec)
     , m_reg() {
     if (!ec) {
+        m_callback = std::move(c.callback);
+        m_filter = c.filter;
+        
         using namespace fs;
         const auto events = to_events(opts);
-        
         change_config cfg;
         cfg.notification_latency = std::chrono::duration_cast<change_config::latency_type>(c.latency);
         m_reg = recursive_monitor(p, cfg, [this, events](change_notifications&& notes) {
             for (auto& n : notes) {
-                add(filter(n, events));
+                add(filter(filter(n, events)));
             }
         }, ec);
-        m_callback = std::move(c.callback);
     }
 }
 
@@ -189,6 +204,10 @@ ifilesystem::make_iterator_state(const path& p, directory_options opts, change_i
     return s;
 }
 
+const change_notification* change_iterator_config::files_only_filter(const change_notification& n) {
+    return n.type() == file_type::regular ? &n : nullptr;
+}
+
 bool ifilesystem::change_iterator_traits::canceled(const basic_iterator<change_iterator_traits>& i) {
     auto p = reinterpret_cast<const state*>(i.m_i.get());
     return !p || p->done();
@@ -218,6 +237,42 @@ TEST_CASE("change_iterator_internal") {
         CHECK(to_events(directory_options::include_modified_events) == expected);
         expected |= change_event::created|change_event::renamed;
         CHECK(to_events(directory_options::include_created_events|directory_options::include_modified_events) == expected);
+    }
+    
+    static auto nop_filter = [](const fs::change_notification& n) -> const fs::change_notification* {
+        return &n;
+    };
+    static auto null_filter = [](const fs::change_notification&) -> const fs::change_notification* {
+        return nullptr;
+    };
+    
+    static fs::change_notification note{fs::path{}, fs::path{}, 0, fs::change_event::none, fs::file_type::unknown};
+    
+    WHEN("filter is null") {
+        CHECK(call_filter(nullptr, nullptr) == nullptr);
+        CHECK(call_filter(nullptr, &note) == &note);
+    }
+    
+    WHEN("filter is not null") {
+        CHECK(call_filter(nop_filter, nullptr) == nullptr);
+        CHECK(call_filter(nop_filter, &note) == &note);
+        CHECK(call_filter(null_filter, &note) == nullptr);
+        fs::change_notification n{fs::path{}, fs::path{}, 0, fs::change_event::rescan_required, fs::file_type::unknown};
+        CHECK(call_filter(null_filter, &n) == &n); // rescan must always pass
+    }
+    
+    WHEN("filtering files only") {
+        CHECK(call_filter(change_iterator_config::files_only_filter, nullptr) == nullptr);
+        CHECK(call_filter(change_iterator_config::files_only_filter, &note) == nullptr);
+        
+        fs::change_notification n{fs::path{}, fs::path{}, 0, fs::change_event::none, fs::file_type::regular};
+        CHECK(call_filter(change_iterator_config::files_only_filter, &n) == &n);
+        n = {fs::path{}, fs::path{}, 0, fs::change_event::none, fs::file_type::directory};
+        CHECK(call_filter(change_iterator_config::files_only_filter, &n) == nullptr);
+        n = {fs::path{}, fs::path{}, 0, fs::change_event::rescan, fs::file_type::directory};
+        CHECK(call_filter(change_iterator_config::files_only_filter, &n) == &n); // rescan must always pass
+        n = {fs::path{}, fs::path{}, 0, fs::change_event::canceled, fs::file_type::directory};
+        CHECK(call_filter(change_iterator_config::files_only_filter, &n) == &n); // cancel must always pass
     }
 }
 

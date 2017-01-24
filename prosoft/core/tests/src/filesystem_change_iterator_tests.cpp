@@ -52,7 +52,7 @@ TEST_CASE("filesystem_change_iterator") {
         REQUIRE(exists(root));
         PS_RAII_REMOVE(root);
         
-        changed_directory_iterator i{root, traits_type::defaults, config_type{config_type::callback_type{}, config_type::latency_type{0}}};
+        changed_directory_iterator i{root, traits_type::defaults, config_type{config_type::latency_type{0}}};
         CHECK(i != change_registration());
         
         const auto f1 = create_file( root / PS_TEXT("1") );
