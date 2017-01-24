@@ -74,7 +74,7 @@ public:
         return get();
     }
     
-    value_type extract() const noexcept { // don't need the noexcept move conditional as the class requires it
+    value_type extract() const noexcept(std::is_nothrow_move_constructible<T>::value) {
         return std::move(m_val);
     }
     
