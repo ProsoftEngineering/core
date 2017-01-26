@@ -39,6 +39,8 @@ namespace fs = prosoft::filesystem::v1;
 
 namespace {
 
+using extraction_type = std::vector<fs::path>;
+
 fs::change_event to_events(fs::directory_options opts) {
     using namespace fs;
     fs::change_event ev = change_event::rescan_required;
@@ -62,6 +64,8 @@ notification_ptr call_filter(fs::change_iterator_config::filter_type f, notifica
 }
 
 using fsiterator_state = fs::ifilesystem::iterator_state;
+
+struct test_state; // for testing
 
 class state : public fsiterator_state {
     using lock_type = std::mutex;
@@ -89,6 +93,10 @@ class state : public fsiterator_state {
     void abort() noexcept;
     
     void notify() noexcept;
+    
+    // testing
+    friend test_state;
+    state() = default;
 public:
     using fsiterator_state::fsiterator_state;
     
@@ -102,6 +110,8 @@ public:
     const fs::change_registration& registration() const noexcept {
         return m_reg;
     }
+    
+    extraction_type extract();
     
     virtual fs::path next(prosoft::system::error_code&) override;
     virtual bool at_end() const override;
@@ -157,6 +167,16 @@ void state::notify() noexcept {
     if (m_callback) {
         PSIgnoreCppException(m_callback(m_reg));
     }
+}
+
+extraction_type state::extract() {
+    extraction_type paths;
+    lock_guard lg{m_lock};
+    for (auto& e : m_entries) {
+        paths.emplace_back(e.extract());
+    }
+    m_entries.clear();
+    return paths;
 }
 
 fs::path state::next(prosoft::system::error_code&) {
@@ -218,6 +238,11 @@ bool ifilesystem::change_iterator_traits::equal_to(const basic_iterator<change_i
     return p && p->registration() == cr;
 }
 
+extraction_type ifilesystem::change_iterator_traits::extract_paths(basic_iterator<change_iterator_traits>& i) {
+    auto p = reinterpret_cast<state*>(i.m_i.get());
+    return p ? p->extract() : extraction_type{};
+}
+
 } // v1
 } // filesystem
 } // prosoft
@@ -225,6 +250,19 @@ bool ifilesystem::change_iterator_traits::equal_to(const basic_iterator<change_i
 #if PSTEST_HARNESS
 // Internal tests.
 #include "catch.hpp"
+
+namespace {
+
+struct test_state {
+    state s;
+    
+    void add(fs::path p) {
+        fs::change_notification n{std::move(p), fs::path{}, 0, fs::change_event::none, fs::file_type::regular};
+        s.add(&n);
+    }
+};
+
+} // anon
 
 using namespace prosoft::filesystem;
 
@@ -273,6 +311,19 @@ TEST_CASE("change_iterator_internal") {
         CHECK(call_filter(change_iterator_config::files_only_filter, &n) == &n); // rescan must always pass
         n = {fs::path{}, fs::path{}, 0, fs::change_event::canceled, fs::file_type::directory};
         CHECK(call_filter(change_iterator_config::files_only_filter, &n) == &n); // cancel must always pass
+    }
+    
+    WHEN("extracting paths") {
+        test_state ts;
+        ts.add(fs::path{PS_TEXT("test")});
+        ts.add(fs::path{PS_TEXT("test2")});
+        ts.add(fs::path{PS_TEXT("test3")});
+        
+        auto paths = ts.s.extract();
+        CHECK(paths.size() == 3);
+        
+        paths = ts.s.extract();
+        CHECK(paths.empty());
     }
 }
 

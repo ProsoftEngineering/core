@@ -91,6 +91,8 @@ TEST_CASE("filesystem_change_iterator") {
             }
         }
         
+        CHECK(i.extract().empty());
+        
         auto last = entries.end();
         CHECK(last != std::find(entries.begin(), last, f1));
         CHECK(last != std::find(entries.begin(), last, subdir));

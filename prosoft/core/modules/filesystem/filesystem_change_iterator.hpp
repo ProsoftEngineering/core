@@ -27,6 +27,7 @@
 #define PS_CORE_FILESYSTEM_CHANGE_ITERATOR_HPP
 
 #include <chrono>
+#include <vector>
 
 #include "filesystem_have_change_monitor.hpp"
 
@@ -75,6 +76,7 @@ struct change_iterator_traits {
     
     static bool canceled(const basic_iterator<change_iterator_traits>&);
     static bool equal_to(const basic_iterator<change_iterator_traits>&, const change_registration&);
+    static std::vector<path> extract_paths(basic_iterator<change_iterator_traits>&);
 };
 
 iterator_state_ptr make_iterator_state(const path&, directory_options, change_iterator_traits::configuration_type&&, error_code&, change_iterator_traits);
@@ -92,6 +94,11 @@ inline ifilesystem::change_iterator_t begin(ifilesystem::change_iterator_t& i) {
 
 inline bool canceled(const ifilesystem::change_iterator_t& i) {
     return ifilesystem::change_iterator_traits::canceled(i);
+}
+
+// A more efficient way than a range loop to grab all available paths. 
+inline std::vector<path> extract_paths(ifilesystem::change_iterator_t& i) {
+    return ifilesystem::change_iterator_traits::extract_paths(i);
 }
 
 // for finding the iterator from a callback
