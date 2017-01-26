@@ -241,6 +241,11 @@ const change_notification* change_iterator_config::files_only_filter(const chang
     return n.type() == file_type::regular ? &n : nullptr;
 }
 
+const change_notification* change_iterator_config::exists_filter(const change_notification& n) {
+    error_code ec;
+    return exists(n.renamed_to_path().empty() ? n.path() : n.renamed_to_path(), ec) ? &n : nullptr;
+}
+
 bool ifilesystem::change_iterator_traits::canceled(const basic_iterator<change_iterator_traits>& i) {
     auto p = reinterpret_cast<const state*>(i.m_i.get());
     return !p || p->done();
@@ -318,7 +323,7 @@ TEST_CASE("change_iterator_internal") {
         CHECK(call(filters_type{null_filter}, &n) == &n); // rescan must always pass
     }
     
-    WHEN("filtering files only") {
+    WHEN("filtering for files") {
         CHECK(call(change_iterator_config::files_only_filter, nullptr) == nullptr);
         CHECK(call(change_iterator_config::files_only_filter, &note) == nullptr);
         
@@ -331,6 +336,16 @@ TEST_CASE("change_iterator_internal") {
         CHECK(call(filters_type{change_iterator_config::files_only_filter}, &n) == &n); // rescan must always pass
         n = {fs::path{}, fs::path{}, 0, fs::change_event::canceled, fs::file_type::directory};
         CHECK(call(filters_type{change_iterator_config::files_only_filter}, &n) == &n); // cancel must always pass
+    }
+    
+    WHEN("filtering for existing paths") {
+        CHECK(call(change_iterator_config::exists_filter, nullptr) == nullptr);
+        CHECK(call(change_iterator_config::exists_filter, &note) == nullptr);
+        
+        fs::change_notification n{fs::temp_directory_path(), fs::path{}, 0, fs::change_event::none, fs::file_type::directory};
+        CHECK(call(change_iterator_config::exists_filter, &n) == &n);
+        n = {fs::path{}, fs::temp_directory_path(), 0, fs::change_event::none, fs::file_type::none}; // dir still exists if type is none
+        CHECK(call(change_iterator_config::exists_filter, &n) == &n);
     }
     
     WHEN("extracting paths") {
