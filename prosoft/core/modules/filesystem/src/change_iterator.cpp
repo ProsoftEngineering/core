@@ -237,7 +237,7 @@ ifilesystem::make_iterator_state(const path& p, directory_options opts, change_i
     return s;
 }
 
-const change_notification* change_iterator_config::files_only_filter(const change_notification& n) {
+const change_notification* change_iterator_config::is_regular_filter(const change_notification& n) {
     return n.type() == file_type::regular ? &n : nullptr;
 }
 
@@ -324,18 +324,18 @@ TEST_CASE("change_iterator_internal") {
     }
     
     WHEN("filtering for files") {
-        CHECK(call(change_iterator_config::files_only_filter, nullptr) == nullptr);
-        CHECK(call(change_iterator_config::files_only_filter, &note) == nullptr);
+        CHECK(call(change_iterator_config::is_regular_filter, nullptr) == nullptr);
+        CHECK(call(change_iterator_config::is_regular_filter, &note) == nullptr);
         
         fs::change_notification n{fs::path{}, fs::path{}, 0, fs::change_event::none, fs::file_type::regular};
-        CHECK(call(change_iterator_config::files_only_filter, &n) == &n);
+        CHECK(call(change_iterator_config::is_regular_filter, &n) == &n);
         n = {fs::path{}, fs::path{}, 0, fs::change_event::none, fs::file_type::directory};
-        CHECK(call(change_iterator_config::files_only_filter, &n) == nullptr);
+        CHECK(call(change_iterator_config::is_regular_filter, &n) == nullptr);
         
         n = {fs::path{}, fs::path{}, 0, fs::change_event::rescan, fs::file_type::directory};
-        CHECK(call(filters_type{change_iterator_config::files_only_filter}, &n) == &n); // rescan must always pass
+        CHECK(call(filters_type{change_iterator_config::is_regular_filter}, &n) == &n); // rescan must always pass
         n = {fs::path{}, fs::path{}, 0, fs::change_event::canceled, fs::file_type::directory};
-        CHECK(call(filters_type{change_iterator_config::files_only_filter}, &n) == &n); // cancel must always pass
+        CHECK(call(filters_type{change_iterator_config::is_regular_filter}, &n) == &n); // cancel must always pass
     }
     
     WHEN("filtering for existing paths") {

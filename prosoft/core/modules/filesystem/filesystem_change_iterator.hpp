@@ -68,8 +68,8 @@ struct change_iterator_config {
     PS_DEFAULT_COPY(change_iterator_config);
     PS_DEFAULT_MOVE(change_iterator_config);
     
-    static const change_notification* files_only_filter(const change_notification&);
-    static const change_notification* files_only_filter(change_notification&&) = delete;
+    static const change_notification* is_regular_filter(const change_notification&);
+    static const change_notification* is_regular_filter(change_notification&&) = delete;
     
     static const change_notification* exists_filter(const change_notification&);
     static const change_notification* exists_filter(change_notification&&) = delete;
