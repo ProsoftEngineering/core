@@ -48,17 +48,22 @@ struct change_iterator_config {
     callback_type callback;
     // Return null to ignore the change.
     using filter_type = const change_notification*(*)(const change_notification&);
-    filter_type filter;
+    using filters_type = std::vector<filter_type>;
+    filters_type filters;
     // Passed on to FS monitor.
     using latency_type = std::chrono::milliseconds;
     latency_type latency;
     
-    change_iterator_config(callback_type cb = callback_type{}, filter_type f = filter_type(), latency_type l = latency_type{1000L})
-        : callback(std::move(cb))
-        , filter(f)
+    static constexpr latency_type default_latency() { return latency_type{1000L}; }
+    
+    change_iterator_config(latency_type l = default_latency())
+        : callback()
+        , filters()
         , latency(l) {}
-    change_iterator_config(latency_type l)
-        : change_iterator_config(callback_type{}, filter_type{}, l) {}
+    change_iterator_config(callback_type cb, filters_type f, latency_type l = default_latency())
+        : callback(std::move(cb))
+        , filters(std::move(f))
+        , latency(l) {}
     ~change_iterator_config() = default;
     PS_DEFAULT_COPY(change_iterator_config);
     PS_DEFAULT_MOVE(change_iterator_config);
