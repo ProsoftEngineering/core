@@ -101,10 +101,6 @@ namespace prosoft {
 namespace filesystem {
 inline namespace v1 {
 
-bool ifilesystem::iterator_state::equal_to(const ifilesystem::iterator_state*) const {
-    return true;
-}
-
 ifilesystem::iterator_state_ptr
 ifilesystem::make_iterator_state(const path& p, directory_options opts, iterator_traits::configuration_type, error_code& ec, iterator_traits) {
     auto s = std::make_shared<state>(p, opts, ec);

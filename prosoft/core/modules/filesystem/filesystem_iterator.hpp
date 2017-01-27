@@ -167,8 +167,6 @@ public:
         return directory_entry{std::move(m_current)};
     }
     
-    virtual bool equal_to(const iterator_state*) const;
-    
     virtual void pop() {}
     
     virtual iterator_depth_type depth() const noexcept {
@@ -363,7 +361,7 @@ template <class Traits>
 bool basic_iterator<Traits>::operator==(const basic_iterator<Traits>& other) const {
     auto ti = m_i.get();
     auto oi = other.m_i.get();
-    return ti == oi || (ti && oi && ti->equal_to(oi));
+    return ti == oi;
 }
 
 template <class Traits>
