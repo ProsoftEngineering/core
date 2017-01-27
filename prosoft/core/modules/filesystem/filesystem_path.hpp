@@ -61,6 +61,7 @@ public:
     typedef typename string_type::const_pointer const_pointer;
     typedef typename std::remove_const<typename std::remove_pointer<const_pointer>::type>::type encoding_value_type; // for u8string this will be char
     static constexpr const value_type preferred_separator = (preferred_separator_style == path_style::posix ? static_cast<value_type>('/') : static_cast<value_type>('\\'));
+    static constexpr const value_type dot = static_cast<value_type>('.');
 
     basic_path() noexcept(std::is_nothrow_default_constructible<string_type>::value);
     basic_path(const basic_path&);
@@ -206,6 +207,9 @@ constexpr const path_style basic_path<String>::preferred_separator_style;
 
 template <class String>
 constexpr const typename basic_path<String>::value_type basic_path<String>::preferred_separator;
+
+template <class String>
+constexpr const typename basic_path<String>::value_type basic_path<String>::dot;
 
 // private
 
@@ -641,12 +645,12 @@ private:
         const bool atEnd = mPos == mEnd;
         if (separatorCount > 0) {
             if (atEnd && (oldPos != mStart || separatorCount > 1) /* ignore root dir only */) {
-                if (mElement != dot_char) { // XXX: corner case: /a/b/c/./ will break
+                if (mElement != path_type::dot) { // XXX: corner case: /a/b/c/./ will break
                     // XXX: we set the dot element, but pos is still at the end, reset it to the first trailing separator.
                     // Next increment will hit the actual end.
                     mPos = oldPos;
                 }
-                mElement = dot_char;
+                mElement = path_type::dot;
                 return;
             }
         } else if (!atEnd) { // not a separator
@@ -674,7 +678,7 @@ private:
             const auto& where = i.base();
             if (atEnd && where > mStart /* ignore root dir only */) {
                 mPos = i.base();
-                mElement = dot_char;
+                mElement = path_type::dot;
                 return;
             } else if (at_start(i.base())) {
                 mPos = i.base();
@@ -688,17 +692,12 @@ private:
         get_element(mPos, mEnd);
     }
 
-    static constexpr const typename path_type::value_type dot_char = static_cast<typename path_type::value_type>('.');
-
     path_type mElement;
     base_iterator mStart;
     base_iterator mEnd;
     base_iterator mPos;
     base_iterator mRootName; // Win32 only
 };
-
-template <class String>
-constexpr const typename basic_path<String>::iterator::path_type::value_type basic_path<String>::iterator::dot_char;
 
 template <class String>
 inline typename basic_path<String>::iterator basic_path<String>::begin() const {
@@ -745,7 +744,6 @@ basic_path<String>& basic_path<String>::replace_extension(const basic_path& e) /
     operator/=(basename);
 
     if (!e.empty()) {
-        constexpr auto dot = static_cast<value_type>('.');
         if (e.native()[0] != dot) {
             operator+=(dot);
         }
