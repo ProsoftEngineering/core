@@ -41,6 +41,9 @@ namespace {
 using fsiterator_state = fs::ifilesystem::iterator_state;
 
 class state : public fsiterator_state {
+// XXX: TEMPORARY TESTING
+    fs::path m_root;
+// XXX
     bool recurse() const noexcept {
         return !is_set(options() & fs::directory_options::skip_subdirectory_descendants);
     }
@@ -65,6 +68,7 @@ state::state(const fs::path& p, fs::directory_options opts, fs::error_code& ec)
     : fsiterator_state(p, opts, ec) {
     if (!ec) {
 // XXX: TEMPORARY TESTING -- should just attempt to open the path for reading
+        m_root = p;
         auto st = fs::status(p, ec);
         if (!ec && !fs::is_directory(st)) {
             ec.assign(ENOTDIR, prosoft::system::posix_category());
@@ -79,7 +83,7 @@ fs::path state::next(prosoft::system::error_code&) {
     }
 // XXX: TEMPORARY TESTING
     if (current().path().empty()) {
-        return root();
+        return m_root;
     }
 // XXX
     return fs::path{};
@@ -97,9 +101,8 @@ namespace prosoft {
 namespace filesystem {
 inline namespace v1 {
 
-bool ifilesystem::iterator_state::equal_to(const ifilesystem::iterator_state* other) const {
-    PSASSERT_NOTNULL(other);
-    return make_public(m_opts) == make_public(other->m_opts) && m_root == other->m_root && m_current == other->m_current;
+bool ifilesystem::iterator_state::equal_to(const ifilesystem::iterator_state*) const {
+    return true;
 }
 
 ifilesystem::iterator_state_ptr

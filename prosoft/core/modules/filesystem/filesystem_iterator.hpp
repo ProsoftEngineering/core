@@ -124,7 +124,6 @@ using iterator_depth_type = int;
 
 namespace ifilesystem {
 class iterator_state {
-    path m_root;
     directory_entry m_current;
     directory_options m_opts;
     
@@ -145,15 +144,12 @@ protected:
     
 public:
     iterator_state() = default;
-    iterator_state(const path& p, directory_options opts, error_code&)
-        : m_root(p)
-        , m_current()
-        , m_opts(opts) {}
-    virtual ~iterator_state() = default;
-    
-    const path& root() const noexcept {
-        return m_root;
+    iterator_state(const path&, directory_options opts, error_code& ec)
+        : m_current()
+        , m_opts(opts) {
+        ec.clear();
     }
+    virtual ~iterator_state() = default;
     
     const directory_entry& current() const noexcept {
         return m_current;
@@ -239,10 +235,6 @@ class basic_iterator {
     const directory_entry& empty_entry() const {
         static const directory_entry empty;
         return empty;
-    }
-    
-    const path& root_or_empty() const {
-        return m_i ? m_i->root() : empty_entry().path();
     }
     
     void clear_if_denied(error_code& ec) const;
