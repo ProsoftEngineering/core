@@ -66,7 +66,7 @@ notification_ptr call(fs::change_iterator_config::filter_type f, notification_pt
 }
 
 notification_ptr call(const fs::change_iterator_config::filters_type& fl, notification_ptr p) {
-    if (!required(p->event())) {
+    if (p && !required(p->event())) {
         for (auto f : fl) {
             if (!call(f, p)) {
                 return nullptr;
@@ -313,6 +313,7 @@ TEST_CASE("change_iterator_internal") {
     
     WHEN("filter is not null") {
         CHECK(call(nop_filter, nullptr) == nullptr);
+        CHECK(call(filters_type{nop_filter}, nullptr) == nullptr);
         CHECK(call(nop_filter, &note) == &note);
         CHECK(call(null_filter, &note) == nullptr);
         
