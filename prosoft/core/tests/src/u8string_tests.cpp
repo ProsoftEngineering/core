@@ -152,7 +152,7 @@ TEST_CASE("u8string") {
 
         // bad utf8
         ss = "\x0C5"; // ISO 8859-1 capital Angstrom
-        CHECK_THROWS_AS(u8string sbad(ss), u8string::invalid_utf8);
+        CHECK_THROWS_AS(u8string(ss), u8string::invalid_utf8);
 
         uint8_t data[] = {'a', 'b', 'c', 0, 0, 'd', 'e', 'f'};
         u8string n1(data, sizeof(data));
