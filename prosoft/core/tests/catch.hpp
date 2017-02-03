@@ -1,6 +1,6 @@
 /*
  *  Catch v1.7.0
- *  Generated: 2017-02-01 21:32:13.239291
+ *  Generated: 2017-02-03 14:03:53.362602
  *  ----------------------------------------------------------
  *  This file has been merged from multiple headers. Please don't edit it directly
  *  Copyright (c) 2012 Two Blue Cubes Ltd. All rights reserved.
@@ -6118,11 +6118,29 @@ namespace Catch {
 
 #if defined ( CATCH_PLATFORM_WINDOWS ) /////////////////////////////////////////
 
-#define NOMINMAX
-#define WIN32_LEAN_AND_MEAN
+// #included from: catch_windows_h_proxy.h
+
+#define TWOBLUECUBES_CATCH_WINDOWS_H_PROXY_H_INCLUDED
+
+#ifdef CATCH_DEFINES_NOMINMAX
+#  define NOMINMAX
+#endif
+#ifdef CATCH_DEFINES_WIN32_LEAN_AND_MEAN
+#  define WIN32_LEAN_AND_MEAN
+#endif
+
+#ifdef __AFXDLL
+#include <AfxWin.h>
+#else
 #include <windows.h>
-#undef WIN32_LEAN_AND_MEAN
-#undef NOMINMAX
+#endif
+
+#ifdef CATCH_DEFINES_NOMINMAX
+#  undef NOMINMAX
+#endif
+#ifdef CATCH_DEFINES_WIN32_LEAN_AND_MEAN
+#  undef WIN32_LEAN_AND_MEAN
+#endif
 
 namespace Catch {
 
@@ -7439,30 +7457,6 @@ namespace Catch {
 #endif
 
 #if defined ( CATCH_CONFIG_COLOUR_WINDOWS ) /////////////////////////////////////////
-
-// #included from: catch_windows_h_proxy.h
-
-#define TWOBLUECUBES_CATCH_WINDOWS_H_PROXY_H_INCLUDED
-
-#ifdef CATCH_DEFINES_NOMINMAX
-#  define NOMINMAX
-#endif
-#ifdef CATCH_DEFINES_WIN32_LEAN_AND_MEAN
-#  define WIN32_LEAN_AND_MEAN
-#endif
-
-#ifdef __AFXDLL
-#include <AfxWin.h>
-#else
-#include <windows.h>
-#endif
-
-#ifdef CATCH_DEFINES_NOMINMAX
-#  undef NOMINMAX
-#endif
-#ifdef CATCH_DEFINES_WIN32_LEAN_AND_MEAN
-#  undef WIN32_LEAN_AND_MEAN
-#endif
 
 namespace Catch {
 namespace {
