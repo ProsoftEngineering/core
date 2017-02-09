@@ -160,7 +160,7 @@ bool is_hidden(const path& p) {
 bool is_hidden(const path& p, error_code& ec) {
     ec.clear();
 #if _WIN32
-    return fattrs(p, FILE_ATTRIBUTE_HIDDEN, ec);
+    return ifilesystem::fattrs(p, FILE_ATTRIBUTE_HIDDEN, ec);
 #else
     if (is_dotfile(p)) {
         return true;
