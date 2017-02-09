@@ -642,8 +642,14 @@ inline bool is_device_file(const path& p, error_code& ec) noexcept {
     return is_device_file(status(p, ec));
 }
 
+bool is_hidden(const path&); // not displayed at the user level
+bool is_hidden(const path&, error_code&);
+
 bool is_mountpoint(const path&);
 bool is_mountpoint(const path&, error_code&);
+
+bool is_package(const path&);
+bool is_package(const path&, error_code&); // directories that are treated as files at the user level (macOS)
 
 namespace ifilesystem {
 path home_directory_path(const access_control_identity&, error_code&); // private as Windows only supports the current user

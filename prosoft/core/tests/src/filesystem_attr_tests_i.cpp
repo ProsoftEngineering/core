@@ -77,3 +77,35 @@ WHEN("getting the mount path for a mount path") {
     REQUIRE_FALSE(mp.empty());
     CHECK(mount_path(mp, ec) == mp);
 }
+
+WHEN("getting the hidden attribute") {
+    error_code ec;
+    CHECK_FALSE(is_hidden(home_directory_path(), ec));
+    CHECK_FALSE(is_hidden(temp_directory_path() / PS_TEXT("abcdefghij"), ec)); // non-existent path
+#if !_WIN32
+    CHECK(is_hidden(temp_directory_path() / ".abcdefghij", ec)); // all dot files are considered hidden, even non-existent ones
+    CHECK(is_hidden(".abcdefghij", ec));
+    auto p = home_directory_path() / ".ssh";
+    if (exists(p, ec)) {
+        CHECK(is_hidden(p, ec));
+    }
+    p = home_directory_path() / ".profile";
+    if (exists(p, ec)) {
+        CHECK(is_hidden(p, ec));
+    }
+#endif
+
+#if __APPLE__
+    CHECK(is_hidden("/Volumes", ec));
+#endif
+}
+
+WHEN("getting the package attribute") {
+    error_code ec;
+    CHECK_FALSE(is_package(temp_directory_path(), ec));
+    CHECK_FALSE(is_package(home_directory_path(), ec));
+    CHECK_FALSE(is_package(temp_directory_path() / PS_TEXT("abcdefghij"), ec)); // non-existent path
+#ifdef MAC_OS_X_VERSION_MIN_REQUIRED
+    CHECK(is_package("/System/Library/CoreServices/Finder.app", ec));
+#endif
+}

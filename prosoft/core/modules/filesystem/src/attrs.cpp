@@ -68,31 +68,63 @@ using unique_file = std::unique_ptr<FILE, FILE_delete>;
 #if __APPLE__
 
 CF::unique_url make_url(const path& p) {
-    using cfstring = to_CFString<path::string_type>;
-    
-    auto s = cfstring{}(p, cfstring::nocopy);
-    PS_THROW_IF_NULLPTR(s);
     error_code ec;
     const auto isdir = is_directory(p, ec); // XXX: will fail if path does not exist
-    return CF::unique_url{ ::CFURLCreateWithFileSystemPath(kCFAllocatorDefault, s.get(), kCFURLPOSIXPathStyle, isdir) };
+    return CF::unique_url{ ::CFURLCreateFromFileSystemRepresentation(kCFAllocatorDefault, as_utf8(data(p.native())), data_size(p.native()), isdir) };
+}
+
+inline fs::error_code error(CFErrorRef e) {
+    PSASSERT_NOTNULL(e);
+    const auto code = e ? CFErrorGetCode(e) : CFIndex{-1};
+    using code_type = decltype(code);
+    constexpr auto min = code_type{std::numeric_limits<int>::min()};
+    constexpr auto max = code_type{std::numeric_limits<int>::max()};
+    return fs::error_code{static_cast<int>(prosoft::clamp(code, min, max)), std::generic_category()};
+}
+
+template <typename CFT>
+unique_cftype<CFT> get_property(const path& p, CFStringRef key, error_code& ec) {
+    PSASSERT_NOTNULL(key);
+    auto url = make_url(p.native());
+    unique_cftype<CFBooleanRef> value;
+    CF::unique_error err;
+    if (CFURLCopyResourcePropertyForKey(url.get(), key, handle(value), handle(err))) {
+        ec.clear();
+    } else {
+        ec = error(err.get());
+    }
+    return value;
 }
 
 #endif // __APPLE__
 
+#if PS_FS_HAVE_BSD_STATFS
+inline bool has_flag(const struct stat& sb, unsigned f) {
+    return f == (sb.st_flags & f);
+}
+
+bool has_flag(const path& p, unsigned f, error_code& ec) {
+    PSASSERT(f != 0, "BUG?");
+    struct stat sb;
+    if (0 == ::lstat(p.c_str(), &sb)) {
+        return has_flag(sb, f);
+    } else {
+        prosoft::system::system_error(ec);
+        return false;
+    }
+}
+#endif
+
+inline bool is_dotfile(const path& p) {
+    const auto leaf = p.filename();
+    return (!leaf.empty() && leaf.native()[0] == path::dot); // first condition should not be necessary, but just to be safe
+}
+
 bool is_mounttrigger(const path& p, error_code& ec) {
     ec.clear();
 #if __APPLE__ && MAC_OS_X_VERSION_MIN_REQUIRED >= MAC_OS_X_VERSION_10_7
-    if (auto url = make_url(p)) {
-        CFBooleanRef val = nullptr;
-        (void)::CFURLCopyResourcePropertyForKey(url.get(), kCFURLIsMountTriggerKey, &val, nullptr);
-        if (val) {
-            return static_cast<bool>(CFBooleanGetValue(val));
-        } else {
-            ifilesystem::error(ENOTSUP, ec);
-        }
-    } else {
-        ifilesystem::error(EINVAL, ec);
-    }
+    auto value = get_property<CFBooleanRef>(p, kCFURLIsMountTriggerKey, ec);
+    return value && CFBooleanGetValue(value.get());
 #elif _WIN32
     if (ifilesystem::fattrs(p, FILE_ATTRIBUTE_REPARSE_POINT, ec)) {
         ::WIN32_FIND_DATAW data;
@@ -117,6 +149,33 @@ bool is_mounttrigger(const path& p, error_code& ec) {
 namespace prosoft {
 namespace filesystem {
 inline namespace v1 {
+
+bool is_hidden(const path& p) {
+    error_code ec;
+    auto val = is_hidden(p, ec);
+    PS_THROW_IF(ec.value(), filesystem_error("Could not get hidden value", p, ec));
+    return val;
+}
+
+bool is_hidden(const path& p, error_code& ec) {
+    ec.clear();
+#if _WIN32
+    return fattrs(p, FILE_ATTRIBUTE_HIDDEN, ec);
+#else
+    if (is_dotfile(p)) {
+        return true;
+    }
+    
+    // No need to take the CF overhead hit for Apple.
+#if PS_FS_HAVE_BSD_STATFS
+    return has_flag(p, UF_HIDDEN, ec);
+#else
+    // Linux has an Ext2 IOCTL that the lsattr/chattr commands uses; we should check it.
+    return false;
+#endif
+    
+#endif // _WIN32
+}
 
 bool is_mountpoint(const path& p) {
     error_code ec;
@@ -201,6 +260,24 @@ path mount_path(const path& p, error_code& ec) {
 #else
     ifilesystem::error(ENOTSUP, ec);
     return {};
+#endif
+}
+
+bool is_package(const path& p) {
+    error_code ec;
+    auto val = is_package(p, ec);
+    PS_THROW_IF(ec.value(), filesystem_error("Could not get package value", p, ec));
+    return val;
+}
+
+bool is_package(const path& p, error_code& ec) {
+#if __APPLE__
+    auto value = get_property<CFBooleanRef>(p, kCFURLIsPackageKey, ec);
+    return value && CFBooleanGetValue(value.get());
+#else
+    (void)p;
+    ec.clear(); // ENOTSUP?
+    return false;
 #endif
 }
 
