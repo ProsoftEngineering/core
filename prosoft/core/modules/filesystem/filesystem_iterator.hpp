@@ -186,7 +186,7 @@ struct null_iterator_config {};
 
 struct iterator_traits {
     static constexpr directory_options required = directory_options::skip_subdirectory_descendants;
-    static constexpr directory_options not_supported = directory_options::none;
+    static constexpr directory_options not_supported = directory_options::include_postorder_directories;
     static constexpr directory_options defaults = required;
     using configuration_type = null_iterator_config;
 };

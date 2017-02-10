@@ -79,7 +79,7 @@ namespace ifilesystem {
 
 struct change_iterator_traits {
     static constexpr directory_options required = directory_options::none;
-    static constexpr directory_options not_supported = directory_options::skip_subdirectory_descendants;
+    static constexpr directory_options not_supported = directory_options::skip_subdirectory_descendants|directory_options::include_postorder_directories;
     static constexpr directory_options defaults = directory_options::include_created_events|directory_options::include_modified_events;
     using configuration_type = change_iterator_config;
     
