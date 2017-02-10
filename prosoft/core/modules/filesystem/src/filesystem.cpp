@@ -145,23 +145,28 @@ struct to_times {
 #endif
 };
 
-file_status file_stat(decltype(::stat) statcall, const path& p, error_code& ec) {
+file_status file_stat(decltype(::stat) statcall, const path& p, status_info what, error_code& ec) {
     stat_buf sb;
     if (0 == statcall(p.c_str(), &sb)) {
         ec.clear();
-        return file_status{to_file_type{}(sb), to_perms{}(sb), to_owner{}(sb), to_times{}(sb)};
+        // Not a big type conversion cost, so just do minimal/complete
+        if (status_info::basic == what) {
+            return file_status{to_file_type{}(sb)};
+        } else {
+            return file_status{to_file_type{}(sb), to_perms{}(sb), to_owner{}(sb), to_times{}(sb)};
+        }
     } else {
         ifilesystem::system_error(ec);
         return file_status{to_file_type{}(ec)};
     }
 }
 
-inline file_status file_stat(const path& p, error_code& ec) {
-    return file_stat(::stat, p, ec);
+inline file_status file_stat(const path& p, status_info what, error_code& ec) {
+    return file_stat(::stat, p, what, ec);
 }
 
-inline file_status link_stat(const path& p, error_code& ec) {
-    return file_stat(::lstat, p, ec);
+inline file_status link_stat(const path& p, status_info what, error_code& ec) {
+    return file_stat(::lstat, p, what, ec);
 }
 
 #else
@@ -338,15 +343,22 @@ struct to_times {
     }
 };
 
-file_status file_stat(const path& p, error_code& ec, bool link) noexcept {
+file_status file_stat(const path& p, status_info what, error_code& ec, bool link) noexcept {
     if (const auto attrs = ifilesystem::fattrs(p, ec)) {
         ec.clear();
         error_code lec; // ignored
         const auto get_type = to_file_type{};
         auto o = owner::invalid_owner();
-        auto ap = to_perms{}(p, o, lec);
+        perms ap = perms::unknown;
+        if (is_set(what & status_info::perms)) {
+            ap = to_perms{}(p, o, lec);
+        }
         auto&& np = ifilesystem::to_native_path{}(p.native());
-        return file_status{!link ? get_type(np, attrs) : get_type(attrs), ap, std::move(o), to_times{}(np, lec)};
+        times t;
+        if (is_set(what & status_info::times)) {
+            t = to_times{}(np, lec);
+        }
+        return file_status{!link ? get_type(np, attrs) : get_type(attrs), ap, std::move(o), t};
     } else {
         if (is_device_path(p)) {
             return file_status{to_file_type{}(FILE_ATTRIBUTE_DEVICE)}; // We know the type from the path, so return it.
@@ -356,12 +368,12 @@ file_status file_stat(const path& p, error_code& ec, bool link) noexcept {
     }
 }
 
-inline file_status file_stat(const path& p, error_code& ec) noexcept {
-    return file_stat(p, ec, false);
+inline file_status file_stat(const path& p, status_info what, error_code& ec) noexcept {
+    return file_stat(p, what, ec, false);
 }
 
-inline file_status link_stat(const path& p, error_code& ec) noexcept {
-    return file_stat(p, ec, true);
+inline file_status link_stat(const path& p, status_info what, error_code& ec) noexcept {
+    return file_stat(p, what, ec, true);
 }
 
 #endif // !_WIN32
@@ -423,26 +435,26 @@ bool equivalent(const path& p1, const path& p2, error_code& ec) noexcept {
 #endif
 }
 
-file_status status(const path& p) {
+file_status status(const path& p, status_info what) {
     error_code ec;
-    auto fs = status(p, ec);
+    auto fs = status(p, what, ec);
     PS_THROW_IF(ec.value(), filesystem_error("Could not get status", p, ec));
     return fs;
 }
 
-file_status status(const path& p, error_code& ec) noexcept {
-    return file_stat(p, ec);
+file_status status(const path& p, status_info what, error_code& ec) noexcept {
+    return file_stat(p, what, ec);
 }
 
-file_status symlink_status(const path& p) {
+file_status symlink_status(const path& p, status_info what) {
     error_code ec;
-    auto fs = symlink_status(p, ec);
+    auto fs = symlink_status(p, what, ec);
     PS_THROW_IF(ec.value(), filesystem_error("Could not get symlink status", p, ec));
     return fs;
 }
 
-file_status symlink_status(const path& p, error_code& ec) noexcept {
-    return link_stat(p, ec);
+file_status symlink_status(const path& p, status_info what, error_code& ec) noexcept {
+    return link_stat(p, what, ec);
 }
 
 bool exists(const path& p) {

@@ -444,11 +444,36 @@ bool remove(const path&, error_code&) noexcept;
 void rename(const path&, const path&);
 void rename(const path&, const path&, error_code&) noexcept;
 
-file_status status(const path&);
-file_status status(const path&, error_code&) noexcept;
+enum class status_info {
+    basic = 0,
+    perms = 0x1,
+    times = 0x2,
+    
+    all = basic|perms|times,
+};
+PS_ENUM_BITMASK_OPS(status_info);
 
-file_status symlink_status(const path&);
-file_status symlink_status(const path&, error_code&) noexcept;
+file_status status(const path&, status_info);
+file_status status(const path&, status_info, error_code&) noexcept;
+
+file_status symlink_status(const path&, status_info);
+file_status symlink_status(const path&, status_info, error_code&) noexcept;
+
+inline file_status status(const path& p) {
+    return status(p, status_info::all);
+}
+
+inline file_status status(const path& p, error_code& ec) noexcept {
+    return status(p, status_info::all, ec);
+}
+
+inline file_status symlink_status(const path& p) {
+    return symlink_status(p, status_info::all);
+}
+
+inline file_status symlink_status(const path& p, error_code& ec) noexcept {
+    return symlink_status(p, status_info::all, ec);
+}
 
 inline bool status_known(const file_status& s) noexcept {
     return s.type() != file_type::none;
@@ -461,11 +486,11 @@ bool exists(const path&);
 bool exists(const path&, error_code&) noexcept;
 
 inline file_time_type last_write_time(const path& p) {
-    return status(p).times().modified();
+    return status(p, status_info::times).times().modified();
 }
 
 inline file_time_type last_write_time(const path& p, error_code& ec) noexcept {
-    return status(p, ec).times().modified();
+    return status(p, status_info::times, ec).times().modified();
 }
 
 void last_write_time(const path&, file_time_type);
@@ -475,80 +500,80 @@ inline bool is_block_file(const file_status& s) noexcept {
     return s.type() == file_type::block;
 }
 inline bool is_block_file(const path& p) {
-    return is_block_file(status(p));
+    return is_block_file(status(p, status_info::basic));
 }
 inline bool is_block_file(const path& p, error_code& ec) noexcept {
-    return is_block_file(status(p, ec));
+    return is_block_file(status(p, status_info::basic, ec));
 }
 
 inline bool is_character_file(const file_status& s) noexcept {
     return s.type() == file_type::character;
 }
 inline bool is_character_file(const path& p) {
-    return is_character_file(status(p));
+    return is_character_file(status(p, status_info::basic));
 }
 inline bool is_character_file(const path& p, error_code& ec) noexcept {
-    return is_character_file(status(p, ec));
+    return is_character_file(status(p, status_info::basic, ec));
 }
 
 inline bool is_directory(const file_status& s) noexcept {
     return s.type() == file_type::directory;
 }
 inline bool is_directory(const path& p) {
-    return is_directory(status(p));
+    return is_directory(status(p, status_info::basic));
 }
 inline bool is_directory(const path& p, error_code& ec) noexcept {
-    return is_directory(status(p, ec));
+    return is_directory(status(p, status_info::basic, ec));
 }
 
 inline bool is_fifo(const file_status& s) noexcept {
     return s.type() == file_type::fifo;
 }
 inline bool is_fifo(const path& p) {
-    return is_fifo(status(p));
+    return is_fifo(status(p, status_info::basic));
 }
 inline bool is_fifo(const path& p, error_code& ec) noexcept {
-    return is_fifo(status(p, ec));
+    return is_fifo(status(p, status_info::basic, ec));
 }
 
 inline bool is_regular_file(const file_status& s) noexcept {
     return s.type() == file_type::regular;
 }
 inline bool is_regular_file(const path& p) {
-    return is_regular_file(status(p));
+    return is_regular_file(status(p, status_info::basic));
 }
 inline bool is_regular_file(const path& p, error_code& ec) noexcept {
-    return is_regular_file(status(p, ec));
+    return is_regular_file(status(p, status_info::basic, ec));
 }
 
 inline bool is_socket(const file_status& s) noexcept {
     return s.type() == file_type::socket;
 }
 inline bool is_socket(const path& p) {
-    return is_socket(status(p));
+    return is_socket(status(p, status_info::basic));
 }
 inline bool is_socket(const path& p, error_code& ec) noexcept {
-    return is_socket(status(p, ec));
+    return is_socket(status(p, status_info::basic, ec));
 }
 
 inline bool is_symlink(const file_status& s) noexcept {
     return s.type() == file_type::symlink;
 }
 inline bool is_symlink(const path& p) {
-    return is_symlink(status(p));
+    return is_symlink(status(p, status_info::basic));
 }
 inline bool is_symlink(const path& p, error_code& ec) noexcept {
-    return is_symlink(status(p, ec));
+    return is_symlink(status(p, status_info::basic, ec));
 }
 
 inline bool is_other(const file_status& s) noexcept {
     return exists(s) && !is_regular_file(s) && !is_directory(s) && !is_symlink(s);
 }
 inline bool is_other(const path& p) {
-    return is_other(status(p));
+    return is_other(status(p, status_info::basic));
 }
 inline bool is_other(const path& p, error_code& ec) noexcept {
-    return is_other(status(p, ec));
+    return is_other(status(p, status_info::basic, ec));
 }
 
 path temp_directory_path();
@@ -636,10 +661,10 @@ inline bool is_device_file(const file_status& s) noexcept {
     return is_character_file(s) || is_block_file(s);
 }
 inline bool is_device_file(const path& p) {
-    return is_device_file(status(p));
+    return is_device_file(status(p, status_info::basic));
 }
 inline bool is_device_file(const path& p, error_code& ec) noexcept {
-    return is_device_file(status(p, ec));
+    return is_device_file(status(p, status_info::basic, ec));
 }
 
 bool is_hidden(const path&); // not displayed at the user level

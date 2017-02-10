@@ -178,6 +178,9 @@ TEST_CASE("filesystem") {
         CHECK(is_regular_file(p));
         CHECK(is_regular_file(st));
         
+        CHECK(st.times().has_modified());
+        CHECK_FALSE(status(p, status_info::basic).times().has_modified());
+        
         CHECK_FALSE(is_directory(st));
         CHECK_FALSE(is_symlink(st));
         CHECK_FALSE(is_socket(st));
