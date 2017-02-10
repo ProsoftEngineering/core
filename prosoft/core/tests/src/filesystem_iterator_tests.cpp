@@ -77,17 +77,12 @@ TEST_CASE("filesystem_iterator") {
         }
         
         SECTION("recurse option") {
-            const auto p = create_file(temp_directory_path() / PS_TEXT("fs17test"));
-            REQUIRE(exists(p));
-        
-            recursive_directory_iterator i{temp_directory_path()};
+            recursive_directory_iterator i{home_directory_path()};
             CHECK(!is_set(i.options() & directory_options::skip_subdirectory_descendants));
-            i = recursive_directory_iterator{temp_directory_path(), directory_options::follow_directory_symlink};
+            i = recursive_directory_iterator{home_directory_path(), directory_options::follow_directory_symlink};
             CHECK(!is_set(i.options() & directory_options::skip_subdirectory_descendants));
-            i = recursive_directory_iterator{temp_directory_path(), directory_options::follow_directory_symlink|directory_options::skip_subdirectory_descendants};
+            i = recursive_directory_iterator{home_directory_path(), directory_options::follow_directory_symlink|directory_options::skip_subdirectory_descendants};
             CHECK(!is_set(i.options() & directory_options::skip_subdirectory_descendants));
-            
-            REQUIRE(remove(p));
         }
     }
 }

@@ -110,6 +110,7 @@ enum class directory_options : unsigned {
     include_apple_double_files = 1U<<25, // macOS
 
     // Internal state
+    reserved_state_will_recurse = 1U<<29,
     reserved_state_skip_descendants = 1U<<30,
     reserved_state_postorder = 1U<<31,
     reserved_state_mask = 0xf0000000,
@@ -283,7 +284,7 @@ public:
     
     template <typename Recurse = void>
     bool recursion_pending(recurse_only_t<Recurse>* = 0) const noexcept {
-        return m_i ? !is_set(m_i->options() & directory_options::reserved_state_skip_descendants) : false;
+        return m_i ? !is_set(m_i->options() & directory_options::reserved_state_will_recurse) : false;
     }
     
     template <typename Recurse = void>

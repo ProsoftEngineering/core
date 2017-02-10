@@ -24,28 +24,259 @@
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #if !_WIN32
-// FTS is not thread safe at all.
-// readdir() is thread safe (on all modern OS versions) for multiple instances, but a single instance is only safe for a single thread to access.
 #include <dirent.h>
 #include <sys/errno.h>
 #else
 #include <windows.h>
 #endif
 
+#include <cstring>
+#include <vector>
+
+#include <system_error.hpp>
+
+#include "fsconfig.h"
 #include "filesystem.hpp"
+#include "filesystem_private.hpp"
 
 namespace fs = prosoft::filesystem::v1;
 
 namespace {
 
+enum class iterator_error {
+    none,
+    encoding_is_not_utf8,
+};
+
+class iterator_error_category : public std::error_category {
+public:
+	iterator_error_category() noexcept : std::error_category() {}
+
+	virtual const char* name() const noexcept override {
+		return "Filesystem iterator";
+    }
+
+	virtual std::string message(int ec) const override {
+        switch (static_cast<iterator_error>(ec)) {
+            case iterator_error::encoding_is_not_utf8:
+                return "A non-UTF8 path name was encountered. It has been skipped.";
+            break;
+            
+            default:
+                PSASSERT_UNREACHABLE("BUG");
+                return std::strerror(EINVAL);
+            break;
+        }
+	}
+};
+
+const std::error_category& iterator_category() {
+    static iterator_error_category cat;
+    return cat;
+}
+
+#if !_WIN32
+using native_dir = ::DIR;
+using native_dirent = ::dirent;
+
+inline bool is_directory(const native_dirent* e) {
+    return e->d_type == DT_DIR;
+}
+
+inline bool is_symlink(const native_dirent* e) {
+    return e->d_type == DT_LNK;
+}
+#else
+using native_dirent = ::WIN32_FIND_DATAW;
+struct native_dir {
+    native_dirent ent;
+    HANDLE handle;
+    bool firstent;
+    native_dir()
+        : handle()
+        , firstent(false) {
+        std::memset(&ent, 0, sizeof(ent));
+    }
+};
+#define d_name cFileName
+inline bool is_directory(const native_dirent* e) {
+    return 0 != (e->dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY);
+}
+
+inline bool is_symlink(const native_dirent* e) {
+    return 0 != (e->dwFileAttributes & FILE_ATTRIBUTE_REPARSE_POINT);
+}
+#endif //!_WIN32
+
+native_dir* open_dir(const fs::path& p) {
+#if !_WIN32
+    return ::opendir(p.c_str());
+#else
+    using namespace prosoft;
+    auto np = to_string<native_string_type, fs::path::string_type>{}(p);
+    if (np.empty() || (*(--np.end()) == fs::path::preferred_separator)) {
+        np.append(PS_TEXT("*"));
+    } else {
+        np.append(PS_TEXT("\\*"));
+    }
+    
+    auto d = new native_dir;
+    d->handle = ::FindFirstFileW(np.c_str(), &d->ent);
+    if (INVALID_HANDLE_VALUE != d->handle) {
+        d->firstent = true;
+    } else {
+        delete d;
+        d = nullptr;
+        errno = (int)::GetLastError();
+    }
+    return d;
+#endif //!_WIN32
+}
+
+int close_dir(native_dir* d) {
+    if (d) {
+#if !_WIN32
+        return ::closedir(d);
+#else
+        ::FindClose(d->handle);
+        delete d;
+        return 0;
+#endif
+    } else {
+        errno = einval().value();
+        return -1;
+    }
+}
+
+native_dirent* read_dir(native_dir* d) {
+    if (d) {
+#if !_WIN32
+        return ::readdir(d);
+#else
+        if (d->firstent) {
+            d->firstent = false;
+            return &d->ent;
+        }
+        if (::FindNextFileW(d->handle, &d->ent)) {
+            return &d->ent;
+        } else {
+            errno = (int)::GetLastError();
+            return nullptr;
+        }
+#endif
+    } else {
+        errno = einval().value();
+        return nullptr;
+    }
+}
+
+#if __APPLE__
+bool is_apple_double(const fs::path& dir, const fs::path& leaf) {
+    static const fs::path::string_type dot_underscore_prefix{"._"};
+    
+    using namespace prosoft;
+    if (starts_with(leaf.native(), dot_underscore_prefix) && leaf.native().size() > dot_underscore_prefix.size()) {
+        auto adp = dir / leaf;
+        fs::error_code ec;
+        if (!fs::is_directory(adp, ec)) {
+            adp = dir / leaf.native().substr(2);
+            return exists(adp, ec);
+        }
+    }
+    return false;
+}
+#else
+inline PS_CONSTEXPR_IF_CPP14 bool is_apple_double(const fs::path&, const fs::path&) {return false;}
+#endif
+
+native_dir* const INVALID_DIR = (native_dir*)((uintptr_t)0xbaadf00dUL);
+
+struct dir_ops {
+    static native_dir* PS_ALWAYS_INLINE open(const fs::path& p) {
+        return open_dir(p);
+    }
+
+    static native_dirent* PS_ALWAYS_INLINE read(native_dir* d) {
+        return read_dir(d);
+    }
+    
+    static int PS_ALWAYS_INLINE close(native_dir* d) {
+        return close_dir(d);
+    }
+};
+
+template <class Ops>
+struct stack_entry {
+    native_dir* m_dir;
+    fs::path m_path;
+    
+    stack_entry(native_dir* d, fs::path&& p) noexcept(std::is_nothrow_move_constructible<fs::path>::value)
+        : m_dir(d)
+        , m_path(std::move(p)) {}
+    stack_entry(native_dir* d, const fs::path& p)
+        : stack_entry(d, fs::path{p}) {}
+    ~stack_entry() {
+        if (INVALID_DIR != m_dir) {
+            Ops{}.close(m_dir);
+        }
+    }
+    stack_entry(stack_entry&& other) noexcept(std::is_nothrow_move_constructible<fs::path>::value)
+        : m_dir(other.m_dir)
+        , m_path(std::move(other.m_path)) {
+        other.m_dir = INVALID_DIR;
+    }
+    
+    PS_DISABLE_COPY(stack_entry);
+};
+
 using fsiterator_state = fs::ifilesystem::iterator_state;
 
+template <class Ops> // Template used for testing
 class state : public fsiterator_state {
-// XXX: TEMPORARY TESTING
-    fs::path m_root;
-// XXX
+    using base = fsiterator_state;
+// XXX: each level of recursion adds another open file descriptor.
+// If this becomes an issue (thousands of subdirs), a solution would be to:
+// save subdirs as they are found, process all files, close parent and then recurse saved subdirs.
+    using entry = stack_entry<Ops>;
+    std::vector<entry> m_stack;
+    
+#if PSTEST_HARNESS
+public:
+#endif
+    Ops m_ops;
+
     bool recurse() const noexcept {
         return !is_set(options() & fs::directory_options::skip_subdirectory_descendants);
+    }
+    
+    size_t size() const {
+        return m_stack.size();
+    }
+    
+    bool is_valid() const {
+        PSASSERT(m_stack.size() > 0, "Broken assumption");
+        return INVALID_DIR != m_stack.back().m_dir;
+    }
+    
+    bool is_child() const {
+        return size() > 1;
+    }
+    
+    const entry& peek_unsafe() const {
+        PSASSERT(m_stack.size() > 0, "BUG");
+        return m_stack.back();
+    }
+    
+    const entry* peek_valid(); // there may not be a valid entry, hence the ptr
+    
+    bool push(fs::path&&, fs::error_code&);
+    
+    bool push(const fs::path& p, fs::error_code& ec) {
+        return push(fs::path{p}, ec);
+    }
+    
+    void push_placeholder(fs::path&& dir) {
+        m_stack.emplace_back(INVALID_DIR, std::move(dir));
     }
 
 public:
@@ -53,46 +284,207 @@ public:
     
     state(const fs::path&, fs::directory_options, fs::error_code&);
     
+    virtual ~state() {};
+    
     virtual fs::path next(prosoft::system::error_code&) override;
     
-    virtual void pop() override {}
+    virtual void pop() override;
     
-    virtual fs::iterator_depth_type depth() const noexcept override {
-        return 0;
-    }
+    virtual fs::iterator_depth_type depth() const noexcept override;
     
     virtual void skip_descendants() override;
 };
 
-state::state(const fs::path& p, fs::directory_options opts, fs::error_code& ec)
-    : fsiterator_state(p, opts, ec) {
-    if (!ec) {
-// XXX: TEMPORARY TESTING -- should just attempt to open the path for reading
-        m_root = p;
-        auto st = fs::status(p, ec);
-        if (!ec && !fs::is_directory(st)) {
-            ec.assign(ENOTDIR, prosoft::system::posix_category());
+template <class Ops>
+const typename state<Ops>::entry* state<Ops>::peek_valid() {
+    if (size() > 0) {
+        const auto& e = m_stack.back();
+        if (INVALID_DIR != e.m_dir) {
+            return &e;
+        } else {
+            pop();
+            return peek_valid();
         }
-// XXX
+    } else {
+        return nullptr;
     }
 }
 
-fs::path state::next(prosoft::system::error_code&) {
-    if (recurse()) {
-        clear(fs::directory_options::reserved_state_skip_descendants);
+inline bool is_permssion_denied(const fs::error_code& ec) {
+#if !_WIN32
+    return ec.value() == EACCES;
+#else
+    return ec.value() == ERROR_ACCESS_DENIED;
+#endif
+}
+
+inline bool clear_if(fs::error_code& ec, bool condition) {
+    if (condition) {
+        ec.clear();
     }
-// XXX: TEMPORARY TESTING
-    if (current().path().empty()) {
-        return m_root;
+    return condition;
+}
+
+template <class Ops>
+bool state<Ops>::push(fs::path&& p, fs::error_code& ec) {
+    if (auto d = m_ops.open(p)) {
+        set(fs::directory_options::reserved_state_will_recurse);
+        m_stack.emplace_back(d, std::move(p));
+        ec.clear();
+        return true;
+    } else {
+        ec = prosoft::system::system_error();
+        base::clear(fs::directory_options::reserved_state_will_recurse);
+        // XXX: push a bad entry so clients can still get a listing of a dir that can't be opened and call skip_descendants() w/o unexpected results.
+        push_placeholder(std::move(p));
+        return clear_if(ec, is_set(options() & fs::directory_options::skip_permission_denied) && is_permssion_denied(ec));
     }
-// XXX
+}
+
+bool leaf_is_dot_or_dot_dot(const fs::path::string_type& leaf) {
+    const auto sz = leaf.size();
+    const bool isdot = sz == 1 && leaf[0] == fs::path::dot;
+    return isdot || (sz == 2 && leaf[0] == fs::path::dot && leaf[1] == fs::path::dot);
+}
+
+inline bool leaf_is_dot_or_dot_dot(const fs::path& leaf) {
+    return leaf_is_dot_or_dot_dot(leaf.native());
+}
+
+template <class Ops>
+state<Ops>::state(const fs::path& p, fs::directory_options opts, fs::error_code& ec)
+    : fsiterator_state(p, opts, ec) {
+    if (!ec) {
+        push(p, ec);
+    }
+}
+
+template <class Ops>
+fs::path state<Ops>::next(prosoft::system::error_code& ec) {
+    const bool postorder = is_set(options() & fs::directory_options::include_postorder_directories);
+
+    base::clear(fs::directory_options::reserved_state_mask);
+    ec.clear();
+    
+    if (postorder && is_child() && !is_valid()) {
+        // Handle post order event for the current directory that we failed to open.
+        set(fs::directory_options::reserved_state_postorder);
+        auto p = peek_unsafe().m_path;
+        pop();
+        return p;
+    }
+    
+    while (auto e = peek_valid()) {
+        PSASSERT(!e->m_path.empty(), "WTF?");
+        for (;;) {
+            if (auto ent = m_ops.read(e->m_dir)) {
+#if DT_WHT // BSD whiteout flag used for Union filesystems -- should never be hit in the realworld
+                if (DT_WHT == ent->d_type) {
+                    continue;
+                }
+#endif
+                size_t namelen;
+                #if PS_FS_HAVE_BSD_STATFS
+                namelen = ent->d_namlen;
+                #elif !_WIN32
+                namelen = ::strlen(ent->d_name);
+                #else
+                namelen = ::wcslen(ent->d_name);
+                #endif
+                
+                fs::path leaf;
+                PSSilenceCppException(leaf = fs::path(fs::path::string_type(ent->d_name, namelen)));
+                if (leaf.empty()) {
+                    // should only happen on non-Apple UNIX when the path is not encoded as UTF8
+                    ec = fs::error_code{static_cast<int>(iterator_error::encoding_is_not_utf8), iterator_category()};
+                    break;
+                }
+                
+                if (leaf_is_dot_or_dot_dot(leaf)) {
+                    continue;
+                }
+                
+                fs::path cpath{e->m_path};
+                if (!is_set(options() & fs::directory_options::include_apple_double_files) && is_apple_double(cpath, leaf)) {
+                    continue;
+                }
+                
+                cpath /= leaf;
+                
+                fs::error_code derr;
+                if (is_set(options() & fs::directory_options::skip_hidden_descendants) && is_hidden(cpath, derr)) {
+                    continue;
+                }
+                
+                if (recurse()
+                    && (is_directory(ent)
+                        || (is_set(options() & fs::directory_options::follow_directory_symlink) && is_symlink(ent) && is_directory(cpath, derr)))
+                    ) {
+                    if ((!is_set(options() & fs::directory_options::follow_mountpoints) && is_mountpoint(cpath, derr))
+                        || (is_set(options() & fs::directory_options::skip_package_descendants) && is_package(cpath, derr))
+                    ) {
+                        // push a placeholder so clients can call skipDescendants() w/o unexpected results.
+                        push_placeholder(fs::path{cpath});
+                    } else if (!push(cpath, ec)) {
+                        break;
+                    }
+                }
+                
+                return cpath;
+            } else {
+                prosoft::system::system_error(ec);
+                
+                // we've read all entries in the current dir
+                if (postorder && is_child()) { // don't include root
+                    set(fs::directory_options::reserved_state_postorder);
+                    auto p = e->m_path;
+                    #if DEBUG
+                    fs::error_code derr;
+                    #endif
+                    PSASSERT(fs::is_directory(p, derr), "BUG"); // could be a possible race where the dir has been removed
+                    pop();
+                    return p;
+                } else {
+                    pop();
+                    break;
+                }
+            }
+        } // for
+        
+        if (ec.value()) {
+            break;
+        }
+    }
+    
     return fs::path{};
 }
 
-void state::skip_descendants() {
-    if (recurse()) {
-        set(fs::directory_options::reserved_state_skip_descendants);
+template <class Ops>
+void state<Ops>::pop() {
+    if (size() > 0) {
+        m_stack.pop_back();
     }
+}
+
+template <class Ops>
+fs::iterator_depth_type state<Ops>::depth() const noexcept {
+    // XXX: depth starts at level 0 and increases to 1 for the first root sub-item found.
+    // It does not jump to N+1 when returning a directory path, but only when returning the 1st sub-item.
+    // We detect this and adjust our count accordingly.
+    auto sz = size();
+    if (is_set(options() & fs::directory_options::reserved_state_will_recurse)) {
+        PSASSERT(sz > 0, "WTF?");
+        sz -= 1;
+    }
+    return sz;
+}
+
+template <class Ops>
+void state<Ops>::skip_descendants() {
+    PSASSERT(is_child(), "BUG"); // root dir should not happen
+    PSASSERT(is_set(fs::directory_options::reserved_state_will_recurse) || !is_valid(), "BUG");
+    pop();
+    base::clear(fs::directory_options::reserved_state_will_recurse);
 }
 
 } // anon
@@ -103,7 +495,7 @@ inline namespace v1 {
 
 ifilesystem::iterator_state_ptr
 ifilesystem::make_iterator_state(const path& p, directory_options opts, iterator_traits::configuration_type, error_code& ec, iterator_traits) {
-    auto s = std::make_shared<state>(p, opts, ec);
+    auto s = std::make_shared<state<dir_ops>>(p, opts, ec);
     if (ec) {
         s.reset(); // null is the end iterator
     }
@@ -123,3 +515,167 @@ const error_code& ifilesystem::permission_denied_error() {
 } // v1
 } // filesystem
 } // prosoft
+
+#if PSTEST_HARNESS
+// Internal tests.
+#include "catch.hpp"
+
+using namespace prosoft::filesystem;
+
+struct test_ops {
+    std::vector<native_dirent> m_ents;
+    native_dirent m_cur;
+    
+    void push_back(fs::path::const_pointer name, fs::file_type t) {
+        m_ents.emplace_back();
+        auto& e = m_ents.back();
+#if PS_FS_HAVE_BSD_STATFS
+        e.d_namlen = prosoft::data_size(name);
+#endif
+        memcpy(e.d_name, name, std::min(prosoft::byte_size(name), sizeof(e.d_name)-sizeof(fs::path::encoding_value_type)));
+        switch(t) {
+#if !_WIN32
+            case fs::file_type::regular:
+                e.d_type = DT_REG;
+            break;
+            case fs::file_type::directory:
+                e.d_type = DT_DIR;
+            break;
+            case fs::file_type::symlink:
+                e.d_type = DT_LNK;
+            break;
+#else
+            case fs::file_type::regular:
+                e.dwFileAttributes = FILE_ATTRIBUTE_NORMAL;
+            break;
+            case fs::file_type::directory:
+                e.dwFileAttributes = FILE_ATTRIBUTE_DIRECTORY;
+            break;
+            case fs::file_type::symlink:
+                e.dwFileAttributes = FILE_ATTRIBUTE_REPARSE_POINT;
+            break;
+#endif
+            default:
+                PSASSERT_UNREACHABLE("Unhandled type");
+            break;
+        }
+    }
+    
+    static native_dir* PS_ALWAYS_INLINE open(const fs::path& p) {
+        return open_dir(p);
+    }
+
+    native_dirent* PS_ALWAYS_INLINE read(native_dir*) {
+        errno = 0;
+        if (m_ents.empty()) {
+            std::memset(&m_cur, 0, sizeof(m_cur));
+            return nullptr;
+        }
+        
+        m_cur = m_ents[0];
+        m_ents.erase(m_ents.begin());
+        return &m_cur;
+    }
+    
+    static int PS_ALWAYS_INLINE close(native_dir* d) {
+        return close_dir(d);
+    }
+};
+
+TEST_CASE("filesystem_iterator_internal") {
+    WHEN("path is empty") {
+#if !_WIN32
+        constexpr int expected = -1;
+#else
+        constexpr int expected = 0;
+#endif
+        auto d = open_dir(PS_TEXT(""));
+        CHECK(expected == close_dir(d));
+        
+        CHECK_FALSE(is_apple_double(temp_directory_path(), PS_TEXT("")));
+    }
+    
+    WHEN("path is apple double prefix") {
+        CHECK_FALSE(is_apple_double(temp_directory_path(), PS_TEXT("._")));
+    }
+    
+    WHEN("native dir is null") {
+        CHECK(-1 == close_dir(nullptr));
+        CHECK(nullptr == read_dir(nullptr));
+    }
+    
+    WHEN("leaf path contains dot component") {
+        CHECK(leaf_is_dot_or_dot_dot(PS_TEXT(".")));
+        CHECK(leaf_is_dot_or_dot_dot(PS_TEXT("..")));
+        
+        CHECK_FALSE(leaf_is_dot_or_dot_dot(PS_TEXT("/.")));
+        CHECK_FALSE(leaf_is_dot_or_dot_dot(PS_TEXT("/..")));
+        
+        CHECK_FALSE(leaf_is_dot_or_dot_dot(PS_TEXT(".a")));
+        CHECK_FALSE(leaf_is_dot_or_dot_dot(PS_TEXT("../a")));
+        CHECK_FALSE(leaf_is_dot_or_dot_dot(PS_TEXT("...")));
+    }
+    
+    using tstate = state<test_ops>;
+    
+    WHEN("using a non-recursive iterator") {
+        error_code ec;
+        auto s = std::make_unique<tstate>(temp_directory_path(), directory_iterator::default_options(), ec);
+        CHECK(0 == ec.value());
+        CHECK(is_set(s->options() & fs::directory_options::reserved_state_will_recurse));
+        CHECK_FALSE(s->recurse());
+        CHECK(s->size() == 1);
+        CHECK(s->is_valid());
+        CHECK_FALSE(s->is_child());
+        // None of the following are legal with non-recursive iterators, we are just testing internal state.
+        CHECK(s->depth() == 0);
+        s->pop();
+        CHECK(s->size() == 0);
+        
+        s = std::make_unique<tstate>(temp_directory_path(), directory_iterator::default_options(), ec);
+        auto p = s->next(ec);
+        CHECK(0 == ec.value());
+        CHECK(p.empty());
+        CHECK_FALSE(is_set(s->options() & fs::directory_options::reserved_state_mask));
+        CHECK(s->size() == 0);
+        
+        s = std::make_unique<tstate>(temp_directory_path(), directory_iterator::default_options(), ec);
+        s->m_ops.push_back(PS_TEXT("."), fs::file_type::directory);
+        s->m_ops.push_back(PS_TEXT(".."), fs::file_type::directory);
+        s->m_ops.push_back(PS_TEXT("testf"), fs::file_type::regular);
+        s->m_ops.push_back(PS_TEXT("testd"), fs::file_type::directory);
+        s->m_ops.push_back(PS_TEXT("tests"), fs::file_type::symlink);
+        
+        auto ents = s->m_ops.m_ents;
+        REQUIRE(ents.size() > 4);
+        auto i = 2;
+        p = s->next(ec);
+        CHECK(0 == ec.value());
+        CHECK(p.filename().native() == ents[i++].d_name);
+        p = s->next(ec);
+        CHECK(0 == ec.value());
+        CHECK(p.filename().native()  == ents[i++].d_name);
+        p = s->next(ec);
+        CHECK(0 == ec.value());
+        CHECK(p.filename().native()  == ents[i++].d_name);
+        p = s->next(ec);
+        CHECK(0 == ec.value());
+        CHECK(p.empty());
+    }
+    
+#if !_WIN32
+    WHEN("invalid UTF8 is encountered") {
+        error_code ec;
+        auto s = std::make_unique<tstate>(temp_directory_path(), directory_iterator::default_options(), ec);
+        s->m_ops.push_back(PS_TEXT("\x0C5") /* ISO 8859-1 capital Angstrom */, fs::file_type::directory);
+        auto p = s->next(ec);
+        CHECK(static_cast<int>(iterator_error::encoding_is_not_utf8) == ec.value());
+        CHECK(p.empty());
+        p = s->next(ec);
+        CHECK(0 == ec.value());
+        CHECK(p.empty());
+    }
+#endif
+}
+
+#endif // PSTEST_HARNESS

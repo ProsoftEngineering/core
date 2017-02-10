@@ -49,12 +49,12 @@ WHEN("creating an iterator with an invalid path") {
 }
 
 WHEN("creating an iterator with a valid path") {
-    iterator_type i{temp_directory_path()};
+    iterator_type i{home_directory_path()};
     CHECK(i.options() == i.default_options());
     CHECK(i != end(i));
 }
 
 WHEN("creating an iterator with reserved options") {
-    iterator_type i{temp_directory_path(), directory_options::follow_directory_symlink|directory_options::reserved_state_mask};
+    iterator_type i{home_directory_path(), directory_options::follow_directory_symlink|directory_options::reserved_state_mask};
     CHECK_FALSE(is_set(i.options() & directory_options::reserved_state_mask));
 }
