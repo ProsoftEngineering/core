@@ -582,6 +582,11 @@ struct test_ops {
     }
 };
 
+template <class T, class... Args>
+std::unique_ptr<T> make_ptr(Args&& ...a) {
+    return std::unique_ptr<T>{ new T(std::forward<Args>(a)...) };
+}
+
 TEST_CASE("filesystem_iterator_internal") {
     WHEN("path is empty") {
 #if !_WIN32
@@ -620,7 +625,7 @@ TEST_CASE("filesystem_iterator_internal") {
     
     WHEN("using a non-recursive iterator") {
         error_code ec;
-        auto s = std::make_unique<tstate>(temp_directory_path(), directory_iterator::default_options(), ec);
+        auto s = make_ptr<tstate>(temp_directory_path(), directory_iterator::default_options(), ec);
         CHECK(0 == ec.value());
         CHECK(is_set(s->options() & fs::directory_options::reserved_state_will_recurse));
         CHECK_FALSE(s->recurse());
@@ -632,14 +637,14 @@ TEST_CASE("filesystem_iterator_internal") {
         s->pop();
         CHECK(s->size() == 0);
         
-        s = std::make_unique<tstate>(temp_directory_path(), directory_iterator::default_options(), ec);
+        s = make_ptr<tstate>(temp_directory_path(), directory_iterator::default_options(), ec);
         auto p = s->next(ec);
         CHECK(0 == ec.value());
         CHECK(p.empty());
         CHECK_FALSE(is_set(s->options() & fs::directory_options::reserved_state_mask));
         CHECK(s->size() == 0);
         
-        s = std::make_unique<tstate>(temp_directory_path(), directory_iterator::default_options(), ec);
+        s = make_ptr<tstate>(temp_directory_path(), directory_iterator::default_options(), ec);
         s->m_ops.push_back(PS_TEXT("."), fs::file_type::directory);
         s->m_ops.push_back(PS_TEXT(".."), fs::file_type::directory);
         s->m_ops.push_back(PS_TEXT("testf"), fs::file_type::regular);
@@ -666,7 +671,7 @@ TEST_CASE("filesystem_iterator_internal") {
 #if !_WIN32
     WHEN("invalid UTF8 is encountered") {
         error_code ec;
-        auto s = std::make_unique<tstate>(temp_directory_path(), directory_iterator::default_options(), ec);
+        auto s = make_ptr<tstate>(temp_directory_path(), directory_iterator::default_options(), ec);
         s->m_ops.push_back(PS_TEXT("\x0C5") /* ISO 8859-1 capital Angstrom */, fs::file_type::directory);
         auto p = s->next(ec);
         CHECK(static_cast<int>(iterator_error::encoding_is_not_utf8) == ec.value());
