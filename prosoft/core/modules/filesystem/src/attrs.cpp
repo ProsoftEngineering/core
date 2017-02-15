@@ -86,7 +86,7 @@ template <typename CFT>
 unique_cftype<CFT> get_property(const path& p, CFStringRef key, error_code& ec) {
     PSASSERT_NOTNULL(key);
     auto url = make_url(p.native());
-    unique_cftype<CFBooleanRef> value;
+    unique_cftype<CFT> value;
     CF::unique_error err;
     if (CFURLCopyResourcePropertyForKey(url.get(), key, handle(value), handle(err))) {
         ec.clear();
