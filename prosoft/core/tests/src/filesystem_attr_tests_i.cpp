@@ -93,6 +93,11 @@ WHEN("getting the hidden attribute") {
     if (exists(p, ec)) {
         CHECK(is_hidden(p, ec));
     }
+#else
+    path p{PS_TEXT("C:\\Windows\\System32\\GroupPolicy")};
+    if (exists(p, ec)) {
+        CHECK(is_hidden(p, ec));
+    }
 #endif
 
 #if __APPLE__
