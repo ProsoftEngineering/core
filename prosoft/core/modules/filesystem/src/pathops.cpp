@@ -1,4 +1,4 @@
-// Copyright © 2016, Prosoft Engineering, Inc. (A.K.A "Prosoft")
+// Copyright © 2016-2017, Prosoft Engineering, Inc. (A.K.A "Prosoft")
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without
@@ -118,7 +118,7 @@ inline namespace v1 {
 path canonical(const path& p, const path& base) {
     error_code ec;
     path rp = canonical(p, base, ec);
-    PS_THROW_IF(ec.value(), filesystem_error("canonical failed", p, ec));
+    PS_THROW_IF(ec.value(), filesystem_error("Could not create a canonical path", p, ec));
     return rp;
 }
 
@@ -164,7 +164,7 @@ path canonical(const path& rp, const path& base, error_code& ec) {
 path current_path() {
     error_code ec;
     path p = current_path(ec);
-    PS_THROW_IF(ec.value(), filesystem_error("current path failed", ec));
+    PS_THROW_IF(ec.value(), filesystem_error("Could not get the current path", ec));
     return p;
 }
 
@@ -176,7 +176,7 @@ path current_path(error_code& ec) {
 void current_path(const path& p) {
     error_code ec;
     current_path(p, ec);
-    PS_THROW_IF(ec.value(), filesystem_error("change current path failed", p, ec));
+    PS_THROW_IF(ec.value(), filesystem_error("Could not change the current path", p, ec));
 }
 
 void current_path(const path& p, error_code& ec) {
