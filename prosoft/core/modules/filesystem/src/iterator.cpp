@@ -1,4 +1,4 @@
-// Copyright © 2016, Prosoft Engineering, Inc. (A.K.A "Prosoft")
+// Copyright © 2016-2017, Prosoft Engineering, Inc. (A.K.A "Prosoft")
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without
@@ -421,7 +421,7 @@ fs::path state<Ops>::next(prosoft::system::error_code& ec) {
                         || (is_set(options() & fs::directory_options::follow_directory_symlink) && is_symlink(ent) && is_directory(cpath, derr)))
                     ) {
                     if ((!is_set(options() & fs::directory_options::follow_mountpoints) && is_mountpoint(cpath, derr))
-                        || (is_set(options() & fs::directory_options::skip_package_descendants) && is_package(cpath, derr))
+                        || (is_set(options() & fs::directory_options::skip_package_content_descendants) && is_package(cpath, derr))
                     ) {
                         // push a placeholder so clients can call skipDescendants() w/o unexpected results.
                         push_placeholder(fs::path{cpath});

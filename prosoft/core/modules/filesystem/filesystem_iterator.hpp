@@ -101,7 +101,7 @@ enum class directory_options : unsigned {
     
     skip_subdirectory_descendants = 1U<<20,
     skip_hidden_descendants = 1U<<21,
-    skip_package_descendants = 1U<<22, // macOS
+    skip_package_content_descendants = 1U<<22, // macOS
     follow_mountpoints = 1U<<23,
     include_postorder_directories = 1U<<24,
     // By default, we mimic the behavior of NSDirectoryEnumerator and skip "._" files.
