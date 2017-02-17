@@ -183,7 +183,7 @@ TEST_CASE("filesystem_iterator") {
             
 #if !_WIN32 // we'd have to create a junction point for Win32
             WHEN("a directory symlink is present") {
-                auto lnk = root / PS_TEXT("lnk");
+                const auto lnk = root / PS_TEXT("lnk");
                 (void)symlink(dir.c_str(), lnk.c_str());
                 REQUIRE(exists(lnk));
                 PS_RAII_REMOVE(lnk);
@@ -211,7 +211,7 @@ TEST_CASE("filesystem_iterator") {
                             CHECK(e.path() == lnk);
                             linkFound = true;
                             // Increment into the dir and check the resulting path.
-                            // The parent path should be the canoncial dir path and not the symlink path.
+                            // The parent path should be the canonical dir path and not the symlink path.
                             e = *i++;
                             CHECK(i.depth() == 1);
                             CHECK(i != end(i));
@@ -346,7 +346,7 @@ TEST_CASE("filesystem_iterator") {
 
             WHEN("an apple double pair is present") {
                 // create a "root" for the apple double pair
-                const auto adr = create_file(dir / PS_TEXT("2")); // orphan Apple double pattern
+                const auto adr = create_file(dir / PS_TEXT("2"));
                 REQUIRE(exists(adr));
                 PS_RAII_REMOVE(adr);
                 
