@@ -184,7 +184,7 @@ TEST_CASE("filesystem_iterator") {
 #if !_WIN32 // we'd have to create a junction point for Win32
             WHEN("a directory symlink is present") {
                 auto lnk = root / PS_TEXT("lnk");
-                symlink(dir.c_str(), lnk.c_str());
+                (void)symlink(dir.c_str(), lnk.c_str());
                 REQUIRE(exists(lnk));
                 PS_RAII_REMOVE(lnk);
                 
