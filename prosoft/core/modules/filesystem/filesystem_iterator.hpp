@@ -284,7 +284,7 @@ public:
     
     template <typename Recurse = void>
     bool recursion_pending(recurse_only_t<Recurse>* = 0) const noexcept {
-        return m_i ? !is_set(m_i->options() & directory_options::reserved_state_will_recurse) : false;
+        return m_i ? is_set(m_i->options() & directory_options::reserved_state_will_recurse) : false;
     }
     
     template <typename Recurse = void>
