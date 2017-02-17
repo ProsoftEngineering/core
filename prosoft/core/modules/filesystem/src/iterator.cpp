@@ -294,6 +294,8 @@ public:
     virtual fs::iterator_depth_type depth() const noexcept override;
     
     virtual void skip_descendants() override;
+    
+    virtual bool at_end() const override;
 };
 
 template <class Ops>
@@ -316,6 +318,14 @@ inline bool is_permssion_denied(const fs::error_code& ec) {
     return ec.value() == EACCES;
 #else
     return ec.value() == ERROR_ACCESS_DENIED;
+#endif
+}
+
+inline bool is_no_entries(const fs::error_code& ec) {
+#if !_WIN32
+    return ec.value() == ENOENT;
+#else
+    return ec.value() == ERROR_NO_MORE_FILES;
 #endif
 }
 
@@ -426,23 +436,38 @@ fs::path state<Ops>::next(prosoft::system::error_code& ec) {
                     ) {
                         // push a placeholder so clients can call skipDescendants() w/o unexpected results.
                         push_placeholder(fs::path{cpath});
-                    } else if (!push(cpath, ec)) {
-                        break;
+                    } else {
+                        static auto copy_link_path = [](const fs::path& p, native_dirent* e) -> fs::path {
+                            if (is_symlink(e)) {
+                                fs::error_code ec;
+                                auto np = fs::canonical(p, ec);
+                                if (!np.empty()) {
+                                    return np;
+                                }
+                            }
+                            return p;
+                        };
+                        
+                        if (!push(copy_link_path(cpath, ent), ec)) {
+                            PSASSERT(peek_unsafe().m_path == copy_link_path(cpath, ent), "Broken assumption"); // assuming placeholder is pushed
+                            pop();
+                            break;
+                        }
                     }
                 }
                 
                 return cpath;
             } else {
-                prosoft::system::system_error(ec);
-                
                 // we've read all entries in the current dir
-                if (postorder && is_child()) { // don't include root
+                prosoft::system::system_error(ec);
+                clear_if(ec, is_no_entries(ec));
+                if (!ec && postorder && is_child()) { // don't include root
                     set(fs::directory_options::reserved_state_postorder);
                     auto p = e->m_path;
                     #if DEBUG
                     fs::error_code derr;
                     #endif
-                    PSASSERT(fs::is_directory(p, derr), "BUG"); // could be a possible race where the dir has been removed
+                    PSASSERT(fs::is_directory(p, derr) || !exists(p, derr), "BUG"); // could be a possible race where the dir has been removed
                     pop();
                     return p;
                 } else {
@@ -464,20 +489,25 @@ template <class Ops>
 void state<Ops>::pop() {
     if (size() > 0) {
         m_stack.pop_back();
+    } else {
+        PSASSERT_UNREACHABLE("BUG");
     }
 }
 
 template <class Ops>
 fs::iterator_depth_type state<Ops>::depth() const noexcept {
-    // XXX: depth starts at level 0 and increases to 1 for the first root sub-item found.
-    // It does not jump to N+1 when returning a directory path, but only when returning the 1st sub-item.
-    // We detect this and adjust our count accordingly.
     auto sz = size();
-    if (is_set(options() & fs::directory_options::reserved_state_will_recurse)) {
-        PSASSERT(sz > 0, "WTF?");
+    if (sz > 0) {
         sz -= 1;
+        const bool adjust = is_set(options() & fs::directory_options::reserved_state_will_recurse) || !is_valid();
+        if (adjust && sz > 0) {
+            sz -= 1;
+        }
+        return sz;
+    } else {
+        PSASSERT_UNREACHABLE("CLIENT BUG");
+        return 0;
     }
-    return sz;
 }
 
 template <class Ops>
@@ -486,6 +516,11 @@ void state<Ops>::skip_descendants() {
     PSASSERT(is_set(fs::directory_options::reserved_state_will_recurse) || !is_valid(), "BUG");
     pop();
     base::clear(fs::directory_options::reserved_state_will_recurse);
+}
+
+template <class Ops>
+bool state<Ops>::at_end() const {
+    return size() == 0;
 }
 
 } // anon
@@ -562,7 +597,7 @@ struct test_ops {
         }
     }
     
-    static native_dir* PS_ALWAYS_INLINE open(const fs::path& p) {
+    virtual native_dir* PS_ALWAYS_INLINE open(const fs::path& p) {
         return open_dir(p);
     }
 
@@ -578,8 +613,19 @@ struct test_ops {
         return &m_cur;
     }
     
-    static int PS_ALWAYS_INLINE close(native_dir* d) {
+    // XXX: close should not access any member data as a new instance is always created
+    virtual int PS_ALWAYS_INLINE close(native_dir* d) {
         return close_dir(d);
+    }
+};
+
+struct test_nopen : test_ops {
+    virtual native_dir* PS_ALWAYS_INLINE open(const fs::path& p) override {
+        return (native_dir*)0x55UL;
+    }
+    
+    virtual int PS_ALWAYS_INLINE close(native_dir* d) override {
+        return 0;
     }
 };
 
@@ -622,11 +668,12 @@ TEST_CASE("filesystem_iterator_internal") {
         CHECK_FALSE(leaf_is_dot_or_dot_dot(PS_TEXT("...")));
     }
     
-    using tstate = state<test_ops>;
+    using tops = state<test_ops>;
+    using nops = state<test_nopen>;
     
     WHEN("using a non-recursive iterator") {
         error_code ec;
-        auto s = make_ptr<tstate>(temp_directory_path(), directory_iterator::default_options(), ec);
+        auto s = make_ptr<tops>(temp_directory_path(), directory_iterator::default_options(), ec);
         CHECK(0 == ec.value());
         CHECK(is_set(s->options() & fs::directory_options::reserved_state_will_recurse));
         CHECK_FALSE(s->recurse());
@@ -638,41 +685,146 @@ TEST_CASE("filesystem_iterator_internal") {
         s->pop();
         CHECK(s->size() == 0);
         
-        s = make_ptr<tstate>(temp_directory_path(), directory_iterator::default_options(), ec);
+        s = make_ptr<tops>(temp_directory_path(), directory_iterator::default_options(), ec);
         auto p = s->next(ec);
         CHECK(0 == ec.value());
         CHECK(p.empty());
         CHECK_FALSE(is_set(s->options() & fs::directory_options::reserved_state_mask));
         CHECK(s->size() == 0);
         
-        s = make_ptr<tstate>(temp_directory_path(), directory_iterator::default_options(), ec);
+        s = make_ptr<tops>(temp_directory_path(), directory_iterator::default_options(), ec);
         s->m_ops.push_back(PS_TEXT("."), fs::file_type::directory);
         s->m_ops.push_back(PS_TEXT(".."), fs::file_type::directory);
         s->m_ops.push_back(PS_TEXT("testf"), fs::file_type::regular);
         s->m_ops.push_back(PS_TEXT("testd"), fs::file_type::directory);
         s->m_ops.push_back(PS_TEXT("tests"), fs::file_type::symlink);
+        s->m_ops.push_back(PS_TEXT("._testad"), fs::file_type::regular); // orphan AppleDouble
         
         auto ents = s->m_ops.m_ents;
-        REQUIRE(ents.size() > 4);
+        REQUIRE(ents.size() > 5);
         auto i = 2;
         p = s->next(ec);
         CHECK(0 == ec.value());
         CHECK(p.filename().native() == ents[i++].d_name);
+        CHECK(s->size() == 1);
+        CHECK(s->depth() == 0);
         p = s->next(ec);
         CHECK(0 == ec.value());
-        CHECK(p.filename().native()  == ents[i++].d_name);
+        CHECK(p.filename().native() == ents[i++].d_name);
+        CHECK(s->size() == 1);
+        CHECK(s->depth() == 0);
         p = s->next(ec);
         CHECK(0 == ec.value());
-        CHECK(p.filename().native()  == ents[i++].d_name);
+        CHECK(p.filename().native() == ents[i++].d_name);
+        CHECK(s->size() == 1);
+        CHECK(s->depth() == 0);
+        p = s->next(ec);
+        CHECK(0 == ec.value());
+        CHECK(p.filename().native() == ents[i++].d_name);
+        CHECK(s->size() == 1);
+        CHECK(s->depth() == 0);
         p = s->next(ec);
         CHECK(0 == ec.value());
         CHECK(p.empty());
+        CHECK(s->size() == 0);
+    }
+    
+    WHEN("using a recursive iterator") {
+        error_code ec;
+        {
+            auto s = make_ptr<tops>(temp_directory_path(), recursive_directory_iterator::default_options(), ec);
+            CHECK(0 == ec.value());
+            CHECK(is_set(s->options() & fs::directory_options::reserved_state_will_recurse));
+            CHECK(s->recurse());
+            CHECK(s->size() == 1);
+            CHECK(s->is_valid());
+            CHECK_FALSE(s->is_child());
+            CHECK(s->depth() == 0);
+            s->pop();
+            CHECK(s->size() == 0);
+        }
+        
+        auto s = make_ptr<nops>(temp_directory_path(), recursive_directory_iterator::default_options(), ec);
+        s->m_ops.push_back(PS_TEXT("."), fs::file_type::directory);
+        s->m_ops.push_back(PS_TEXT(".."), fs::file_type::directory);
+        s->m_ops.push_back(PS_TEXT("testf"), fs::file_type::regular);
+        s->m_ops.push_back(PS_TEXT("testd"), fs::file_type::directory);
+        
+        CHECK(s->depth() == 0);
+        
+        auto ents = s->m_ops.m_ents;
+        REQUIRE(ents.size() > 3);
+        auto p = s->next(ec);
+        CHECK(0 == ec.value());
+        CHECK(p.filename().native() == ents[2].d_name);
+        CHECK_FALSE(is_set(s->options() & fs::directory_options::reserved_state_will_recurse));
+        CHECK(s->size() == 1);
+        CHECK(s->depth() == 0);
+        p = p = s->next(ec);
+        CHECK(0 == ec.value());
+        CHECK(p.filename().native() == ents[3].d_name);
+        CHECK(is_set(s->options() & fs::directory_options::reserved_state_will_recurse));
+        CHECK(s->size() == 2);
+        CHECK(s->depth() == 0);
+        p = s->next(ec);
+        CHECK(0 == ec.value());
+        CHECK(p.empty());
+        CHECK(s->size() == 0);
+    }
+    
+    WHEN("a sub-directory fails to open") {
+        error_code ec;
+        auto s = make_ptr<tops>(temp_directory_path(), recursive_directory_iterator::default_options(), ec);
+        s->m_ops.push_back(PS_TEXT("."), fs::file_type::directory);
+        s->m_ops.push_back(PS_TEXT(".."), fs::file_type::directory);
+        s->m_ops.push_back(PS_TEXT("testd"), fs::file_type::directory);
+        
+        auto ents = s->m_ops.m_ents;
+        REQUIRE(ents.size() > 2);
+        auto p = s->next(ec);
+        CHECK_FALSE(0 == ec.value());
+        CHECK(s->size() == 1);
+        CHECK(s->depth() == 0);
+        CHECK(p.empty());
+        p = s->next(ec);
+        CHECK(0 == ec.value());
+        CHECK(p.empty());
+        CHECK(s->size() == 0);
+    }
+    
+    WHEN("postorder option is set") {
+        error_code ec;
+        auto s = make_ptr<nops>(temp_directory_path(), recursive_directory_iterator::default_options()|directory_options::include_postorder_directories, ec);
+        s->m_ops.push_back(PS_TEXT("."), fs::file_type::directory);
+        s->m_ops.push_back(PS_TEXT(".."), fs::file_type::directory);
+        s->m_ops.push_back(PS_TEXT("testd"), fs::file_type::directory);
+        
+        auto ents = s->m_ops.m_ents;
+        REQUIRE(ents.size() > 2);
+        auto p = s->next(ec);
+        CHECK(0 == ec.value());
+        CHECK(p.filename().native() == ents[2].d_name);
+        CHECK(is_set(s->options() & fs::directory_options::reserved_state_will_recurse));
+        CHECK(s->size() == 2);
+        CHECK(s->depth() == 0);
+        CHECK_FALSE(is_set(s->options() & directory_options::reserved_state_postorder));
+        p = s->next(ec);
+        CHECK(0 == ec.value());
+        CHECK(p.filename().native() == ents[2].d_name);
+        CHECK_FALSE(is_set(s->options() & fs::directory_options::reserved_state_will_recurse));
+        CHECK(s->size() == 1);
+        CHECK(s->depth() == 0);
+        CHECK(is_set(s->options() & directory_options::reserved_state_postorder));
+        p = s->next(ec);
+        CHECK(0 == ec.value());
+        CHECK(p.empty());
+        CHECK(s->size() == 0);
     }
     
 #if !_WIN32
     WHEN("invalid UTF8 is encountered") {
         error_code ec;
-        auto s = make_ptr<tstate>(temp_directory_path(), directory_iterator::default_options(), ec);
+        auto s = make_ptr<tops>(temp_directory_path(), directory_iterator::default_options(), ec);
         s->m_ops.push_back(PS_TEXT("\x0C5") /* ISO 8859-1 capital Angstrom */, fs::file_type::directory);
         auto p = s->next(ec);
         CHECK(static_cast<int>(iterator_error::encoding_is_not_utf8) == ec.value());

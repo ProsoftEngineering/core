@@ -291,6 +291,9 @@ public:
     void pop(recurse_only_t<Recurse>* = 0) {
         if (m_i) {
             m_i->pop();
+            if (m_i->at_end()) {
+                m_i.reset(); // become end
+            }
         }
     }
     
@@ -302,6 +305,11 @@ public:
     }
     
     // Extensions
+    template <typename Recurse = void>
+    bool is_postorder(recurse_only_t<Recurse>* = 0) {
+        return m_i && is_set(m_i->options() & directory_options::reserved_state_postorder);
+    }
+    
     basic_iterator& operator++(int);
     
     // moves current entry out -- be careful
