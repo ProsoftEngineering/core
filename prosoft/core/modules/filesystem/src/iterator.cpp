@@ -151,6 +151,7 @@ int close_dir(native_dir* d) {
 native_dirent* read_dir(native_dir* d) {
     if (d) {
 #if !_WIN32
+        errno = 0; // POSIX requires this to determine EOF
         return ::readdir(d);
 #else
         if (d->firstent) {
