@@ -40,6 +40,7 @@ add_library(${fs_lib}
     ${PSFS}/src/pathops.cpp
     ${PSFS}/src/filesystem.cpp
     ${PSFS}/src/filesystem_acl.cpp
+    ${PSFS}/src/snapshot.cpp
     ${PSFS}/src/standard_directory_path.cpp
 )
 
