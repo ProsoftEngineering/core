@@ -150,15 +150,13 @@ TEST_CASE("filesystem_iterator") {
                 CHECK(i == end(i));
             }
             
-            WHEN("skip permission denied is disabled") {
 #if __APPLE__
+            WHEN("skip permission denied is disabled") {
                 REQUIRE(geteuid() != 0);
                 CHECK_THROWS(recursive_directory_iterator("/var/root"));
-#endif // __APPLE__
             }
             
             WHEN("skip permission denied is enabled") {
-#if __APPLE__
                 recursive_directory_iterator i{"/var/root", recursive_directory_iterator::default_options()|directory_options::skip_permission_denied};
                 CHECK(i == end(i));
                 
@@ -178,8 +176,8 @@ TEST_CASE("filesystem_iterator") {
                     }
                 }
                 CHECK(rootFound);
-#endif // __APPLE__
             }
+#endif // __APPLE__
             
 #if !_WIN32 // we'd have to create a junction point for Win32
             WHEN("a directory symlink is present") {
@@ -278,7 +276,7 @@ TEST_CASE("filesystem_iterator") {
                 CHECK(i != end(i));
             #if _WIN32
                 // . files are not considered hidden. We'd need to set the hidden attribute on the item.
-                i++
+                i++;
             #endif
                 i++;
                 CHECK(i == end(i));

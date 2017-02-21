@@ -64,7 +64,11 @@ public:
             
             default:
                 PSASSERT_UNREACHABLE("BUG");
+#if !_WIN32
                 return std::strerror(EINVAL);
+#else
+                return "Unknown error";
+#endif
             break;
         }
 	}
@@ -193,15 +197,15 @@ inline PS_CONSTEXPR_IF_CPP14 bool is_apple_double(const fs::path&, const fs::pat
 native_dir* const INVALID_DIR = (native_dir*)((uintptr_t)0xbaadf00dUL);
 
 struct dir_ops {
-    static native_dir* PS_ALWAYS_INLINE open(const fs::path& p) {
+    PS_ALWAYS_INLINE static native_dir* open(const fs::path& p) {
         return open_dir(p);
     }
 
-    static native_dirent* PS_ALWAYS_INLINE read(native_dir* d) {
+    PS_ALWAYS_INLINE static native_dirent* read(native_dir* d) {
         return read_dir(d);
     }
     
-    static int PS_ALWAYS_INLINE close(native_dir* d) {
+    PS_ALWAYS_INLINE static int close(native_dir* d) {
         return close_dir(d);
     }
 };
@@ -358,9 +362,11 @@ bool leaf_is_dot_or_dot_dot(const fs::path::string_type& leaf) {
     return isdot || (sz == 2 && leaf[0] == fs::path::dot && leaf[1] == fs::path::dot);
 }
 
+#if !_WIN32 || !PS_CPP17_FILESYSTEM_PATH_USES_NATIVE_ENCODING
 inline bool leaf_is_dot_or_dot_dot(const fs::path& leaf) {
     return leaf_is_dot_or_dot_dot(leaf.native());
 }
+#endif
 
 template <class Ops>
 state<Ops>::state(const fs::path& p, fs::directory_options opts, fs::error_code& ec)
@@ -496,7 +502,7 @@ void state<Ops>::pop() {
 
 template <class Ops>
 fs::iterator_depth_type state<Ops>::depth() const noexcept {
-    auto sz = size();
+    auto sz = static_cast<fs::iterator_depth_type>(size());
     if (sz > 0) {
         sz -= 1;
         const bool adjust = is_set(options() & fs::directory_options::reserved_state_will_recurse) || !is_valid();
@@ -597,11 +603,11 @@ struct test_ops {
         }
     }
     
-    virtual native_dir* PS_ALWAYS_INLINE open(const fs::path& p) {
+    virtual native_dir* open(const fs::path& p) {
         return open_dir(p);
     }
 
-    native_dirent* PS_ALWAYS_INLINE read(native_dir*) {
+    native_dirent* read(native_dir*) {
         errno = 0;
         if (m_ents.empty()) {
             std::memset(&m_cur, 0, sizeof(m_cur));
@@ -614,17 +620,17 @@ struct test_ops {
     }
     
     // XXX: close should not access any member data as a new instance is always created
-    virtual int PS_ALWAYS_INLINE close(native_dir* d) {
+    virtual int close(native_dir* d) {
         return close_dir(d);
     }
 };
 
 struct test_nopen : test_ops {
-    virtual native_dir* PS_ALWAYS_INLINE open(const fs::path& p) override {
+    virtual native_dir* open(const fs::path& p) override {
         return (native_dir*)0x55UL;
     }
     
-    virtual int PS_ALWAYS_INLINE close(native_dir* d) override {
+    virtual int close(native_dir* d) override {
         return 0;
     }
 };
