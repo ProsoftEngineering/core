@@ -131,7 +131,6 @@ native_dir* open_dir(const fs::path& p) {
     } else {
         delete d;
         d = nullptr;
-        errno = (int)::GetLastError();
     }
     return d;
 #endif //!_WIN32
@@ -147,7 +146,11 @@ int close_dir(native_dir* d) {
         return 0;
 #endif
     } else {
+#if !_WIN32
         errno = einval().value();
+#else
+        ::SetLastError(static_cast<DWORD>(einval().value()));
+#endif
         return -1;
     }
 }
@@ -165,12 +168,15 @@ native_dirent* read_dir(native_dir* d) {
         if (::FindNextFileW(d->handle, &d->ent)) {
             return &d->ent;
         } else {
-            errno = (int)::GetLastError();
             return nullptr;
         }
 #endif
     } else {
+#if !_WIN32
         errno = einval().value();
+#else
+        ::SetLastError(static_cast<DWORD>(einval().value()));
+#endif
         return nullptr;
     }
 }
