@@ -609,6 +609,9 @@ struct test_ops {
 
     native_dirent* read(native_dir*) {
         errno = 0;
+#if _WIN32
+        SetLastError(0);
+#endif
         if (m_ents.empty()) {
             std::memset(&m_cur, 0, sizeof(m_cur));
             return nullptr;
@@ -766,7 +769,7 @@ TEST_CASE("filesystem_iterator_internal") {
         CHECK_FALSE(is_set(s->options() & fs::directory_options::reserved_state_will_recurse));
         CHECK(s->size() == 1);
         CHECK(s->depth() == 0);
-        p = p = s->next(ec);
+        p = s->next(ec);
         CHECK(0 == ec.value());
         CHECK(p.filename().native() == ents[3].d_name);
         CHECK(is_set(s->options() & fs::directory_options::reserved_state_will_recurse));
