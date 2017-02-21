@@ -102,7 +102,7 @@ struct FAttrs {
     }
     
     operator DWORD() const noexcept {
-        return attrs;
+        return *this ? attrs : 0;
     }
 };
 
