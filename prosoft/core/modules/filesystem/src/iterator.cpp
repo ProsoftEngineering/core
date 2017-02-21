@@ -377,6 +377,13 @@ inline bool leaf_is_dot_or_dot_dot(const fs::path& leaf) {
 template <class Ops>
 state<Ops>::state(const fs::path& p, fs::directory_options opts, fs::error_code& ec)
     : fsiterator_state(p, opts, ec) {
+#if _WIN32
+    // Empty path is valid in Win32 (implicit "."), but not POSIX. Use POSIX behavior for Windows.
+    if (p.empty()) {
+        ec = einval();
+        return;
+    }
+#endif
     if (!ec) {
         push(p, ec);
     }
