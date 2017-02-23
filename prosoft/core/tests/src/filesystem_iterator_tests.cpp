@@ -108,6 +108,9 @@ TEST_CASE("filesystem_iterator") {
                 auto e = *i;
                 CHECK(i.recursion_pending());
                 CHECK(e.path().filename().native() == PS_TEXT("1"));
+#if __linux__
+                std::cout << static_cast<int>(e.status().type());
+#endif
                 e = *i++;
                 CHECK(e.path().filename().native() == PS_TEXT("._2"));
                 CHECK(i.depth() == 1);
