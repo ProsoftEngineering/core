@@ -26,6 +26,9 @@ matrix:
         env: PSCC=clang PSCXX=clang++
 
         # Linux
+        # Containers are disabled because the filesystem iterator tests are failing inexplicably.
+        # Perhaps something to do with AUFS.
+        # However I did download the docker instance and run the tests manually and they passed.
       - os: linux
         compiler: gcc
         addons: &gcc48
@@ -33,6 +36,7 @@ matrix:
                 sources: ['ubuntu-toolchain-r-test']
                 packages: ['gcc-4.8', 'g++-4.8', 'libacl1-dev']
         env: PSCC=gcc-4.8 PSCXX=g++-4.8
+        sudo: required
 
       - os: linux
         compiler: gcc
@@ -42,6 +46,7 @@ matrix:
                 packages: ['gcc-4.9', 'g++-4.9', 'libacl1-dev']
         env: PSCC=gcc-4.9 PSCXX=g++-4.9
         dist: trusty
+        sudo: required
 
       - os: linux
         compiler: gcc
