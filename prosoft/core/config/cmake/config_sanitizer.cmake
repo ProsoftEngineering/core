@@ -45,7 +45,7 @@ macro(ps_core_config_asan TARGET_NAME)
         ps_core_config_xcode_asan()
         if(HAVE_XCODE_ADDRESS_SANITIZER)
             set (HAVE_ADDRESS_SANITIZER true)
-            message(STATUS "Xcode sanitizer enabled")
+            message(STATUS "Xcode sanitizer enabled: ${TARGET_NAME}")
         endif()
     endif()
     
