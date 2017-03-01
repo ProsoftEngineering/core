@@ -76,6 +76,12 @@ if(APPLE)
     )
 endif()
 
+if(WIN32)
+	 target_sources(${PROJECT_NAME} PRIVATE
+        ${CORETESTS}/src/winutils_tests.cpp
+    )
+endif()
+
 target_include_directories(${PROJECT_NAME} PRIVATE ${CORETESTS})
 
 if (UNIX AND NOT APPLE)
@@ -89,6 +95,7 @@ enable_testing()
 
 ps_core_use_filesystem(${PROJECT_NAME}) # brings in u8string and identity
 ps_core_use_regex(${PROJECT_NAME})
+ps_core_use_winutils(${PROJECT_NAME})
 
 # We add all of our tests to coverage as they will produce the coverage for header-only implementations
 ps_core_enable_target_code_coverage(${PROJECT_NAME})
