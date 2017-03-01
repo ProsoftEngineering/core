@@ -94,7 +94,7 @@ WHEN("getting the hidden attribute") {
         CHECK(is_hidden(p, ec));
     }
 #else
-    path p{PS_TEXT("C:\\Windows\\System32\\GroupPolicy")};
+    path p{PS_TEXT("C:\\Windows\\Installer")};
     if (exists(p, ec)) {
         CHECK(is_hidden(p, ec));
     }
