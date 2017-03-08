@@ -476,12 +476,11 @@ TEST_CASE("filesystem") {
 
         const auto lnk = root / PS_TEXT("lnk");
 
-        static auto noerr_or_win32_denied = [](const error_code& ec) {
+        static auto noerr_or_win32_denied = [](const error_code& e) {
  #if !WIN32
-            return !ec;
+            return !e;
  #else
-            std::cout << "SLNK: " << ec.value() << "\n";
-            return !ec || ec.value() == ERROR_PRIVILEGE_NOT_HELD;
+            return !e || e.value() == ERROR_PRIVILEGE_NOT_HELD;
  #endif
         };
 

@@ -198,7 +198,7 @@ void create_symlink(const path& p, const path& link) {
 
 void create_symlink(const path& p, const path& link, error_code& ec) {
 #if !_WIN32
-    if (0 == symlink(p.c_str(), link.c_str())
+    if (0 == symlink(p.c_str(), link.c_str()))
 #else
     static_assert(_WIN32_WINNT >= 0x0600, "Vista is required.");
     // Could stat p to see if it's a dir and set the flag for the caller, but the spec says to use create_directory_symlink
