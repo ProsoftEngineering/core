@@ -269,7 +269,7 @@ bool remove(const path& p, error_code& ec) noexcept {
 void rename(const path& op, const path& np) {
     error_code ec;
     rename(op, np, ec);
-    PS_THROW_IF(ec.value() != 0, filesystem_error("Coulnd not rename path", op, np, ec));
+    PS_THROW_IF(ec.value() != 0, filesystem_error("Could not rename path", op, np, ec));
 }
 
 void rename(const path& op, const path& np, error_code& ec) noexcept {
@@ -403,7 +403,7 @@ path ifilesystem::home_directory_path(const access_control_identity& cid, error_
 // Internal tests.
 #include "catch.hpp"
 
-TEST_CASE("dirops internal") {
+TEST_CASE("dirops_internal") {
     using namespace prosoft::filesystem;
     
     SECTION("directory exists") {
