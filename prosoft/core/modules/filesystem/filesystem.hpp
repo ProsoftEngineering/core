@@ -436,6 +436,22 @@ inline bool create_directory(const path& p, error_code& ec) noexcept {
 bool create_directory(const path&, const path& cloneFrom);
 bool create_directory(const path&, const path& cloneFrom, error_code&) noexcept;
 
+// Win32 symlink creation requires Admin
+void create_symlink(const path&, const path& link);
+void create_symlink(const path&, const path& link, error_code&);
+
+#if !_WIN32
+inline void create_directory_symlink(const path& p, const path& link) {
+    create_symlink(p, link);
+}
+inline void create_directory_symlink(const path& p, const path& link, error_code& ec) {
+    create_symlink(p, link, ec);
+}
+#else
+void create_directory_symlink(const path&, const path& link);
+void create_directory_symlink(const path&, const path& link, error_code&);
+#endif
+
 bool equivalent(const path&, const path&);
 bool equivalent(const path&, const path&, error_code&) noexcept;
 

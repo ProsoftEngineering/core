@@ -190,6 +190,45 @@ bool create_directory(const path& p, const path& cloneFrom, error_code& ec) noex
     return false;
 }
 
+void create_symlink(const path& p, const path& link) {
+    error_code ec;
+    create_symlink(p, link, ec);
+    PS_THROW_IF(ec.value() != 0, filesystem_error("Could not create symlink", p, link, ec));
+}
+
+void create_symlink(const path& p, const path& link, error_code& ec) {
+#if !_WIN32
+    if (0 == symlink(p.c_str(), link.c_str())
+#else
+    static_assert(_WIN32_WINNT >= 0x0600, "Vista is required.");
+    // Could stat p to see if it's a dir and set the flag for the caller, but the spec says to use create_directory_symlink
+    if (CreateSymbolicLinkW(link.c_str(), p.c_str(), 0)) // Vista+ and SE_CREATE_SYMBOLIC_LINK_NAME right (Admin only by default)
+#endif
+    {
+        ec.clear();
+    } else {
+        system::system_error(ec);
+    }
+}
+
+#if _WIN32
+void create_directory_symlink(const path& p, const path& link) {
+    error_code ec;
+    create_directory_symlink(p, link, ec);
+    PS_THROW_IF(ec.value() != 0, filesystem_error("Could not create directory symlink", p, link, ec));
+}
+
+void create_directory_symlink(const path& p, const path& link, error_code& ec) {
+    // p may not exist, so don't assert it's a dir
+    static_assert(_WIN32_WINNT >= 0x0600, "Vista is required.");
+    if (CreateSymbolicLinkW(link.c_str(), p.c_str(), SYMBOLIC_LINK_FLAG_DIRECTORY)) {
+        ec.clear();
+    } else {
+        system::system_error(ec);
+    }
+}
+#endif // WIN32
+
 bool remove(const path& p) {
     error_code ec;
     const auto good = remove(p, ec);

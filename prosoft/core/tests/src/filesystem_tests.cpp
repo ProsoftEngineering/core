@@ -465,7 +465,68 @@ TEST_CASE("filesystem") {
             REQUIRE_FALSE(exists(p, ec));
             CHECK_THROWS(remove(p));
         }
-    }
+    } // create/remove dirs
+
+    SECTION("symlink") {
+        const auto root = temp_directory_path() / PS_TEXT("fs17test");
+        error_code ec;
+        create_directory(root, ec);
+        REQUIRE(exists(root, ec));
+        PS_RAII_REMOVE(root);
+
+        const auto lnk = root / PS_TEXT("lnk");
+
+        static auto noerr_or_win32_denied = [](const error_code& ec) {
+ #if !WIN32
+            return !ec;
+ #else
+            std::cout << "SLNK: " << ec.value() << "\n";
+            return !ec || ec.value() == ERROR_PRIVILEGE_NOT_HELD;
+ #endif
+        };
+
+        WHEN("creating a symlink to a file") {
+            const auto f  = create_file(root / PS_TEXT("file"));
+            REQUIRE(exists(f, ec));
+            PS_RAII_REMOVE(f);
+
+            create_symlink(f, lnk, ec);
+            CHECK(noerr_or_win32_denied(ec));
+
+            if (!ec) {
+                CHECK(is_symlink(lnk, ec));
+                REQUIRE(remove(lnk, ec));
+            }
+        }
+
+        WHEN("creating a symlink to a dir") {
+            const auto d = root / PS_TEXT("dir");
+            create_directory(d, ec);
+            REQUIRE(exists(d, ec));
+            PS_RAII_REMOVE(d);
+
+            create_directory_symlink(d, lnk, ec);
+            CHECK(noerr_or_win32_denied(ec));
+
+            if (!ec) {
+                CHECK(is_symlink(lnk, ec));
+                REQUIRE(remove(lnk, ec));
+            }
+        }
+
+        WHEN("creating a symlink to a non-existent path") {
+            const auto f  = root / PS_TEXT("file1234567890");
+            REQUIRE_FALSE(exists(f, ec));
+
+            create_symlink(f, lnk, ec);
+            CHECK(noerr_or_win32_denied(ec));
+
+            if (!ec) {
+                CHECK(is_symlink(lnk, ec));
+                REQUIRE(remove(lnk, ec));
+            }
+        }
+    } // symlink
     
     SECTION("rename") {
         const auto op = temp_directory_path() / PS_TEXT("fs171");
