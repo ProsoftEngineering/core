@@ -153,17 +153,17 @@ TEST_CASE("filesystem_iterator") {
 #if __APPLE__
             WHEN("skip permission denied is disabled") {
                 REQUIRE(geteuid() != 0);
-                CHECK_THROWS(recursive_directory_iterator("/var/root"));
+                CHECK_THROWS(recursive_directory_iterator("/var/audit"));
             }
             
             WHEN("skip permission denied is enabled") {
-                recursive_directory_iterator i{"/var/root", recursive_directory_iterator::default_options()|directory_options::skip_permission_denied};
+                recursive_directory_iterator i{"/var/audit", recursive_directory_iterator::default_options()|directory_options::skip_permission_denied};
                 CHECK(i == end(i));
                 
                 i = recursive_directory_iterator{"/var", recursive_directory_iterator::default_options()|directory_options::skip_permission_denied};
                 bool rootFound{};
                 for (auto& e : i) {
-                    if (e.path().filename().native() == "root") {
+                    if (e.path().filename().native() == "audit") {
                         CHECK(is_directory(e.status()));
                         CHECK_FALSE(i.recursion_pending());
                         const auto d = i.depth();
