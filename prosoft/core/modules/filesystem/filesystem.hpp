@@ -577,10 +577,10 @@ inline bool is_symlink(const file_status& s) noexcept {
     return s.type() == file_type::symlink;
 }
 inline bool is_symlink(const path& p) {
-    return is_symlink(status(p, status_info::basic));
+    return is_symlink(symlink_status(p, status_info::basic));
 }
 inline bool is_symlink(const path& p, error_code& ec) noexcept {
-    return is_symlink(status(p, status_info::basic, ec));
+    return is_symlink(symlink_status(p, status_info::basic, ec));
 }
 
 inline bool is_other(const file_status& s) noexcept {
