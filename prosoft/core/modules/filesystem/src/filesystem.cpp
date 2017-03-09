@@ -176,9 +176,9 @@ inline bool is_device_path(const path& p) {
 }
 
 struct to_file_type {
-    file_type operator()(const ifilesystem::native_path_type& p, DWORD attrs) const noexcept { // resolve reparse points
+    file_type operator()(const ifilesystem::native_path_type& p, DWORD attrs, bool link) const noexcept { // resolve reparse points
         auto ft = file_type::unknown; // default to unknown
-        if ((attrs & FILE_ATTRIBUTE_REPARSE_POINT)) {
+        if (link && (attrs & FILE_ATTRIBUTE_REPARSE_POINT)) {
             ::WIN32_FIND_DATAW data;
             if (::FindFirstFile(p.c_str(), &data)) {
                 if (IO_REPARSE_TAG_SYMLINK == data.dwReserved0) {
@@ -358,7 +358,7 @@ file_status file_stat(const path& p, status_info what, error_code& ec, bool link
         if (is_set(what & status_info::times)) {
             t = to_times{}(np, lec);
         }
-        return file_status{!link ? get_type(np, attrs) : get_type(attrs), ap, std::move(o), t};
+        return file_status{get_type(np, attrs, link), ap, std::move(o), t};
     } else {
         if (is_device_path(p)) {
             return file_status{to_file_type{}(FILE_ATTRIBUTE_DEVICE)}; // We know the type from the path, so return it.
