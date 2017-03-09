@@ -472,7 +472,6 @@ TEST_CASE("filesystem") {
         error_code ec;
         create_directory(root, ec);
         REQUIRE(exists(root, ec));
-        PS_RAII_REMOVE(root);
 
         const auto lnk = root / PS_TEXT("lnk");
 
@@ -496,11 +495,12 @@ TEST_CASE("filesystem") {
                 CHECK(is_symlink(lnk, ec));
                 REQUIRE(remove(lnk, ec));
             }
+            CHECK(exists(f, ec));
         }
 
         WHEN("creating a symlink to a dir") {
             const auto d = root / PS_TEXT("dir");
-            create_directory(d, ec);
+            CHECK(create_directory(d, ec));
             REQUIRE(exists(d, ec));
             PS_RAII_REMOVE(d);
 
@@ -511,6 +511,7 @@ TEST_CASE("filesystem") {
                 CHECK(is_symlink(lnk, ec));
                 REQUIRE(remove(lnk, ec));
             }
+            CHECK(exists(d, ec));
         }
 
         WHEN("creating a symlink to a non-existent path") {
@@ -524,6 +525,10 @@ TEST_CASE("filesystem") {
                 CHECK(is_symlink(lnk, ec));
                 REQUIRE(remove(lnk, ec));
             }
+        }
+
+        WHEN("cleanup") { // Attempting to RAII_remove each time through results in weird win32 isues where the root dir can end up with an empty DACL and thus no rights.
+            REQUIRE(remove(root, ec));
         }
     } // symlink
     
