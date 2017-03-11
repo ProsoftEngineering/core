@@ -52,6 +52,7 @@ set(SRCTESTS
     ${CORETESTS}/src/regex_tests.cpp
     ${CORETESTS}/src/semaphore_tests.cpp
     ${CORETESTS}/src/stable_hash_wrapper_tests.cpp
+	${CORETESTS}/src/stream_utils_tests.cpp
     ${CORETESTS}/src/string_component_tests.cpp
     ${CORETESTS}/src/string_convert_tests.cpp
     ${CORETESTS}/src/system_error_tests.cpp
