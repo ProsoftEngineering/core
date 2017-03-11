@@ -85,6 +85,24 @@ TEST_CASE("winutils") {
         CHECK_FALSE(modify_process_privilege(PS_TEXT("dummy_name"), privilege_action::disable, ec));
         CHECK(ec);
     }
+
+    WHEN("converting a guid to a string") {
+        GUID g;
+        REQUIRE(S_OK == IIDFromString(L"{239027b0-e56b-428c-9d36-36c5c3a5635e}", &g));
+
+        CHECK(guid_string(g) == "239027b0-e56b-428c-9d36-36c5c3a5635e");
+        CHECK(guid_string(g, guid_string_opts::brace) == "{239027b0-e56b-428c-9d36-36c5c3a5635e}");
+        CHECK(guid_string(g, guid_string_opts::uppercase) == "239027B0-E56B-428C-9D36-36C5C3A5635E");
+        CHECK(guid_wstring(g, guid_string_opts::uppercase|guid_string_opts::brace) == L"{239027B0-E56B-428C-9D36-36C5C3A5635E}");
+
+        CHECK(iid_string(g) == "{239027b0-e56b-428c-9d36-36c5c3a5635e}");
+        CHECK(iid_string(g, guid_string_opts::none) == "{239027b0-e56b-428c-9d36-36c5c3a5635e}");
+        CHECK(iid_wstring(g, guid_string_opts::uppercase) == L"{239027B0-E56B-428C-9D36-36C5C3A5635E}");
+
+        // Leading zero
+        REQUIRE(S_OK == IIDFromString(L"{d9085bf4-4b74-47df-a6af-06e970ebc2a6}", &g));
+        CHECK(guid_string(g) == "d9085bf4-4b74-47df-a6af-06e970ebc2a6");
+    }
 }
 
 #endif // _WIN32

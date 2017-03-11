@@ -29,7 +29,12 @@
 #include <type_traits>
 
 #if _WIN32
+#include <iosfwd>
+#include <cstring>
+#include <sstream>
 #include <system_error>
+
+#include <prosoft/core/include/stream_utils.hpp>
 
 #include <prosoft/core/config/config.h>
 #include <prosoft/core/config/config_windows.h>
@@ -80,6 +85,67 @@ inline bool ok(HRESULT result, std::error_code& ec, const std::error_category& c
         ec = std::error_code{result, cat};
         return false;
     }
+}
+
+} // windows
+} // prosoft
+
+template <class Char, class Traits>
+std::basic_ostream<Char, Traits>& operator<<(std::basic_ostream<Char, Traits>& os, const GUID& g) {
+    static const std::basic_string<Char> dash(1, static_cast<Char>('-'));
+    prosoft::stream_guard ss{os};
+    return os << std::setfill(static_cast<Char>('0')) << std::hex
+    // each non-int operator<< resets width to 0
+        << std::setw(2) << g.Data1 << dash
+        << std::setw(2) << g.Data2 << dash
+        << std::setw(2) << g.Data3 << dash
+        << std::setw(2) << uint16_t(g.Data4[0]) << uint16_t(g.Data4[1]) << dash
+        << std::setw(2) << uint16_t(g.Data4[2]) << uint16_t(g.Data4[3]) << uint16_t(g.Data4[4])
+        << uint16_t(g.Data4[5]) << uint16_t(g.Data4[6]) << uint16_t(g.Data4[7]);
+}
+
+namespace prosoft {
+namespace windows {
+
+enum class guid_string_opts {
+    none,
+    brace,
+    uppercase,
+};
+PS_ENUM_BITMASK_OPS(guid_string_opts);
+
+template <class Char>
+std::basic_string<Char> guid_to_string(const GUID& g, guid_string_opts opts = guid_string_opts::none) {
+    std::basic_stringstream<Char> ss;
+    if (is_set(opts & guid_string_opts::uppercase)) {
+        ss << std::uppercase;
+    }
+
+    const bool brace = is_set(opts & guid_string_opts::brace);
+    if (brace) {
+        ss << static_cast<Char>('{');
+    }
+    ss << g;
+    if (brace) {
+        ss << static_cast<Char>('}');
+    }
+    return ss.str();
+}
+
+inline auto guid_string(const GUID& g, guid_string_opts opts = guid_string_opts::none) {
+    return guid_to_string<char>(g, opts);
+}
+
+inline auto guid_wstring(const GUID& g, guid_string_opts opts = guid_string_opts::none) {
+    return guid_to_string<wchar_t>(g, opts);
+}
+
+inline auto iid_string(const GUID& g, guid_string_opts opts = guid_string_opts::none) {
+    return guid_to_string<char>(g, guid_string_opts::brace|opts);
+}
+
+inline auto iid_wstring(const GUID& g, guid_string_opts opts = guid_string_opts::none) {
+    return guid_to_string<wchar_t>(g, guid_string_opts::brace|opts);
 }
 
 } // windows
