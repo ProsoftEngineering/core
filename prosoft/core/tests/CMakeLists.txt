@@ -48,6 +48,7 @@ set(SRCTESTS
     ${CORETESTS}/src/filesystem_iterator_tests.cpp
     ${CORETESTS}/src/filesystem_monitor_tests.cpp
     ${CORETESTS}/src/filesystem_path_tests.cpp
+	${CORETESTS}/src/filesystem_snapshot_tests.cpp
     ${CORETESTS}/src/path_utils_tests.cpp
     ${CORETESTS}/src/regex_tests.cpp
     ${CORETESTS}/src/semaphore_tests.cpp
@@ -94,9 +95,8 @@ ps_core_configure(${PROJECT_NAME})
 # This must be done before using modules so that the modules can setup their internal tests (if any)
 enable_testing()
 
-ps_core_use_filesystem(${PROJECT_NAME}) # brings in u8string and identity
+ps_core_use_filesystem(${PROJECT_NAME}) # brings in identity, u8string and winutils
 ps_core_use_regex(${PROJECT_NAME})
-ps_core_use_winutils(${PROJECT_NAME})
 
 # We add all of our tests to coverage as they will produce the coverage for header-only implementations
 ps_core_enable_target_code_coverage(${PROJECT_NAME})

@@ -26,13 +26,146 @@
 #ifndef PS_CORE_FILESYSTEM_SNAPSHOT_HPP
 #define PS_CORE_FILESYSTEM_SNAPSHOT_HPP
 
-#define PS_HAVE_FILESYSTEM_SNAPSHOT WIN32
+// XXX: Windows snapshots require a 32bit OS for 32bit apps. WOW64 is not supported.
+#define PS_HAVE_FILESYSTEM_SNAPSHOT _WIN32
 
 #if PS_HAVE_FILESYSTEM_SNAPSHOT
+
+#include <memory>
+#include <system_error>
+#include <type_traits>
+
+#include "filesystem_path.hpp"
 
 namespace prosoft {
 namespace filesystem {
 inline namespace v1 {
+
+struct snapshot_id {
+#if _WIN32
+    using id_type = unsigned char[16]; // GUID
+    id_type m_id;
+
+    snapshot_id() noexcept {
+        std::memset(m_id, 0, sizeof(m_id));
+    }
+
+    snapshot_id(const id_type id) noexcept {
+        memcpy_s(m_id, sizeof(m_id), id, sizeof(m_id));
+    }
+
+    snapshot_id(native_string_type::const_pointer); // mainly for testing
+
+    PS_DEFAULT_COPY(snapshot_id);
+    PS_DEFAULT_MOVE(snapshot_id);
+
+    int compare(const snapshot_id& other) const noexcept {
+        return std::memcmp(m_id, other.m_id, sizeof(m_id));
+    }
+#else
+    native_string_type m_id;
+
+    snapshot_id(native_string_type&& s) noexcept(std::is_nothrow_move_constructible<native_string_type>::value)
+        : m_id(std::move(s)) {
+    }
+    snapshot_id(const native_string_type& s)
+        : m_id(s) {
+    }
+    PS_DEFAULT_CLASS(snapshot_id);
+
+    int compare(const snapshot_id& other) const {
+        return m_id.compare(other.m_id);
+    }
+#endif
+};
+
+inline bool operator==(const snapshot_id& lhs, const snapshot_id& rhs) noexcept(noexcept(std::declval<snapshot_id>().compare(std::declval<snapshot_id&>()))) {
+    return lhs.compare(rhs) == 0;
+}
+
+inline bool operator!=(const snapshot_id& lhs, const snapshot_id& rhs) noexcept(noexcept(operator==(std::declval<snapshot_id&>(), std::declval<snapshot_id&>()))) {
+    return !operator==(lhs, rhs);
+}
+
+class snapshot_manager;
+
+class snapshot {
+    friend snapshot_manager;
+    snapshot_id m_id;
+    using flags_type = uint8_t;
+    flags_type m_flags;
+
+    void clear() {
+        m_id = snapshot_id{};
+        m_flags = flags_type{};
+    }
+
+public:
+    explicit snapshot(snapshot_id&& sid)
+        : m_id(std::move(sid))
+        , m_flags() {
+    }
+    
+    explicit snapshot(const snapshot_id& sid)
+        : m_id(sid)
+        , m_flags() {
+    }
+
+    snapshot(snapshot&& other) noexcept(std::is_nothrow_move_constructible<snapshot_id>::value)
+        : m_id(std::move(other.m_id))
+        , m_flags(other.m_flags) {
+        other.clear();
+    }
+
+    PS_DISABLE_COPY(snapshot); // implicit reap not supported
+    snapshot& operator=(snapshot&&) = delete; // implicit reap not supported
+
+    ~snapshot();
+
+    const snapshot_id& id() const noexcept {
+        return m_id;
+    }
+
+    flags_type reserved() const noexcept {
+        return m_flags;
+    }
+};
+
+inline bool operator==(const snapshot& lhs, const snapshot& rhs) noexcept(noexcept(operator==(std::declval<snapshot_id&>(), std::declval<snapshot_id&>()))) {
+    return lhs.id() == rhs.id();
+}
+
+inline bool operator!=(const snapshot& lhs, const snapshot& rhs) noexcept(noexcept(operator==(std::declval<snapshot&>(), std::declval<snapshot&>()))) {
+    return !operator==(lhs, rhs);
+}
+
+#define PS_FILESYSTEM_SNAPSHOT_CAN_CREATE_ID !_WIN32
+
+struct snapshot_create_options {
+    enum : unsigned {
+        none = 0,
+        defaults = none,
+    } m_flags = defaults;
+#if PS_FILESYSTEM_SNAPSHOT_CAN_CREATE_ID
+    snapshot_id m_id;
+#endif
+};
+
+PS_WARN_UNUSED_RESULT snapshot create_snapshot(const path&, const snapshot_create_options& opts = snapshot_create_options{});
+PS_WARN_UNUSED_RESULT snapshot create_snapshot(const path&, const snapshot_create_options&, std::error_code&);
+inline PS_WARN_UNUSED_RESULT snapshot create_snapshot(const path& p, std::error_code& ec) {
+    return create_snapshot(p, snapshot_create_options{}, ec);
+}
+
+void attach_snapshot(snapshot&, const path& mount);
+void attach_snapshot(snapshot&, const path& mount, std::error_code&);
+
+// Snapshot lifecycles are automatically managed, but detach/delete are provied for explicit control.
+void detach_snapshot(snapshot&);
+void detach_snapshot(snapshot&, std::error_code&);
+
+void delete_snapshot(snapshot&);
+void delete_snapshot(snapshot&, std::error_code&);
 
 } // v1
 } // filesystem

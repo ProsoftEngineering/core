@@ -59,7 +59,8 @@ if(APPLE)
 endif()
 
 if(WIN32)
-    target_link_libraries(${fs_lib} PUBLIC "shell32")
+    target_link_libraries(${fs_lib} PUBLIC "shell32" "vssapi")
+	ps_core_module_use_external_module(${fs_lib} winutils)
 endif()
 
 ps_core_module_use_u8string_module(${fs_lib})
