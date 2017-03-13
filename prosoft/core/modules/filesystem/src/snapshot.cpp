@@ -41,6 +41,8 @@
 #include "filesystem.hpp"
 #include "filesystem_snapshot.hpp"
 
+#include "unique_resource.hpp"
+
 #if PS_HAVE_FILESYSTEM_SNAPSHOT
 
 namespace fs = prosoft::filesystem;
@@ -489,10 +491,10 @@ void vss_delete_snapshot(backup_components& backup, const GUID& snapid,  std::er
 }
 
 fs::path sysroot() noexcept {
-    wchar_t* buf;
+    prosoft::unique_malloc<wchar_t> buf;
     size_t len;
-    if (0 == _wdupenv_s(&buf, &len, L"SystemRoot")) {
-        return fs::path{std::wstring{buf, len}};
+    if (0 == _wdupenv_s(prosoft::handle(buf), &len, L"SystemRoot")) {
+        return fs::path{std::wstring{buf.get(), len}};
     }
     return fs::path{L"C:\\windows"};
 }
