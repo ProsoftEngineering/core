@@ -547,10 +547,6 @@ GUID make_snapshot(const fs::path& p, backup_components& backup, GUID& provider,
     return snapid;
 }
 
-inline bool is_null(const GUID& g) {
-    return 0 == std::memcmp(&g, &GUID_NULL, sizeof(GUID));
-}
-
 // Multiple providers can be installed and some 3rd party providers may cause errors.
 GUID system_provider(backup_components& backup, fs::error_code& ec) {
     GUID provider{};
@@ -790,7 +786,7 @@ snapshot create_snapshot(const path& p, const snapshot_create_options&, error_co
         PS_THROW_IF(!backup, std::system_error(ec, "Failed to init VSS"));
 
         auto provider = system_provider(backup, ec);
-        PS_THROW_IF(is_null(provider), std::system_error(ec, "Failed to find VSS system provider"));
+        PS_THROW_IF(provider == GUID_NULL, std::system_error(ec, "Failed to find VSS system provider"));
 
         auto snapid = make_snapshot(p, backup, provider, ec);
         return snapshot{reinterpret_cast<unsigned char*>(&snapid)};
