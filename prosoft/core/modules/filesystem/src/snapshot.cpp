@@ -487,7 +487,7 @@ bool end_snapshot(backup_components& backup, std::error_code& ec) {
 void vss_delete_snapshot(backup_components& backup, const GUID& snapid,  std::error_code& ec) {
     LONG count;
     GUID ignored;
-    check(backup->DeleteSnapshots(snapid, VSS_OBJECT_SNAPSHOT, true, &count, &ignored), ec, snapshot_category());
+    ok(backup->DeleteSnapshots(snapid, VSS_OBJECT_SNAPSHOT, true, &count, &ignored), ec, snapshot_category());
 }
 
 fs::path sysroot() noexcept {
@@ -705,7 +705,7 @@ XXX: When operating on persistent snapshots (deletion, or list via Query) the ba
 static bool detach_snapshot(backup_components& backup, snapshot& snap, std::error_code& ec) {
     const auto& snapid = guid(snap);
     CComQIPtr<IVssBackupComponentsEx2> backup2(backup);
-    if (backup2 && check(backup2->UnexposeSnapshot(snapid), ec, snapshot_category())) {
+    if (backup2 && ok(backup2->UnexposeSnapshot(snapid), ec, snapshot_category())) {
         return true;
     } else {
         if (!ec) {
@@ -814,7 +814,7 @@ void attach_snapshot(snapshot& snap, const path& p, std::error_code& ec) {
         if (auto backup = vss_backup(ec)) {
             const auto& snapid = *reinterpret_cast<const GUID*>(&snap.id().m_id[0]);
             wchar_t* exposedPath;
-            if (check(backup->ExposeSnapshot(snapid, nullptr, VSS_VOLSNAP_ATTR_EXPOSED_LOCALLY, const_cast<VSS_PWSZ>(p.c_str()), &exposedPath), ec, cat)) {
+            if (ok(backup->ExposeSnapshot(snapid, nullptr, VSS_VOLSNAP_ATTR_EXPOSED_LOCALLY, const_cast<VSS_PWSZ>(p.c_str()), &exposedPath), ec, cat)) {
                 snapshot_manager::set(snap, snapshot_attached);
                 CoTaskMemFree(exposedPath);
             }
