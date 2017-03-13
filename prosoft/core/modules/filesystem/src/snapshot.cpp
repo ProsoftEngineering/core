@@ -852,7 +852,6 @@ void delete_snapshot(snapshot& snap, std::error_code& ec) {
     if (!ec) {
         if (auto backup = vss_backup(ec)) {
             delete_snapshot(backup, snap, ec);
-            dbg(make_msg("Delete", guid(snap)), ec);
             if (!ec) {
                 snapshot_manager::clear(snap);
             }
