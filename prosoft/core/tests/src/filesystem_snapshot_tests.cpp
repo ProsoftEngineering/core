@@ -120,7 +120,7 @@ TEST_CASE("filesystem_snapshot") {
             snapshot dead{snapid};
             CHECK_THROWS(detach_snapshot(dead));
             CHECK_THROWS(delete_snapshot(dead));
-            // There will be another delete attempt ono destruction of 'dead'
+            // There will be another delete attempt on destruction of 'dead'
         }
     }
 }
