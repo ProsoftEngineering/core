@@ -318,6 +318,7 @@ TEST_CASE("filesystem") {
         const auto p = current_path() / uniqueName;
         CHECK(canonical(p) == p);
         CHECK(absolute(p) == p);
+        CHECK(system_complete(p) == p);
     }
     
     WHEN("resolving a tilde-prefixed path") {
@@ -327,7 +328,39 @@ TEST_CASE("filesystem") {
         const auto subp = path{PS_TEXT("a/b/c/d")}.make_preferred();
         CHECK(canonical(tilde / subp) == home / subp);
     }
+
+    WHEN("path is empty") {
+        const auto cur = current_path();
+#if !_WIN32
+        CHECK_THROWS(canonical(path()));
+#endif
+        CHECK(absolute(path()) == cur);
+        CHECK(system_complete(path()) == cur);
+
+        // pathological case
+        CHECK(absolute(path(), path()) == path());
+    }
     
+#if _WIN32
+    WHEN("resolving a root-dir relative path") {
+        const path p{PS_TEXT("\\a\\b\\c")};
+        const auto cur = current_path();
+        CHECK(absolute(p) == cur.root_name() / p);
+        CHECK(system_complete(p) == cur.root_name() / p);
+    }
+
+    WHEN("resolve a root-name relative path") {
+        path p{PS_TEXT("C:a")};
+        const auto cur = current_path();
+        CHECK(absolute(p) == cur / p.relative_path());
+        CHECK(system_complete(p) == cur / p.relative_path());
+
+        p = path{PS_TEXT("F:a")};
+        CHECK(absolute(p) == p.root_name() / cur.relative_path() / p.relative_path());
+        CHECK(system_complete(p) == p.root_name() / p.relative_path());
+    }
+#endif
+
     WHEN("getting the home dir") {
         error_code ec;
         const auto p = home_directory_path(ec);

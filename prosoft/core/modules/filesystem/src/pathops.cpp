@@ -193,15 +193,11 @@ void current_path(const path& p, error_code& ec) {
 }
 
 path absolute(const path& p, const path& base) {
-#if !_WIN32
     if (p.is_absolute()) {
         return p;
     }
-#else
-    if (p.is_absolute()) {
-        return p;
-    }
-    
+
+#if _WIN32
     auto root = p.root_name();
     if (!root.empty()) {
         const auto ab = absolute(base);
@@ -213,7 +209,7 @@ path absolute(const path& p, const path& base) {
     }
 #endif // WIN32
     
-    return absolute(base) / p;
+    return !base.empty() ? absolute(base) / p : p;
 }
 
 #if _WIN32
@@ -224,8 +220,17 @@ path system_complete(const path& p) {
     return np;
 }
 
-path system_complete(const path& p, error_code ec) {
+path system_complete(const path& p, error_code& ec) {
     ec.clear();
+    if (p.has_root_name()) {
+        unique_malloc<path::encoding_value_type> tmp{fullpath(p.c_str())};
+        if (tmp) {
+            return {tmp.get()};
+        } else {
+            ec = error_code{EINVAL, system::posix_category()};
+            return {};
+        }
+    }
     return absolute(p);
 }
 #endif

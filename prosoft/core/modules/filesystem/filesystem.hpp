@@ -421,13 +421,13 @@ path absolute(const path&, const path& base = current_path());
 inline path system_complete(const path& p) {
     return absolute(p);
 }
-inline path system_complete(const path& p, error_code ec) {
+inline path system_complete(const path& p, error_code& ec) {
     ec.clear();
     return absolute(p);
 }
 #else
 path system_complete(const path&);
-path system_complete(const path&, error_code);
+path system_complete(const path&, error_code&);
 #endif
 
 // As an extension, canonical will expand an initial '~' char to home_directory_path().
