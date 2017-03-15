@@ -160,7 +160,7 @@ inline PS_WARN_UNUSED_RESULT snapshot create_snapshot(const path& p, std::error_
 void attach_snapshot(snapshot&, const path& mount);
 void attach_snapshot(snapshot&, const path& mount, std::error_code&);
 
-// Snapshot lifecycles are automatically managed, but detach/delete are provied for explicit control.
+// Snapshot lifecycles are automatically managed, but detach/delete are provided for explicit control.
 void detach_snapshot(snapshot&);
 void detach_snapshot(snapshot&, std::error_code&);
 
