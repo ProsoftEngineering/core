@@ -89,6 +89,10 @@ inline path operator/(const path& lhs, const path& rhs) {
     return path{lhs} /= rhs;
 }
 
+inline path operator/(path&& lhs, const path& rhs) { // extension
+    return lhs /= rhs;
+}
+
 template <class CharT, class Traits>
 std::basic_ostream<CharT, Traits>& operator<<(std::basic_ostream<CharT, Traits>& os, const path& p) {
     os <<
