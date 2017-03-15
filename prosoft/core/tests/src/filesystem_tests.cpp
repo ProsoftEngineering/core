@@ -304,17 +304,20 @@ TEST_CASE("filesystem") {
         const auto base = current_path();
         const auto p = uniqueName;
         CHECK(canonical(p) == base / p);
+        CHECK(absolute(p) == base / p);
     }
 
     WHEN("resolving a partial path") {
         const auto base = current_path();
         const auto p = path{PS_TEXT("a")} / uniqueName;
         CHECK(canonical(p) == base / p);
+        CHECK(absolute(p) == base / p);
     }
 
     WHEN("resolving an absolute path") {
         const auto p = current_path() / uniqueName;
         CHECK(canonical(p) == p);
+        CHECK(absolute(p) == p);
     }
     
     WHEN("resolving a tilde-prefixed path") {

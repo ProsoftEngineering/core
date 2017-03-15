@@ -192,6 +192,44 @@ void current_path(const path& p, error_code& ec) {
     }
 }
 
+path absolute(const path& p, const path& base) {
+#if !_WIN32
+    if (p.is_absolute()) {
+        return p;
+    }
+#else
+    if (p.is_absolute()) {
+        return p;
+    }
+    
+    auto root = p.root_name();
+    if (!root.empty()) {
+        const auto ab = absolute(base);
+        return root /= ab.root_directory() / ab.relative_path() / p.relative_path();
+    }
+    
+    if (p.has_root_directory()) {
+        return absolute(base).root_name() / p;
+    }
+#endif // WIN32
+    
+    return absolute(base) / p;
+}
+
+#if _WIN32
+path system_complete(const path& p) {
+    error_code ec;
+    path np = system_complete(p, ec);
+    PS_THROW_IF(ec.value(), filesystem_error("Could not construct a system complete path", p, ec));
+    return np;
+}
+
+path system_complete(const path& p, error_code ec) {
+    ec.clear();
+    return absolute(p);
+}
+#endif
+
 } // v1
 } // filesystem
 } // prosoft

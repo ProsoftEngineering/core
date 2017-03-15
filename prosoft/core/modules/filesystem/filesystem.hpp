@@ -416,6 +416,20 @@ path current_path(error_code&);
 void current_path(const path&);
 void current_path(const path&, error_code&);
 
+path absolute(const path&, const path& base = current_path());
+#if !_WIN32
+inline path system_complete(const path& p) {
+    return absolute(p);
+}
+inline path system_complete(const path& p, error_code ec) {
+    ec.clear();
+    return absolute(p);
+}
+#else
+path system_complete(const path&);
+path system_complete(const path&, error_code);
+#endif
+
 // As an extension, canonical will expand an initial '~' char to home_directory_path().
 // As an extension, canonical will behave as weakly_canonical for non-existant path members.
 path canonical(const path&, const path& base = current_path());
