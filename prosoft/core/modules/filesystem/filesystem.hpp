@@ -431,11 +431,17 @@ path system_complete(const path&, error_code&);
 #endif
 
 // As an extension, canonical will expand an initial '~' char to home_directory_path().
-// As an extension, canonical will behave as weakly_canonical for non-existant path members.
 path canonical(const path&, const path& base = current_path());
 path canonical(const path&, const path& base, error_code&);
 inline path canonical(const path& p, error_code& ec) {
     return canonical(p, current_path(ec), ec);
+}
+// As an extension, canonical behaves as weakly_canonical for nonexistent path members.
+inline path weakly_canonical(const path& p) {
+    return canonical(p);
+}
+inline path weakly_canonical(const path& p, error_code& ec) {
+    return canonical(p, ec);
 }
 
 // perms are an extension and ignored on Windows. perms:all is the std. default.

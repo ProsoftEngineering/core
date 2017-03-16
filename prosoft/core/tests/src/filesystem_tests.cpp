@@ -304,6 +304,7 @@ TEST_CASE("filesystem") {
         const auto base = current_path();
         const auto p = uniqueName;
         CHECK(canonical(p) == base / p);
+        CHECK(weakly_canonical(p) == base / p);
         CHECK(absolute(p) == base / p);
     }
 
@@ -311,12 +312,14 @@ TEST_CASE("filesystem") {
         const auto base = current_path();
         const auto p = path{PS_TEXT("a")} / uniqueName;
         CHECK(canonical(p) == base / p);
+        CHECK(weakly_canonical(p) == base / p);
         CHECK(absolute(p) == base / p);
     }
 
     WHEN("resolving an absolute path") {
         const auto p = current_path() / uniqueName;
         CHECK(canonical(p) == p);
+        CHECK(weakly_canonical(p) == p);
         CHECK(absolute(p) == p);
         CHECK(system_complete(p) == p);
     }
@@ -325,6 +328,7 @@ TEST_CASE("filesystem") {
         const auto tilde  = path{PS_TEXT("~")};
         const auto home = canonical(home_directory_path()); // home path may be a symlink
         CHECK(canonical(tilde) == home);
+        CHECK(weakly_canonical(tilde) == home);
         const auto subp = path{PS_TEXT("a/b/c/d")}.make_preferred();
         CHECK(canonical(tilde / subp) == home / subp);
     }
@@ -333,6 +337,7 @@ TEST_CASE("filesystem") {
         const auto cur = current_path();
 #if !_WIN32
         CHECK_THROWS(canonical(path()));
+        CHECK_THROWS(weakly_canonical(path()));
 #endif
         CHECK(absolute(path()) == cur);
         CHECK(system_complete(path()) == cur);
