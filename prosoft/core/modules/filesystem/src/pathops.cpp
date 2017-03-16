@@ -141,7 +141,7 @@ path canonical(const path& rp, const path& base, error_code& ec) {
         auto parent = p.parent_path(); // attempt to resolve parents
         if (!parent.empty()) {
             return canonical(parent, ec) / p.filename();
-        } else if (!base.empty()) { // add the base -- XXX: this assumes that path is a relative leaf with no separators and thus no recursion was performed
+        } else if (!p.empty() && !base.empty()) { // add the base -- XXX: this assumes that path is a relative leaf with no separators and thus no recursion was performed
             return base / p;
         } else {
             ifilesystem::error(ENOENT, ec);
