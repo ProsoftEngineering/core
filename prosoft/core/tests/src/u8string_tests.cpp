@@ -1,4 +1,4 @@
-// Copyright © 2014-2015, Prosoft Engineering, Inc. (A.K.A "Prosoft")
+// Copyright © 2014-2017, Prosoft Engineering, Inc. (A.K.A "Prosoft")
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without
@@ -38,6 +38,8 @@ const char* u8test = "\xE2\x84\xAB\xE1\xBA\xA1\xC4\x81\xE2\x80\xA6"; // 4 u16 co
 const u16string::value_type u16test[] = {0x212b, 0x1ea1, 0x0101, 0x2026, 0}; // ditto, but a u16 literal
 const u16string::value_type u32test[] = {0xD840, 0xDC0B, 0}; // 1 u32 codepoint (0x0002000B), u16 literal
 
+// See https://github.com/philsquared/Catch/issues/565 for why this is needed.
+CATCH_INTERNAL_SUPPRESS_PARENTHESES_WARNINGS
 template <typename T>
 void test_ascii_compare() {
     CHECK(T("a") < T("b"));
@@ -65,6 +67,7 @@ void test_ascii_compare() {
     CHECK(T("hello") == T("hello"));
     CHECK(T("hello") != T("world"));
 }
+CATCH_INTERNAL_UNSUPPRESS_PARENTHESES_WARNINGS
 } // anon
 
 TEST_CASE("u8string") {
