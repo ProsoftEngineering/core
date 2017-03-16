@@ -132,7 +132,7 @@ public:
     void swap(basic_path&) noexcept(noexcept(std::swap(std::declval<string_type&>(), std::declval<string_type&>())));
 
     const string_type& native() const & noexcept;
-    string_type native() &&
+    PS_WARN_UNUSED_RESULT string_type native() &&
 #if !_MSC_VER // A noexcept conditional here crashes VS 2015 update 2 (update 3?). Something to do with the ref qualifier?
         noexcept(std::is_nothrow_move_constructible<string_type>::value)
 #endif

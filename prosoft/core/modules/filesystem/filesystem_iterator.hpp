@@ -79,7 +79,7 @@ public:
         return m_path;
     }
     
-    path_type path() && noexcept(std::is_nothrow_move_constructible<path_type>::value) {
+    PS_WARN_UNUSED_RESULT path_type path() && noexcept(std::is_nothrow_move_constructible<path_type>::value) {
         return path_type{std::move(m_path)};
     }
 
@@ -164,7 +164,7 @@ public:
         m_current = directory_entry{next(ec)};
     }
     
-    directory_entry extract() noexcept(std::is_nothrow_move_constructible<directory_entry>::value) {
+    PS_WARN_UNUSED_RESULT directory_entry extract() noexcept(std::is_nothrow_move_constructible<directory_entry>::value) {
         return directory_entry{std::move(m_current)};
     }
     
@@ -313,7 +313,7 @@ public:
     basic_iterator& operator++(int);
     
     // moves current entry out -- be careful
-    directory_entry extract() noexcept(std::is_nothrow_move_constructible<directory_entry>::value);
+    PS_WARN_UNUSED_RESULT directory_entry extract() noexcept(std::is_nothrow_move_constructible<directory_entry>::value);
     
     static constexpr directory_options default_options() {
         return Traits::defaults;

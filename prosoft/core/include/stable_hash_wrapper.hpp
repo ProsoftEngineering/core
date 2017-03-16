@@ -74,7 +74,7 @@ public:
         return get();
     }
     
-    value_type extract() const noexcept(std::is_nothrow_move_constructible<T>::value) {
+    PS_WARN_UNUSED_RESULT value_type extract() const noexcept(std::is_nothrow_move_constructible<T>::value) {
         return std::move(m_val);
     }
     

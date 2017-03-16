@@ -137,7 +137,7 @@ public:
     
     // Change events are usually frequent and ephemeral. This allows moving a path out of the event without a copy.
     // This invalidates the notification!
-    path_type extract_path() noexcept(std::is_nothrow_move_constructible<path_type>::value) {
+    PS_WARN_UNUSED_RESULT path_type extract_path() noexcept(std::is_nothrow_move_constructible<path_type>::value) {
         m_event = change_event::none;
         m_regid = 0;
         return path_type{!m_newpath.empty() ? std::move(m_newpath) : std::move(m_path)};
