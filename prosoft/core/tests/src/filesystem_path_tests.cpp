@@ -1610,6 +1610,78 @@ TEST_CASE("filesystem_path") {
         }
     }
     
+    SECTION("lexical generation") {
+        WHEN("path is empty") {
+            const path p{};
+            path base{PS_TEXT("")};
+            CHECK(p.lexically_relative(base).empty());
+            CHECK(p.lexically_proximate(base).empty());
+            base = path{PS_TEXT("/a/b/c")}.make_preferred();
+            CHECK(p.lexically_relative(base).empty());
+            CHECK(p.lexically_proximate(base).empty());
+            base = path{PS_TEXT("b/c")}.make_preferred();
+            CHECK(p.lexically_relative(base).empty());
+            CHECK(p.lexically_proximate(base).empty());
+        }
+        
+        WHEN("path is absolute") {
+            const auto p = path{PS_TEXT("/a/d")}.make_preferred();
+            const auto p2 = path{PS_TEXT("/a/b/c")}.make_preferred();
+            
+            CHECK(p.lexically_relative(p2) == path(PS_TEXT("../../d")).make_preferred());
+            CHECK(p.lexically_proximate(p2) == path(PS_TEXT("../../d")).make_preferred());
+            CHECK(p.lexically_relative(p2, path::lex_opt_baseless) == path(PS_TEXT("d")).make_preferred());
+            
+            CHECK(p2.lexically_relative(p) == path(PS_TEXT("../b/c")).make_preferred());
+            CHECK(p2.lexically_proximate(p) == path(PS_TEXT("../b/c")).make_preferred());
+            CHECK(p2.lexically_relative(p, path::lex_opt_baseless) == path(PS_TEXT("b/c")).make_preferred());
+            
+            CHECK(p.lexically_relative(p) == path(path::dot));
+            CHECK(p.lexically_proximate(p) == path(path::dot));
+            CHECK(p2.lexically_relative(p2) == path(path::dot));
+            
+            auto p3 = path{PS_TEXT("/z/x/y")}.make_preferred();
+            CHECK(p.lexically_relative(p3) == path(PS_TEXT("../../../a/d")).make_preferred());
+            CHECK(p3.lexically_relative(p) == path(PS_TEXT("../../z/x/y")).make_preferred());
+            
+            p3 = path{++p3.begin(), p3.end()};
+            CHECK(p3.is_relative());
+            CHECK(p.lexically_relative(p3).empty());
+            CHECK(p.lexically_proximate(p3) == p);
+            
+        }
+        
+        WHEN("path is relative") {
+            const auto p = path{PS_TEXT("a/b/c")}.make_preferred();
+            auto base = path{PS_TEXT("a")};
+            CHECK(p.lexically_relative(base) == path(PS_TEXT("b/c")).make_preferred());
+            CHECK(p.lexically_proximate(base) == path(PS_TEXT("b/c")).make_preferred());
+            CHECK(p.lexically_relative(p) == path(path::dot));
+            
+            base = path{PS_TEXT("/a")}.make_preferred();
+            CHECK(p.lexically_relative(base).empty());
+            CHECK(p.lexically_proximate(base) == p);
+            
+            base = path{PS_TEXT("c/d")};
+            CHECK(p.lexically_relative(base).empty());
+            CHECK(p.lexically_proximate(base) == p);
+            
+            base = path{PS_TEXT("a/b/c/x/y")}.make_preferred();
+            CHECK(p.lexically_relative(base) == path(PS_TEXT("../..")).make_preferred());
+            
+            if (win32Paths) {
+                const auto wp = path{PS_TEXT("C:a")};
+                base = path{PS_TEXT("C:a\\b\\c")};
+                CHECK(p.lexically_relative(base) == path(PS_TEXT("..\\..")));
+                CHECK(base.lexically_relative(wp) == path(PS_TEXT("b\\c")));
+                
+                base = path{PS_TEXT("D:a")};
+                CHECK(p.lexically_relative(base).empty());
+                CHECK(p.lexically_proximate(base) == p);
+            }
+        }
+    }
+    
     SECTION("conversion to string") {
         const auto p = path{PS_TEXT("/a/b/c")}.make_preferred();
         
