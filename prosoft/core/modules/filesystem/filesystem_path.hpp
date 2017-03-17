@@ -195,6 +195,8 @@ public:
 
     iterator begin() const;
     iterator end() const;
+    
+    basic_path(iterator, iterator); // Extension
 
 private:
     string_type m_pathname;
@@ -707,6 +709,21 @@ inline typename basic_path<String>::iterator basic_path<String>::begin() const {
 template <class String>
 inline typename basic_path<String>::iterator basic_path<String>::end() const {
     return iterator{*this, m_pathname.end()};
+}
+
+template <class String>
+basic_path<String>::basic_path(iterator first, iterator last) {
+    if (preferred_separator_style == path_style::windows) {
+        if ((*first).has_root_name()) {
+            operator+=(*first++);
+            if (first != last) {
+                operator+=(*first++); // whether a root dir or a name we end up with the correct path type
+            }
+        }
+    }
+    while(first != last) {
+        operator/=(*first++);
+    }
 }
 
 // modify //

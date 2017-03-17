@@ -715,6 +715,37 @@ TEST_CASE("filesystem_path") {
         }
     }
     
+    WHEN("constructing from a path range") {
+        auto p = path{PS_TEXT("/a/b/c")}.make_preferred();
+        CHECK(path(p.begin(), p.end()) == p);
+        
+        p = path{PS_TEXT("/a/b/c/")}.make_preferred();
+        CHECK(path(p.begin(), p.end()) == p/PS_TEXT("."));
+        
+        p = path{PS_TEXT("a/b.txt")}.make_preferred();
+        CHECK(path(p.begin(), p.end()) == p);
+        
+        if (win32Paths) {
+            p = PS_TEXT(R"(\\?\C:\folder\item.txt)");
+            CHECK(path(p.begin(), p.end()) == p);
+            
+            p = PS_TEXT(R"(C:\folder)");
+            CHECK(path(p.begin(), p.end()) == p);
+            
+            p = PS_TEXT(R"(C:folder)");
+            CHECK(path(p.begin(), p.end()) == p);
+            
+            p = PS_TEXT(R"(\\?\C:folder)");
+            CHECK(path(p.begin(), p.end()) == p);
+            
+            p = PS_TEXT(R"(C:\)");
+            CHECK(path(p.begin(), p.end()) == p);
+            
+            p = PS_TEXT(R"(C:)");
+            CHECK(path(p.begin(), p.end()) == p);
+        }
+    }
+    
     if (win32Paths) { SECTION("windows iteration") {
         const path::string_type separator{path::preferred_separator};
         path p {PS_TEXT(R"(\\server\folder\item.txt)")};
