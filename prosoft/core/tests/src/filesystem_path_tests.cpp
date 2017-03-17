@@ -703,7 +703,7 @@ TEST_CASE("filesystem_path") {
         WHEN("iterating a corner case path") {
             p = path{PS_TEXT("/a/b/c/./")}.make_preferred();
             i = p.end();
-            THEN("tail path components are found, but incremeenting to the end beahves unexpectedly") {
+            THEN("tail path components are found, but incrementing to the end behaves unexpectedly") {
                 CHECK((*i).empty());
                 CHECK((*--i).native() == PS_TEXT("."));
                 CHECK((*--i).native() == PS_TEXT("."));

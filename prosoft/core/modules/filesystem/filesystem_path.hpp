@@ -754,8 +754,7 @@ inline basic_path<String>& basic_path<String>::replace_filename(const basic_path
 }
 
 template <class String>
-basic_path<String>& basic_path<String>::replace_extension(const basic_path& e) // replacement
-{
+basic_path<String>& basic_path<String>::replace_extension(const basic_path& e) { // replacement
     const auto basename = stem();
     remove_filename();
     operator/=(basename);
@@ -1006,7 +1005,6 @@ basic_path<String> basic_path<String>::filename() const {
 }
 
 namespace ifilesystem {
-
 template <class String>
 typename String::size_type find_extension(const String& s) {
     const auto dot = PS_TEXT(".");
@@ -1017,7 +1015,7 @@ typename String::size_type find_extension(const String& s) {
     }
     return string_type::npos;
 }
-}
+} // ifilesystem
 
 template <class String>
 basic_path<String> basic_path<String>::stem() const {
