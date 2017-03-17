@@ -1630,11 +1630,9 @@ TEST_CASE("filesystem_path") {
             
             CHECK(p.lexically_relative(p2) == path(PS_TEXT("../../d")).make_preferred());
             CHECK(p.lexically_proximate(p2) == path(PS_TEXT("../../d")).make_preferred());
-            CHECK(p.lexically_relative(p2, path::lex_opt_baseless) == path(PS_TEXT("d")).make_preferred());
             
             CHECK(p2.lexically_relative(p) == path(PS_TEXT("../b/c")).make_preferred());
             CHECK(p2.lexically_proximate(p) == path(PS_TEXT("../b/c")).make_preferred());
-            CHECK(p2.lexically_relative(p, path::lex_opt_baseless) == path(PS_TEXT("b/c")).make_preferred());
             
             CHECK(p.lexically_relative(p) == path(path::dot));
             CHECK(p.lexically_proximate(p) == path(path::dot));

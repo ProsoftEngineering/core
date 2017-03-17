@@ -179,14 +179,10 @@ public:
     basic_path stem() const;
     basic_path extension() const;
     
-    enum lex_opt {
-        lex_opt_none = 0,
-        lex_opt_baseless = 0x1 // don't add ".." components
-    }; // Extension
-    PS_WARN_UNUSED_RESULT basic_path lexically_relative(const basic_path&, lex_opt opt = lex_opt_none) const;
+    PS_WARN_UNUSED_RESULT basic_path lexically_relative(const basic_path&) const;
     
-    PS_WARN_UNUSED_RESULT basic_path lexically_proximate(const basic_path& p, lex_opt opt = lex_opt_none) const {
-        auto np = lexically_relative(p, opt);
+    PS_WARN_UNUSED_RESULT basic_path lexically_proximate(const basic_path& p) const {
+        auto np = lexically_relative(p);
         if (np.empty()) {
             np = *this;
         }
@@ -1058,7 +1054,7 @@ basic_path<String> basic_path<String>::extension() const {
 }
 
 template <class String>
-basic_path<String> basic_path<String>::lexically_relative(const basic_path& base, lex_opt opt) const {
+basic_path<String> basic_path<String>::lexically_relative(const basic_path& base) const {
     // This form of mismatch in std:: requires C++14 (GCC 4.9+)
     static auto mismatch = [](iterator f1, iterator l1, iterator f2, iterator l2) {
         while (f1 != l1 && f2 != l2 && *f1 == *f2) {
@@ -1079,14 +1075,12 @@ basic_path<String> basic_path<String>::lexically_relative(const basic_path& base
         return {dot};
     } else {
         basic_path np;
-        if (0 == (opt & lex_opt_baseless)) {
-            iterator i{std::move(r.second)};
-            while(i++ != blast) {
-                np /= PS_TEXT("..");
-            }
+        iterator i{std::move(r.second)};
+        while(i++ != blast) {
+            np /= PS_TEXT("..");
         }
         
-        iterator i{std::move(r.first)};
+        i = std::move(r.first);
         while(i != last) {
             np /= *i++;
         }
