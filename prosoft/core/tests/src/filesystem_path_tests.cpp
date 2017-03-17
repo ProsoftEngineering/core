@@ -1624,7 +1624,7 @@ TEST_CASE("filesystem_path") {
             CHECK(p.lexically_proximate(base).empty());
         }
         
-        WHEN("path is absolute") {
+        WHEN("path is posix absolute") {
             const auto p = path{PS_TEXT("/a/d")}.make_preferred();
             const auto p2 = path{PS_TEXT("/a/b/c")}.make_preferred();
             
@@ -1672,12 +1672,12 @@ TEST_CASE("filesystem_path") {
             if (win32Paths) {
                 const auto wp = path{PS_TEXT("C:a")};
                 base = path{PS_TEXT("C:a\\b\\c")};
-                CHECK(p.lexically_relative(base) == path(PS_TEXT("..\\..")));
+                CHECK(wp.lexically_relative(base) == path(PS_TEXT("..\\..")));
                 CHECK(base.lexically_relative(wp) == path(PS_TEXT("b\\c")));
                 
                 base = path{PS_TEXT("D:a")};
-                CHECK(p.lexically_relative(base).empty());
-                CHECK(p.lexically_proximate(base) == p);
+                CHECK(wp.lexically_relative(base).empty());
+                CHECK(wp.lexically_proximate(base) == wp);
             }
         }
     }
