@@ -27,7 +27,6 @@
 #define PS_CORE_WIN_TOKEN_UTILS_HPP
 
 #include <prosoft/core/config/config.h>
-#include <prosoft/core/config/config_windows.h>
 #include <windows.h>
 
 #include <system_error>

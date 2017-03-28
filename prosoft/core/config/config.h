@@ -1,4 +1,4 @@
-// Copyright © 2015, Prosoft Engineering, Inc. (A.K.A "Prosoft")
+// Copyright © 2015-2017, Prosoft Engineering, Inc. (A.K.A "Prosoft")
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without
@@ -28,12 +28,11 @@
 #ifndef PS_CORE_CONFIG_H
 
 #include <prosoft/core/config/config_compiler.h>
-#include <prosoft/core/config/config_stdlib.h>
 #include <prosoft/core/config/config_cpp.h>
+#include <prosoft/core/config/config_platform.h> // must be included before "lib" headers that may bring in system headers
+#include <prosoft/core/config/config_stdlib.h>
 #include <prosoft/core/config/config_cpp_except.h>
 #include <prosoft/core/config/config_cpp_util.h>
 #include <prosoft/core/config/config_assert.h>
-
-#include <prosoft/core/config/config_platform.h>
 
 #endif // PS_CORE_CONFIG_H

@@ -28,6 +28,8 @@
 #ifndef PS_CORE_FILESYSTEM_HPP
 #define PS_CORE_FILESYSTEM_HPP
 
+#include <prosoft/core/config/config_platform.h>
+
 #include <chrono>
 #include <functional>
 #include <iomanip>

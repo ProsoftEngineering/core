@@ -26,18 +26,18 @@
 #ifndef PS_WINUTILS_HPP
 #define PS_WINUTILS_HPP
 
-#include <type_traits>
+#include <prosoft/core/config/config_platform.h>
 
 #if _WIN32
 #include <iosfwd>
 #include <cstring>
 #include <sstream>
 #include <system_error>
-
-#include <prosoft/core/include/stream_utils.hpp>
+#include <type_traits>
 
 #include <prosoft/core/config/config.h>
-#include <prosoft/core/config/config_windows.h>
+#include <prosoft/core/include/stream_utils.hpp>
+
 #include <windows.h>
 
 namespace prosoft {

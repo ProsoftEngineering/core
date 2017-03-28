@@ -1,4 +1,4 @@
-// Copyright © 2015-2016, Prosoft Engineering, Inc. (A.K.A "Prosoft")
+// Copyright © 2015-2017, Prosoft Engineering, Inc. (A.K.A "Prosoft")
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without
@@ -23,6 +23,7 @@
 // (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
+#include <prosoft/core/config/config_platform.h>
 #include <filesystem/path_utils.hpp>
 #include <string/string_types.hpp>
 #include <u8string/u8string.hpp>

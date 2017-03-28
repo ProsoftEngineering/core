@@ -1,4 +1,4 @@
-// Copyright © 2015-2016, Prosoft Engineering, Inc. (A.K.A "Prosoft")
+// Copyright © 2015-2017, Prosoft Engineering, Inc. (A.K.A "Prosoft")
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without
@@ -26,12 +26,11 @@
 #ifndef PS_CORE_SYSTEM_ERROR_HPP
 #define PS_CORE_SYSTEM_ERROR_HPP
 
+#include <prosoft/core/config/config_platform.h>
+
 #include <system_error>
 
-#include <prosoft/core/config/config.h>
-
 #if _WIN32
-#include <prosoft/core/config/config_windows.h>
 #include <windows.h>
 #endif
 
