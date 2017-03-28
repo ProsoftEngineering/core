@@ -615,9 +615,9 @@ class snapshot_error_category : public std::error_category {
                 return "VSS component is in an invalid state.";
             break;
 
-            // VSS_E_UNEXPECTED, usually means that a VSS writer is in somme state other than "Stable". Use vssadmin list writers to check.
+            // VSS_E_UNEXPECTED, usually means that a VSS writer is in some state other than "Stable". Use vssadmin list writers to check.
             // In particular, the 'System Writer' and 'MSSearch Service Writer' writers may get into a "waiting for commpletion" state and prevent snapshots.
-            // In may be possible to recover from this particular scenerio with the following (from an Admin shell):
+            // It may be possible to recover from this particular scenerio with the following (from an Admin shell):
             /*
             net stop vss
             net stop CryptSvc
