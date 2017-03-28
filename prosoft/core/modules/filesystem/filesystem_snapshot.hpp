@@ -27,7 +27,8 @@
 #define PS_CORE_FILESYSTEM_SNAPSHOT_HPP
 
 // XXX: Windows snapshots require a 32bit OS for 32bit apps. WOW64 is not supported.
-#define PS_HAVE_FILESYSTEM_SNAPSHOT _WIN32
+// Mingw spits out warnings that the VSS COM API "has not been verified". In addition, ATL is not available.
+#define PS_HAVE_FILESYSTEM_SNAPSHOT _WIN32 && !__MINGW32__
 
 #if PS_HAVE_FILESYSTEM_SNAPSHOT
 

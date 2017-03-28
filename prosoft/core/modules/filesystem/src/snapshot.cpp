@@ -23,7 +23,9 @@
 // (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#if _WIN32
+#include <prosoft/core/config/config_platform.h>
+
+#if _WIN32 && !__MINGW32__
 #include <algorithm>
 #include <sstream>
 #include <utility>
