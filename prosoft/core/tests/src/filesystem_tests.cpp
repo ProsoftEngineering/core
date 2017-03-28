@@ -519,7 +519,7 @@ TEST_CASE("filesystem") {
         const auto lnk = root / PS_TEXT("lnk");
 
         static auto noerr_or_win32_denied = [](const error_code& e) {
- #if !WIN32
+ #if !_WIN32
             return !e;
  #else
             return !e || e.value() == ERROR_PRIVILEGE_NOT_HELD;
