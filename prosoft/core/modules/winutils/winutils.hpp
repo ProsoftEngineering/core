@@ -30,6 +30,7 @@
 
 #if _WIN32
 #include <iosfwd>
+#include <iomanip>
 #include <cstring>
 #include <sstream>
 #include <system_error>
