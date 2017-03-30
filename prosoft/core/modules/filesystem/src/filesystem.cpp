@@ -1,4 +1,4 @@
-// Copyright © 2015-2016, Prosoft Engineering, Inc. (A.K.A "Prosoft")
+// Copyright © 2015-2017, Prosoft Engineering, Inc. (A.K.A "Prosoft")
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without
@@ -308,26 +308,38 @@ private:
     }
 };
 
+// System clock wraps GetSystemTimeAsFileTime, so ticks are 100ns intervals.
+static_assert(file_time_type::clock::period::den == 10000000LL, "Broken assumption");
+using clock_tick = file_time_type::clock::duration;
+constexpr clock_tick filetime_epoch_to_utc_offset{116444736000000000LL};
+
+inline FILETIME to_filetime(const clock_tick& t) {
+    return FILETIME{static_cast<DWORD>(t.count()), static_cast<DWORD>(t.count()>>32)};
+}
+
+inline clock_tick to_clocktick(const FILETIME& ft) {
+    return clock_tick{ static_cast<long long>(ft.dwLowDateTime) | (static_cast<long long>(ft.dwHighDateTime)<<32) };
+}
+
+inline clock_tick to_utc(const FILETIME& ft) {
+    return to_clocktick(ft) - filetime_epoch_to_utc_offset;
+}
+
+inline FILETIME from_utc(const clock_tick& t) {
+    return to_filetime(t + filetime_epoch_to_utc_offset);
+}
+
 struct to_times {
     file_time_type from(const ::FILETIME& ft) {
-        ::SYSTEMTIME st;
-        if ((ft.dwLowDateTime > 0 || ft.dwHighDateTime > 0) && ::FileTimeToSystemTime(&ft, &st)) {
-            struct tm tmt;
-            tmt.tm_year = st.wYear - 1900;
-            tmt.tm_mon = st.wMonth - 1;
-            tmt.tm_mday = st.wDay;
-            tmt.tm_hour = st.wHour;
-            tmt.tm_min = st.wMinute;
-            tmt.tm_sec = st.wSecond;
-            tmt.tm_wday = 0;
-            tmt.tm_yday = 0;
-            tmt.tm_isdst = -1;
-            using namespace std::chrono;
-            using clock = file_time_type::clock;
-            return file_time_type{clock::from_time_t(::mktime(&tmt)).time_since_epoch() + duration_cast<clock::duration>(milliseconds{st.wMilliseconds})};
+        if ((ft.dwLowDateTime > 0 || ft.dwHighDateTime > 0)) { // Assuming FILETIME epoch.
+            return file_time_type{to_utc(ft)};
         } else {
             return times::make_invalid();
         }
+    }
+
+    ::FILETIME to_filetime(const file_time_type& t) {
+        return from_utc(t.time_since_epoch());
     }
 
     times operator()(const path& p, error_code& ec) {
@@ -510,9 +522,16 @@ void last_write_time(const path& p, file_time_type t, error_code& ec) noexcept {
         ec = system::system_error();
     }
 #else
-    (void)p;
-    (void)t;
-    ec = error_code(ERROR_NOT_SUPPORTED, std::system_category());
+    if (auto h = ifilesystem::open(p, FILE_WRITE_ATTRIBUTES, FILE_SHARE_WRITE, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, ec)) {
+        const auto ft = to_times{}.to_filetime(t);
+        if (SetFileTime(h.get(), nullptr, nullptr, &ft)) {
+            ec.clear();
+        } else {
+            system::system_error(ec);
+        }
+    } else {
+        system::system_error(ec);
+    }
 #endif
 }
 
@@ -612,6 +631,30 @@ TEST_CASE("filesystem_internal") {
     CHECK(val.tv_sec == 0);
     CHECK(val.tv_nsec == 10000000);
 #else
+    constexpr auto offset_low = (DWORD)filetime_epoch_to_utc_offset.count();
+    constexpr auto offset_high = (DWORD)(filetime_epoch_to_utc_offset.count()>>32);
+
+    auto ft = to_times{}.to_filetime(file_time_type{});
+    CHECK(ft.dwLowDateTime == offset_low);
+    CHECK(ft.dwHighDateTime == offset_high);
+
+    auto utc = to_times{}.from(ft);
+    CHECK(utc.time_since_epoch() == clock_tick());
+
+    using namespace std::chrono;
+    ft = to_times{}.to_filetime(file_time_type{duration_cast<file_time_type::duration>(seconds(1))});
+    CHECK(ft.dwLowDateTime == offset_low + duration_cast<clock_tick>(seconds(1)).count());
+    CHECK(ft.dwHighDateTime == offset_high);
+
+    utc = to_times{}.from(ft);
+    CHECK(utc.time_since_epoch() == duration_cast<clock_tick>(seconds(1)));
+    
+    ft = to_times{}.to_filetime(file_time_type{duration_cast<file_time_type::duration>(milliseconds(10))});
+    CHECK(ft.dwLowDateTime == offset_low + duration_cast<clock_tick>(milliseconds(10)).count());
+    CHECK(ft.dwHighDateTime == offset_high);
+
+    utc = to_times{}.from(ft);
+    CHECK(utc.time_since_epoch() == duration_cast<clock_tick>(milliseconds(10)));
 #endif
     }
 }

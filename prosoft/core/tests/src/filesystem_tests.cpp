@@ -194,12 +194,8 @@ TEST_CASE("filesystem") {
         using namespace std::chrono;
         const auto now = std::chrono::system_clock::now();
         const auto t = now - duration_cast<file_time_type::duration>(seconds(3600));
-#if !_WIN32
         CHECK_NOTHROW(last_write_time(p, t));
         CHECK(last_write_time(p) < now);
-#else
-        CHECK_THROWS(last_write_time(p, t)); // not implemented yet
-#endif
         
         REQUIRE(remove(p));
     }
