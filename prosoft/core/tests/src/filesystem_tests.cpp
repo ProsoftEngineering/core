@@ -340,10 +340,8 @@ TEST_CASE("filesystem") {
 
     WHEN("path is empty") {
         const auto cur = current_path();
-#if !_WIN32
-        CHECK_THROWS(canonical(path()));
-        CHECK_THROWS(weakly_canonical(path()));
-#endif
+        CHECK_NOTHROW(canonical(path()));
+        CHECK_NOTHROW(weakly_canonical(path()));
         CHECK(absolute(path()) == cur);
         CHECK(system_complete(path()) == cur);
 
