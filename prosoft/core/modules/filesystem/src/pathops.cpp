@@ -35,6 +35,7 @@
 #include "filesystem.hpp"
 #include "filesystem_private.hpp"
 
+#include <string/string_component.hpp>
 #include <unique_resource.hpp>
 
 namespace {
@@ -98,6 +99,15 @@ template<>
 inline wchar_t* fullpath<wchar_t>(const wchar_t* p) {
     return ::_wfullpath(nullptr, p, 0);
 }
+
+// XXX: extended-length paths must be sanitized as Win32 normalization is not performed.
+void extended_length(path& p) {
+    PSASSERT(p.is_absolute(), "Broken assumption");
+    auto&& prefix = ifilesystem::unc_prefix_raw<path::string_type>();
+    if (p.native().size() >= MAX_PATH && !prosoft::starts_with(p.native(), prefix)) {
+        p = path{prefix + p.native()};
+    }
+}
 #endif
 
 path shell_expansion(const path& p, error_code& ec) { // returns empty if no expansion (to avoid an unnecessary copy
@@ -157,9 +167,11 @@ path canonical(const path& rp, const path& base, error_code& ec) {
     auto sp = sanitize(p.native(), path::preferred_separator_style);
     unique_malloc<path::encoding_value_type> tmp{fullpath(sp.c_str())};
     if (tmp) {
-        return {tmp.get()};
+        ep = path{tmp.get()};
+        extended_length(ep);
+        return ep;
     } else {
-        return sp;
+        return path{std::move(sp)};
     }
 #endif
 }

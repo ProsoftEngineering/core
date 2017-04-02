@@ -369,6 +369,16 @@ TEST_CASE("filesystem") {
         CHECK(absolute(p) == p.root_name() / cur.relative_path() / p.relative_path());
         CHECK(system_complete(p) == p.root_name() / p.relative_path());
     }
+
+    WHEN("path is >= than MAX_PATH") {
+        path::string_type s;
+        std::generate_n(std::back_inserter(s), MAX_PATH, [](){return L'a';});
+        using namespace prosoft::filesystem;
+        const path base{L"C:\\"};
+        const path prefix{LR"(\\?\)"};
+        CHECK(canonical(s, base) == prefix / base / s); // relative
+        CHECK(canonical(base / s) ==  prefix / base / s); // absolute
+    }
 #endif
 
     WHEN("getting the home dir") {

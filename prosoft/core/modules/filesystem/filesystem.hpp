@@ -433,6 +433,7 @@ path system_complete(const path&, error_code&);
 #endif
 
 // As an extension, canonical will expand an initial '~' char to home_directory_path().
+// As an extension for WIN32, canonical will create extended-length paths for a path that is >= MAX_PATH.
 path canonical(const path&, const path& base = current_path());
 path canonical(const path&, const path& base, error_code&);
 inline path canonical(const path& p, error_code& ec) {
