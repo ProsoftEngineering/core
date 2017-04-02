@@ -129,6 +129,11 @@ path canonical(const path& rp, const path& base, error_code& ec) {
     if (ec.value()) {
         return {rp};
     }
+    
+    if (ep.empty() && !rp.is_absolute()) {
+        ep = absolute(rp, base);
+    }
+
     const path& p = !ep.empty() ? ep : rp;
     
 #if !_WIN32
@@ -138,11 +143,9 @@ path canonical(const path& rp, const path& base, error_code& ec) {
     if (resolved) {
         return {resolved.get()};
     } else if (ENOENT == errno && p != rootp) {
-        auto parent = p.parent_path(); // attempt to resolve parents
+        const auto parent = p.parent_path(); // attempt to resolve parents
         if (!parent.empty()) {
             return canonical(parent, ec) / p.filename();
-        } else if (!p.empty() && !base.empty()) { // add the base -- XXX: this assumes that path is a relative leaf with no separators and thus no recursion was performed
-            return base / p;
         } else {
             ifilesystem::error(ENOENT, ec);
         }

@@ -300,7 +300,7 @@ TEST_CASE("filesystem") {
 
     WHEN("resolving a relative path") {
         const auto base = current_path();
-        const auto p = uniqueName;
+        const auto& p = uniqueName;
         CHECK(canonical(p) == base / p);
         CHECK(weakly_canonical(p) == base / p);
         CHECK(absolute(p) == base / p);
@@ -329,6 +329,13 @@ TEST_CASE("filesystem") {
         CHECK(weakly_canonical(tilde) == home);
         const auto subp = path{PS_TEXT("a/b/c/d")}.make_preferred();
         CHECK(canonical(tilde / subp) == home / subp);
+    }
+
+    WHEN("resolving a relative path with a specified base") {
+        const auto base = mount_path(temp_directory_path());
+        const auto& p = uniqueName;
+        CHECK(canonical(p, base) == base / p);
+        CHECK(absolute(p, base) == base / p);
     }
 
     WHEN("path is empty") {
