@@ -1,4 +1,4 @@
-// Copyright © 2013-2015, Prosoft Engineering, Inc. (A.K.A "Prosoft")
+// Copyright © 2013-2017, Prosoft Engineering, Inc. (A.K.A "Prosoft")
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without
@@ -35,11 +35,15 @@ namespace prosoft {
 #if !_WIN32
 using native_string_type = std::string;
 using u16string = std::u16string;
+
+class u8string; // forward
+using unicode_string_type = u8string;
 #else
 using native_string_type = std::wstring;
 // Define as std::wstring for ease of use with Win unicode APIs expecting whcar_t*.
 static_assert(sizeof(wchar_t) == sizeof(char16_t), "Broken assumption");
 using u16string = native_string_type;
+using unicode_string_type = native_string_type;
 #endif
 
 using u32string = std::u32string;
