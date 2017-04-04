@@ -523,9 +523,6 @@ TEST_CASE("filesystem") {
 
     SECTION("symlink") {
         const auto root = temp_directory_path() / PS_TEXT("fs17test");
-        error_code ec;
-        create_directory(root, ec);
-        REQUIRE(exists(root, ec));
 
         const auto lnk = root / PS_TEXT("lnk");
 
@@ -536,6 +533,15 @@ TEST_CASE("filesystem") {
             return !e || e.value() == ERROR_PRIVILEGE_NOT_HELD;
  #endif
         };
+        
+        error_code ec;
+        // Attempting to RAII_remove each time through results in weird win32 isues where the root dir can end up with an empty DACL and thus no rights.
+        // So we'll do a setup/cleanup stage.
+        SECTION("setup") {
+            create_directory(root, ec);
+            std::cout << "Created symlink test dir\n";
+            REQUIRE(exists(root, ec));
+        }
 
         WHEN("creating a symlink to a file") {
             const auto f  = create_file(root / PS_TEXT("file"));
@@ -581,7 +587,7 @@ TEST_CASE("filesystem") {
             }
         }
 
-        WHEN("cleanup") { // Attempting to RAII_remove each time through results in weird win32 isues where the root dir can end up with an empty DACL and thus no rights.
+        SECTION("cleanup") {
             REQUIRE(remove(root, ec));
         }
     } // symlink
