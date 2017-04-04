@@ -308,9 +308,14 @@ private:
     }
 };
 
-// System clock wraps GetSystemTimeAsFileTime, so ticks are 100ns intervals.
+#ifndef __MINGW32__
+// MSVC: std:: clock wraps GetSystemTimeAsFileTime, so ticks are 100ns intervals.
 static_assert(file_time_type::clock::period::den == 10000000LL, "Broken assumption");
 using clock_tick = file_time_type::clock::duration;
+#else
+static_assert(file_time_type::clock::period::den != 10000000LL, "Broken assumption");
+using clock_tick = std::chrono::duration<long long, std::ratio<1LL, 10000000LL>>;
+#endif
 constexpr clock_tick filetime_epoch_to_utc_offset{116444736000000000LL};
 
 inline FILETIME to_filetime(const clock_tick& t) {
@@ -321,13 +326,27 @@ inline clock_tick to_clocktick(const FILETIME& ft) {
     return clock_tick{ static_cast<long long>(ft.dwLowDateTime) | (static_cast<long long>(ft.dwHighDateTime)<<32) };
 }
 
-inline clock_tick to_utc(const FILETIME& ft) {
-    return to_clocktick(ft) - filetime_epoch_to_utc_offset;
+inline file_time_type::clock::duration to_utc(const FILETIME& ft) {
+    return
+#if __MINGW__
+    std::chrono::duration_cast<file_time_type::clock::duration>(
+#endif
+    to_clocktick(ft) - filetime_epoch_to_utc_offset
+#if __MINGW__
+    )
+#endif
+    ;
 }
 
 inline FILETIME from_utc(const clock_tick& t) {
     return to_filetime(t + filetime_epoch_to_utc_offset);
 }
+
+#ifdef __MINGW32__
+inline FILETIME from_utc(const file_time_type::clock::duration& t) {
+    return to_filetime(std::chrono::duration_cast<clock_tick>(t) + filetime_epoch_to_utc_offset);
+}
+#endif
 
 struct to_times {
     file_time_type from(const ::FILETIME& ft) {
@@ -633,13 +652,15 @@ TEST_CASE("filesystem_internal") {
 #else
     constexpr auto offset_low = (DWORD)filetime_epoch_to_utc_offset.count();
     constexpr auto offset_high = (DWORD)(filetime_epoch_to_utc_offset.count()>>32);
-
+    
+    using ft_duration = file_time_type::clock::duration;
+    
     auto ft = to_times{}.to_filetime(file_time_type{});
     CHECK(ft.dwLowDateTime == offset_low);
     CHECK(ft.dwHighDateTime == offset_high);
 
     auto utc = to_times{}.from(ft);
-    CHECK(utc.time_since_epoch() == clock_tick());
+    CHECK(utc.time_since_epoch() == ft_duration());
 
     using namespace std::chrono;
     ft = to_times{}.to_filetime(file_time_type{duration_cast<file_time_type::duration>(seconds(1))});
@@ -647,14 +668,14 @@ TEST_CASE("filesystem_internal") {
     CHECK(ft.dwHighDateTime == offset_high);
 
     utc = to_times{}.from(ft);
-    CHECK(utc.time_since_epoch() == duration_cast<clock_tick>(seconds(1)));
+    CHECK(utc.time_since_epoch() == duration_cast<ft_duration>(seconds(1)));
     
     ft = to_times{}.to_filetime(file_time_type{duration_cast<file_time_type::duration>(milliseconds(10))});
     CHECK(ft.dwLowDateTime == offset_low + duration_cast<clock_tick>(milliseconds(10)).count());
     CHECK(ft.dwHighDateTime == offset_high);
 
     utc = to_times{}.from(ft);
-    CHECK(utc.time_since_epoch() == duration_cast<clock_tick>(milliseconds(10)));
+    CHECK(utc.time_since_epoch() == duration_cast<ft_duration>(milliseconds(10)));
 #endif
     }
 }
