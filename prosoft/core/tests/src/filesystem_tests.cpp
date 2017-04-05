@@ -539,7 +539,6 @@ TEST_CASE("filesystem") {
         // So we'll do a setup/cleanup stage.
         SECTION("setup") {
             create_directory(root, ec);
-            std::cout << "Created symlink test dir\n";
             REQUIRE(exists(root, ec));
         }
 
