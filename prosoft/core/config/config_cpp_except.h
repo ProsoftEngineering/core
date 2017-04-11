@@ -1,4 +1,4 @@
-// Copyright © 2013-2015, Prosoft Engineering, Inc. (A.K.A "Prosoft")
+// Copyright © 2013-2017, Prosoft Engineering, Inc. (A.K.A "Prosoft")
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without
@@ -30,10 +30,17 @@
 #error "missing config_cpp"
 #endif
 
+#define PS_STRINGIFY__(L) #L
+#define PS_STRINGIFY_(L) PS_STRINGIFY__(L)
+
+#define PS_LINE_STR PS_STRINGIFY_(__LINE__)
+
 #if defined(__cplusplus)
 
 #include <iostream>
 #include <stdexcept>
+
+// Function/File names are not included in exceptions as they can bloat the binary and expose private info.
 
 namespace prosoft {
 inline void log_exception(int line) {
@@ -70,7 +77,8 @@ inline void log_exception(const std::exception& ex, int line) {
             throw ex__;                \
         }                              \
     } while (0)
-#define PS_THROW_IF_NULLPTR(p_) PS_THROW_IF(nullptr == p_, std::runtime_error("NULL!"))
+
+#define PS_THROW_IF_NULLPTR(p_) PS_THROW_IF(nullptr == p_, std::runtime_error("NULL @ " PS_LINE_STR "!"))
 
 #endif // __cplusplus
 
