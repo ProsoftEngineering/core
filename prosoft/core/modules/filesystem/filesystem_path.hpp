@@ -81,8 +81,8 @@ public:
         :  m_pathname(p) {}
     basic_path(typename std::remove_const<typename std::remove_pointer<const_pointer>::type>::type* p)
         :  m_pathname(p) {}
-    template <typename = typename std::enable_if<!std::is_same<value_type, encoding_value_type>::value>>
-    basic_path(encoding_value_type v)
+    template <typename T = void>
+    basic_path(encoding_value_type v, typename std::enable_if<!std::is_same<value_type, encoding_value_type>::value, T>::type* = 0)
         :  m_pathname(&v, 1) {}
     /*
     template <class Source>
