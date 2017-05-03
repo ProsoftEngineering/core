@@ -1618,12 +1618,15 @@ TEST_CASE("filesystem_path") {
             path base{PS_TEXT("")};
             CHECK(p.lexically_relative(base).empty());
             CHECK(p.lexically_proximate(base).empty());
+            CHECK(p.lexically_detached(base).empty());
             base = path{PS_TEXT("/a/b/c")}.make_preferred();
             CHECK(p.lexically_relative(base).empty());
             CHECK(p.lexically_proximate(base).empty());
+            CHECK(p.lexically_detached(base).empty());
             base = path{PS_TEXT("b/c")}.make_preferred();
             CHECK(p.lexically_relative(base).empty());
             CHECK(p.lexically_proximate(base).empty());
+            CHECK(p.lexically_detached(base).empty());
         }
         
         WHEN("path is posix absolute") {
@@ -1632,22 +1635,29 @@ TEST_CASE("filesystem_path") {
             
             CHECK(p.lexically_relative(p2) == path(PS_TEXT("../../d")).make_preferred());
             CHECK(p.lexically_proximate(p2) == path(PS_TEXT("../../d")).make_preferred());
+            CHECK(p.lexically_detached(p2) == path(PS_TEXT("d")).make_preferred());
             
             CHECK(p2.lexically_relative(p) == path(PS_TEXT("../b/c")).make_preferred());
             CHECK(p2.lexically_proximate(p) == path(PS_TEXT("../b/c")).make_preferred());
+            CHECK(p2.lexically_detached(p) == path(PS_TEXT("b/c")).make_preferred());
             
             CHECK(p.lexically_relative(p) == path(path::dot));
             CHECK(p.lexically_proximate(p) == path(path::dot));
+            CHECK(p.lexically_detached(p) == path(path::dot));
             CHECK(p2.lexically_relative(p2) == path(path::dot));
+            CHECK(p2.lexically_detached(p2) == path(path::dot));
             
             auto p3 = path{PS_TEXT("/z/x/y")}.make_preferred();
             CHECK(p.lexically_relative(p3) == path(PS_TEXT("../../../a/d")).make_preferred());
+            CHECK(p.lexically_detached(p3) == path(PS_TEXT("a/d")).make_preferred());
             CHECK(p3.lexically_relative(p) == path(PS_TEXT("../../z/x/y")).make_preferred());
+            CHECK(p3.lexically_detached(p) == path(PS_TEXT("z/x/y")).make_preferred());
             
             p3 = path{++p3.begin(), p3.end()};
             CHECK(p3.is_relative());
             CHECK(p.lexically_relative(p3).empty());
             CHECK(p.lexically_proximate(p3) == p);
+            CHECK(p.lexically_detached(p3).empty());
             
         }
         
@@ -1656,27 +1666,35 @@ TEST_CASE("filesystem_path") {
             auto base = path{PS_TEXT("a")};
             CHECK(p.lexically_relative(base) == path(PS_TEXT("b/c")).make_preferred());
             CHECK(p.lexically_proximate(base) == path(PS_TEXT("b/c")).make_preferred());
+            CHECK(p.lexically_detached(base) == path(PS_TEXT("b/c")).make_preferred());
             CHECK(p.lexically_relative(p) == path(path::dot));
+            CHECK(p.lexically_detached(p) == path(path::dot));
             
             base = path{PS_TEXT("/a")}.make_preferred();
             CHECK(p.lexically_relative(base).empty());
             CHECK(p.lexically_proximate(base) == p);
+            CHECK(p.lexically_detached(base).empty());
             
             base = path{PS_TEXT("c/d")};
             CHECK(p.lexically_relative(base).empty());
             CHECK(p.lexically_proximate(base) == p);
+            CHECK(p.lexically_detached(base).empty());
             
             base = path{PS_TEXT("a/b/c/x/y")}.make_preferred();
             CHECK(p.lexically_relative(base) == path(PS_TEXT("../..")).make_preferred());
+            CHECK(p.lexically_detached(base).empty());
             
             if (win32Paths) {
                 const auto wp = path{PS_TEXT("C:a")};
                 base = path{PS_TEXT("C:a\\b\\c")};
                 CHECK(wp.lexically_relative(base) == path(PS_TEXT("..\\..")));
+                CHECK(wp.lexically_detached(base).empty());
                 CHECK(base.lexically_relative(wp) == path(PS_TEXT("b\\c")));
+                CHECK(base.lexically_detached(wp) == path(PS_TEXT("b\\c")));
                 
                 base = path{PS_TEXT("D:a")};
                 CHECK(wp.lexically_relative(base).empty());
+                CHECK(wp.lexically_detached(base).empty());
                 CHECK(wp.lexically_proximate(base) == wp);
             }
         }

@@ -188,6 +188,8 @@ public:
         }
         return np;
     }
+    
+    PS_WARN_UNUSED_RESULT basic_path lexically_detached(const basic_path&) const; // extension -- remove all base components
 
     bool empty() const noexcept(noexcept(std::declval<string_type>().empty()));
     bool has_root_name() const;
@@ -210,6 +212,10 @@ public:
 
 private:
     string_type m_pathname;
+    
+    // This form of mismatch in std:: requires C++14 (GCC 4.9+)
+    using iterator_pair = std::pair<iterator,iterator>;
+    static iterator_pair mismatch(iterator, iterator, iterator, iterator);
 }; // path
 
 // statics
@@ -1054,16 +1060,16 @@ basic_path<String> basic_path<String>::extension() const {
 }
 
 template <class String>
+typename basic_path<String>::iterator_pair basic_path<String>::mismatch(iterator f1, iterator l1, iterator f2, iterator l2) {
+    while (f1 != l1 && f2 != l2 && *f1 == *f2) {
+        ++f1;
+        ++f2;
+    }
+    return std::make_pair(std::move(f1), std::move(f2));
+};
+
+template <class String>
 basic_path<String> basic_path<String>::lexically_relative(const basic_path& base) const {
-    // This form of mismatch in std:: requires C++14 (GCC 4.9+)
-    static auto mismatch = [](iterator f1, iterator l1, iterator f2, iterator l2) {
-        while (f1 != l1 && f2 != l2 && *f1 == *f2) {
-            ++f1;
-            ++f2;
-        }
-        return std::make_pair(std::move(f1), std::move(f2));
-    };
-    
     auto first = begin();
     auto last = end();
     auto bfirst = base.begin();
@@ -1080,6 +1086,29 @@ basic_path<String> basic_path<String>::lexically_relative(const basic_path& base
             np /= PS_TEXT("..");
         }
         
+        i = std::move(r.first);
+        while(i != last) {
+            np /= *i++;
+        }
+        return np;
+    }
+}
+
+template <class String>
+basic_path<String> basic_path<String>::lexically_detached(const basic_path& base) const {
+    auto first = begin();
+    auto last = end();
+    auto bfirst = base.begin();
+    auto blast = base.end();
+    auto r = mismatch(first, last, bfirst, blast);
+    if (r.first == first && r.second == bfirst) {
+        return {};
+    } else if (r.first == last && r.second == blast) {
+        return {dot};
+    } else {
+        basic_path np;
+        iterator i{std::move(r.second)};
+        while(i++ != blast) {}
         i = std::move(r.first);
         while(i != last) {
             np /= *i++;
