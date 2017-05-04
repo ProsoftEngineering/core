@@ -1,4 +1,4 @@
-// Copyright © 2015, Prosoft Engineering, Inc. (A.K.A "Prosoft")
+// Copyright © 2015-2017, Prosoft Engineering, Inc. (A.K.A "Prosoft")
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without
@@ -40,7 +40,7 @@ class to_string<std::string, u8string> {
 public:
     typedef std::string result_type;
     typedef u8string argument_type;
-    result_type operator()(const argument_type& us) {
+    const result_type& operator()(const argument_type& us) {
         return us.str();
     }
     
