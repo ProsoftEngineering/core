@@ -677,14 +677,14 @@ basic_iterator<Traits>& basic_iterator<Traits>::operator++() {
 template <class Traits>
 basic_iterator<Traits>::basic_iterator(const path& p, directory_options opts, configuration_type&& t) {
     error_code ec;
-    m_i = ifilesystem::make_iterator_state(p, ifilesystem::make_options<Traits>(opts), std::move(t), ec, traits_type{});
+    m_i = ifilesystem::make_iterator_state(p, ifilesystem::make_options<Traits>(opts), std::move(t), ec);
     PS_THROW_IF(ec.value() != 0, filesystem_error("Could not create dir iterator", p, ec));
     operator++();
 }
 
 template <class Traits>
 inline basic_iterator<Traits>::basic_iterator(const path& p, directory_options opts, configuration_type&& t, error_code& ec)
-    : m_i(ifilesystem::make_iterator_state(p, ifilesystem::make_options<Traits>(opts), std::move(t), ec, traits_type{})) {
+    : m_i(ifilesystem::make_iterator_state(p, ifilesystem::make_options<Traits>(opts), std::move(t), ec)) {
     increment(ec);
     clear_if_denied(ec);
 }

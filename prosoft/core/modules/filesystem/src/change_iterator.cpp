@@ -226,7 +226,7 @@ namespace filesystem {
 inline namespace v1 {
 
 ifilesystem::iterator_state_ptr
-ifilesystem::make_iterator_state(const path& p, directory_options opts, change_iterator_traits::configuration_type&& c, error_code& ec, change_iterator_traits) {
+ifilesystem::make_iterator_state(const path& p, directory_options opts, change_iterator_traits::configuration_type&& c, error_code& ec) {
     if (!is_set(opts & make_opts_required)) {
         ec = einval();
         return {};

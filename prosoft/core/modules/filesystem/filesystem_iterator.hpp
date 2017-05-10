@@ -201,18 +201,13 @@ struct recursive_iterator_traits {
 
 template <class Traits>
 struct is_recursive {
-    static constexpr bool value = is_set(Traits::not_supported & directory_options::skip_subdirectory_descendants);
+    static constexpr bool value = !is_set(Traits::required & directory_options::skip_subdirectory_descendants);
 };
 
 static_assert(!is_recursive<iterator_traits>::value, "WTF?");
 static_assert(is_recursive<recursive_iterator_traits>::value, "WTF?");
 
-iterator_state_ptr make_iterator_state(const path&, directory_options, iterator_traits::configuration_type, error_code&, iterator_traits);
-
-inline iterator_state_ptr
-make_iterator_state(const path& p, directory_options opts, recursive_iterator_traits::configuration_type, error_code& ec, recursive_iterator_traits) {
-    return make_iterator_state(p, opts, iterator_traits::configuration_type{}, ec, iterator_traits{});
-}
+iterator_state_ptr make_iterator_state(const path&, directory_options, null_iterator_config, error_code&);
 
 const error_code& permission_denied_error();
 

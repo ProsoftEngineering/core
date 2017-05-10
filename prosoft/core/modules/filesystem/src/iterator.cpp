@@ -551,7 +551,7 @@ namespace filesystem {
 inline namespace v1 {
 
 ifilesystem::iterator_state_ptr
-ifilesystem::make_iterator_state(const path& p, directory_options opts, iterator_traits::configuration_type, error_code& ec, iterator_traits) {
+ifilesystem::make_iterator_state(const path& p, directory_options opts, iterator_traits::configuration_type, error_code& ec) {
     auto s = std::make_shared<state<dir_ops>>(p, opts, ec);
     if (ec) {
         s.reset(); // null is the end iterator

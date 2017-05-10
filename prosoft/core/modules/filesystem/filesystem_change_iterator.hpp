@@ -88,7 +88,7 @@ struct change_iterator_traits {
     static std::vector<path> extract_paths(basic_iterator<change_iterator_traits>&);
 };
 
-iterator_state_ptr make_iterator_state(const path&, directory_options, change_iterator_traits::configuration_type&&, error_code&, change_iterator_traits);
+iterator_state_ptr make_iterator_state(const path&, directory_options, change_iterator_traits::configuration_type&&, error_code&);
 
 using change_iterator_t = basic_iterator<ifilesystem::change_iterator_traits>;
 
