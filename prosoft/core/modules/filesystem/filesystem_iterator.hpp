@@ -183,20 +183,20 @@ public:
 
 using iterator_state_ptr = std::shared_ptr<ifilesystem::iterator_state>;
 
-struct null_iterator_config {};
+struct iterator_config {};
 
 struct iterator_traits {
     static constexpr directory_options required = directory_options::skip_subdirectory_descendants;
     static constexpr directory_options not_supported = directory_options::include_postorder_directories;
     static constexpr directory_options defaults = required;
-    using configuration_type = null_iterator_config;
+    using configuration_type = iterator_config;
 };
 
 struct recursive_iterator_traits {
     static constexpr directory_options required = directory_options::none;
     static constexpr directory_options not_supported = directory_options::skip_subdirectory_descendants;
     static constexpr directory_options defaults = required;
-    using configuration_type = null_iterator_config;
+    using configuration_type = iterator_config;
 };
 
 template <class Traits>
@@ -207,7 +207,7 @@ struct is_recursive {
 static_assert(!is_recursive<iterator_traits>::value, "WTF?");
 static_assert(is_recursive<recursive_iterator_traits>::value, "WTF?");
 
-iterator_state_ptr make_iterator_state(const path&, directory_options, null_iterator_config, error_code&);
+iterator_state_ptr make_iterator_state(const path&, directory_options, iterator_config, error_code&);
 
 const error_code& permission_denied_error();
 
