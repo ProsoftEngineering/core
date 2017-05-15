@@ -53,7 +53,12 @@ FSEventStreamCreateFlags platform_flags(const fs::change_config& cfg) {
     constexpr fs::change_config cfg_default;
     static_assert(cfg_default.notification_latency > decltype(cfg_default.notification_latency){}, "Broken assumption");
     
-    return platform_flag_defaults | (cfg.reserved_flags & valid_reserved_flags_mask);
+    FSEventStreamCreateFlags clear_flags{};
+    if (cfg.notification_latency > cfg_default.notification_latency) {
+        clear_flags = kFSEventStreamCreateFlagNoDefer; // enable batch mode
+    }
+    
+    return (platform_flag_defaults & ~clear_flags) | (cfg.reserved_flags & valid_reserved_flags_mask);
 };
 
 struct fsevents_delete {
