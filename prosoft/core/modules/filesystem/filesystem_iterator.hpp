@@ -313,6 +313,42 @@ public:
     static constexpr directory_options default_options() {
         return Traits::defaults;
     }
+    
+private:
+    // Semi-private option to skip increment-on-init behavior.
+    template <typename, typename = void>
+    struct skip_init_increment : std::false_type {};
+    
+    template <typename... Args>
+    using void_t = void;
+    
+    template <class T>
+    struct skip_init_increment<T, void_t<typename std::is_integral<decltype(T::skip_init_increment)>::type>> : std::true_type {};
+    
+    template <class T, class Void>
+    using skip_init_increment_t = typename std::enable_if<skip_init_increment<T>::value, Void>::type;
+    
+    template <class T, class Void>
+    using do_init_increment_t = typename std::enable_if<!skip_init_increment<T>::value, Void>::type;
+    
+    template <typename Void = void>
+    void init_increment(error_code& ec, skip_init_increment_t<traits_type, Void>* = 0) {
+        ec.clear();
+    }
+    
+    template <typename Void = void>
+    constexpr void init_increment(skip_init_increment_t<traits_type, Void>* = 0) {
+    }
+    
+    template <typename Void = void>
+    void init_increment(error_code& ec, do_init_increment_t<traits_type, Void>* = 0) {
+        increment(ec);
+    }
+    
+    template <typename Void = void>
+    void init_increment(do_init_increment_t<traits_type, Void>* = 0) {
+        operator++();
+    }
 };
 
 template <class Traits>
