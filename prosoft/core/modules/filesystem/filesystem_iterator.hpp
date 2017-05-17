@@ -319,8 +319,13 @@ private:
     template <typename, typename = void>
     struct skip_init_increment : std::false_type {};
     
-    template <typename... Args>
-    using void_t = void;
+    // In C++11 unused template alias params were ignored for SFINAE.
+    // For C++14 this could be used instead: template <typename... Args> using void_t = void;
+    // GCC < 5 requires the more verbose definition.
+    template<typename... Args> struct make_void {
+        typedef void type;
+    };
+    template<typename... Args> using void_t = typename make_void<Args...>::type;
     
     template <class T>
     struct skip_init_increment<T, void_t<typename std::is_integral<decltype(T::skip_init_increment)>::type>> : std::true_type {};
@@ -349,6 +354,8 @@ private:
     void init_increment(do_init_increment_t<traits_type, Void>* = 0) {
         operator++();
     }
+    
+    static_assert(!skip_init_increment<ifilesystem::iterator_traits>::value, "WTF?");
 };
 
 template <class Traits>
