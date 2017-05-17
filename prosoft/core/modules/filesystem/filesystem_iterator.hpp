@@ -337,7 +337,7 @@ private:
     }
     
     template <typename Void = void>
-    constexpr void init_increment(skip_init_increment_t<traits_type, Void>* = 0) {
+    constexpr void init_increment(skip_init_increment_t<traits_type, Void>* = 0) const {
     }
     
     template <typename Void = void>
