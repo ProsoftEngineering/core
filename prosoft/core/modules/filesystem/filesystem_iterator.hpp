@@ -337,8 +337,7 @@ private:
     using do_init_increment_t = typename std::enable_if<!skip_init_increment<T>::value, Void>::type;
     
     template <typename Void = void>
-    void init_increment(error_code& ec, skip_init_increment_t<traits_type, Void>* = 0) {
-        ec.clear();
+    void init_increment(error_code&, skip_init_increment_t<traits_type, Void>* = 0) const {
     }
     
     template <typename Void = void>
