@@ -1,4 +1,4 @@
-// Copyright © 2006-2015, Prosoft Engineering, Inc. (A.K.A "Prosoft")
+// Copyright © 2006-2017, Prosoft Engineering, Inc. (A.K.A "Prosoft")
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without
@@ -132,7 +132,8 @@
 // Superset of PS_CPP11. "Preferred" compiler versions that implement the majority of C++11 features.
 #define PS_PREFERRED_CPP11 (PS_CLANG_REQ(3, 2, 0) || PS_GCC_REQ(4, 7, 0) || PS_MSVC_REQ(18, 0))
 // Superset of PS_PREFERRED_CPP11. 100% compliant C++11 compilers (XXX: this does not imply a 100% compliant std lib -- e.g. std::regex is not implemented in GCC until 4.9)
-#define PS_COMPLETE_CPP11 (PS_CLANG_REQ(3, 3, 0) || PS_GCC_REQ(4, 8, 1))
+// VS2017 is technically not complete, as the C99 preprocessor and SFINAE still have minor missing features. But for our purposes it is.
+#define PS_COMPLETE_CPP11 (PS_CLANG_REQ(3, 3, 0) || PS_GCC_REQ(4, 8, 1) || PS_MSVC_REQ(19, 1))
 #else // PS_CPP11
 #define PS_PREFERRED_CPP11 0
 #define PS_COMPLETE_CPP11 0
@@ -143,7 +144,7 @@
 // Superset of PS_CPP14. "Preferred" compiler versions that implement the majority of C++14 features.
 #define PS_PREFERRED_CPP14 (PS_CLANG_REQ(3, 4, 0) || PS_GCC_REQ(4, 9, 0) || PS_MSVC_REQ(19, 0))
 // Superset of PS_PREFERRED_CPP14. 100% compliant C++14 compilers.
-#define PS_COMPLETE_CPP14 (PS_CLANG_REQ(3, 4, 0) || PS_GCC_REQ(5, 0, 0))
+#define PS_COMPLETE_CPP14 (PS_CLANG_REQ(3, 4, 0) || PS_GCC_REQ(5, 0, 0) || PS_MSVC_REQ(19, 1))
 #else // PS_CPP14
 #define PS_PREFERRED_CPP14 0
 #define PS_COMPLETE_CPP14 0
