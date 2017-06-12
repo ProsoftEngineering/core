@@ -486,10 +486,24 @@ bool end_snapshot(backup_components& backup, std::error_code& ec) {
 }
 #endif
 
-void vss_delete_snapshot(backup_components& backup, const GUID& snapid,  std::error_code& ec) {
+void vss_delete_snapshotset(backup_components& backup, const GUID& setid,  std::error_code& ec) {
     LONG count;
-    GUID ignored;
-    ok(backup->DeleteSnapshots(snapid, VSS_OBJECT_SNAPSHOT, true, &count, &ignored), ec, snapshot_category());
+    GUID failedsnap;
+    ok(backup->DeleteSnapshots(setid, VSS_OBJECT_SNAPSHOT_SET, true, &count, &failedsnap), ec, snapshot_category());
+    if (failedsnap != GUID_NULL) {
+        dbgout << "Failed to remove snapshot " << failedsnap << "using set " << setid << "\n";
+    }
+}
+
+GUID snapshot_setid(backup_components& backup, const GUID& snapid, std::error_code& ec) {
+    VSS_SNAPSHOT_PROP props;
+    if (ok(backup->GetSnapshotProperties(snapid, &props), ec, snapshot_category())) {
+        GUID setid{props.m_SnapshotSetId};
+        VssFreeSnapshotProperties(&props);
+        return setid;
+    }
+
+    return GUID_NULL;
 }
 
 fs::path sysroot() noexcept {
@@ -719,9 +733,13 @@ static bool detach_snapshot(backup_components& backup, snapshot& snap, std::erro
 }
 
 static void delete_snapshot(backup_components& backup, snapshot& snap, std::error_code& ec) {
-    vss_delete_snapshot(backup, guid(snap), ec);
+    const auto& snapid = guid(snap);
+    const auto setid = snapshot_setid(backup, snapid, ec);
+    if (!ec) {
+        vss_delete_snapshotset(backup, setid, ec);
+    }
     if (ec) {
-        dbg(make_msg("Failed to delete snapshot", guid(snap)), ec);
+        dbg(make_msg("Failed to delete snapshot", snapid) + make_msg(" using set id", setid), ec);
     }
 }
 
