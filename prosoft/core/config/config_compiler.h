@@ -117,9 +117,10 @@
 
 // C++11/14 support -- Clang and GCC are basically 100% 11 compliant as of 3.3 and 4.8.1 respectively.
 // VS 2013 is decent, and 2015 much better (basically complete excepting SFINAE)
-// Clang: http://clang.llvm.org/cxx_status.html
+// Clang: https://clang.llvm.org/cxx_status.html
 // GCC: https://gcc.gnu.org/projects/cxx0x.html, https://gcc.gnu.org/projects/cxx1y.html
 // MSVC: http://msdn.microsoft.com/en-us/library/vstudio/hh567368.aspx
+// All: http://en.cppreference.com/w/cpp/compiler_support
 //
 
 #if defined(__cplusplus)
@@ -157,6 +158,8 @@
 #define PS_PREFERRED_CPP14 0
 #define PS_COMPLETE_CPP14 0
 #endif // __cplusplus
+
+#define PS_CPP17 (__cplusplus > 201402L)
 
 //// Compiler name ////
 
