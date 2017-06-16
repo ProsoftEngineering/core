@@ -71,11 +71,11 @@ macro(ps_core_config_compiler_maximum_warnings TARGET_NAME)
         target_compile_options(${TARGET_NAME} PRIVATE "-Wenum-conversion")
     endif()
     
-    # GCC 5.1 only has -Wint-conversion for C/Obj-C while Clang doesn't complain for C++
-    if(PSCLANG)
+    # GCC complains about -Wint-conversion for C++ while Clang doesn't care.
+    if(${CMAKE_VERSION} VERSION_GREATER 3.2) # COMPILE_LANGUAGE requires 3.3+ 
         check_c_compiler_flag(-Wint-conversion HAS_INT_CONVERSION_WARNING)
         if(HAS_INT_CONVERSION_WARNING)
-            target_compile_options(${TARGET_NAME} PRIVATE "-Wint-conversion")
+            target_compile_options(${TARGET_NAME} PRIVATE $<$<COMPILE_LANGUAGE:C>:-Wint-conversion>)
         endif()
     endif()
     
@@ -104,13 +104,11 @@ macro(ps_core_config_compiler_maximum_warnings TARGET_NAME)
     endif()
     
     include(CheckCXXCompilerFlag)
-    if(PSCLANG)
+    if(${CMAKE_VERSION} VERSION_GREATER 3.2) # COMPILE_LANGUAGE requires 3.3+
         # GCC errors when C++ warnings are given for non-C++ sources (C). Clang does not care.
-        # Unfortunately Cmake has no target-level CXX_FLAGS only the global CMAKE_CXX_FLAGS.
-        # We'd have to use regex on the source file list to set the flag for each C++ file -- a pain.
         check_cxx_compiler_flag(-Woverloaded-virtual HAS_OVERLOADED_VIRTUAL_WARNING)
         if(HAS_OVERLOADED_VIRTUAL_WARNING)
-            target_compile_options(${TARGET_NAME} PRIVATE "-Woverloaded-virtual")
+            target_compile_options(${TARGET_NAME} PRIVATE $<$<COMPILE_LANGUAGE:CXX>:-Woverloaded-virtual>)
         endif()
     endif()
 endmacro()
