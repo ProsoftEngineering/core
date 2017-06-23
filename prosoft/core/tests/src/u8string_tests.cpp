@@ -301,17 +301,17 @@ TEST_CASE("u8string") {
         CHECK(0 == path.compare(1, path.length() - 1, prefix, 3, u8string::npos));
 
         s = u8string("ICASE COMPARE");
-        CHECK(0 == s.compare(u8string("icase compare"), true));
+        CHECK(0 == s.compare(u8string("icase compare"), u8string::case_insensitive_compare));
 
         s = u8string("\xE1\xBA\xA0");
-        CHECK(0 == s.compare(u8string("\xE1\xBA\xA1"), true));
+        CHECK(0 == s.compare(u8string("\xE1\xBA\xA1"), u8string::case_insensitive_compare));
 
         // Capital Sharp S added in 5.1, should be the uppercase form of the small "sharp s". (Prior to 2010 it was common, though not standard, to use "SS".)
         s = u8string("\xE1\xBA\x9E");
-        CHECK(0 == s.compare(u8string("\xC3\x9F"), true));
+        CHECK(0 == s.compare(u8string("\xC3\x9F"), true)); // check legacy bool API
 
         s = u8string("aaa");
-        CHECK(-1 == s.compare(u8string("aaaa"), false));
+        CHECK(-1 == s.compare(u8string("aaaa"), false)); // check legacy bool API
         CHECK(-1 == s.compare(u8string("AAAA"), true));
 
         CHECK(s == "aaa");

@@ -552,16 +552,17 @@ u8string& u8string::replace(size_type pos, size_type len, const u8string& other)
     return *this;
 }
 
-int u8string::compare(const u8string& other, bool icase) const {
-    return compare(0, npos, other, 0, npos, icase);
+int u8string::compare(const u8string& other, compare_flags flags) const {
+    return compare(0, npos, other, 0, npos, flags);
 }
 
-int u8string::compare(size_type pos, size_type count, const u8string& other, bool icase) const {
-    return compare(pos, count, other, 0, npos, icase);
+int u8string::compare(size_type pos, size_type count, const u8string& other, compare_flags flags) const {
+    return compare(pos, count, other, 0, npos, flags);
 }
 
-int u8string::compare(size_type pos, size_type count, const u8string& other, size_type pos2, size_type count2, bool icase) const {
+int u8string::compare(size_type pos, size_type count, const u8string& other, size_type pos2, size_type count2, compare_flags flags) const {
     int retval;
+    const bool icase = (flags & case_insensitive_compare);
     if (!icase && ascii() && other.ascii()) {
         retval = str().compare(pos, count, other.str(), pos2, count2);
     } else {
@@ -598,7 +599,8 @@ int u8string::compare(size_type pos, size_type count, const u8string& other, siz
     return retval;
 }
 
-int u8string::compare(unicode_type c1, unicode_type c2, bool icase) {
+int u8string::compare(unicode_type c1, unicode_type c2, compare_flags flags) {
+    const bool icase = (flags & case_insensitive_compare);
     if (!icase && _is_ascii(c1) && _is_ascii(c2)) { // ASCII case-compare shortcut
         return (c1 == c2 ? 0 : (c1 > c2 ? 1 : -1));
     }

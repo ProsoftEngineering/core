@@ -182,12 +182,31 @@ public:
     PS_EXPORT u8string& replace(size_type pos, size_type len, const u8string& str);
 
     // ==
+    
+    enum compare_flags {
+        default_compare = 0x0,
+        case_insensitive_compare = 0x1
+    };
 
-    PS_EXPORT int compare(const u8string&, bool icase = false) const;
-    PS_EXPORT int compare(size_type pos, size_type count, const u8string&, bool icase = false) const;
-    PS_EXPORT int compare(size_type pos, size_type count, const u8string& other, size_type pos2, size_type count2, bool icase = false) const;
+    PS_EXPORT int compare(const u8string&, compare_flags flags = default_compare) const;
+    PS_EXPORT int compare(size_type pos, size_type count, const u8string&, compare_flags flags = default_compare) const;
+    PS_EXPORT int compare(size_type pos, size_type count, const u8string& other, size_type pos2, size_type count2, compare_flags flags = default_compare) const;
 
-    PS_EXPORT static int compare(unicode_type, unicode_type, bool icase = false); // normalized codepoint compare
+    PS_EXPORT static int compare(unicode_type, unicode_type, compare_flags flags = default_compare); // normalized codepoint compare
+    
+    // Legacy, prefer the flag variants
+    int compare(const u8string& us, bool icase) const {
+        return compare(us, !icase ? default_compare : case_insensitive_compare);
+    }
+    int compare(size_type pos, size_type count, const u8string& other, bool icase) const {
+        return compare(pos, count, other, !icase ? default_compare : case_insensitive_compare);
+    }
+    int compare(size_type pos, size_type count, const u8string& other, size_type pos2, size_type count2, bool icase) const {
+        return compare(pos, count, other, pos2, count2, !icase ? default_compare : case_insensitive_compare);
+    }
+    static inline int compare(unicode_type u1, unicode_type u2, bool icase) {
+        return compare(u1, u2, !icase ? default_compare : case_insensitive_compare);
+    }
 
     // ==
 
@@ -385,7 +404,7 @@ private:
     void _invalidate_cache() {
         _u8.invalidate();
     }
-
+    
     PS_EXPORT u8string(std::string&&, size_type count, bool ascii);
 
     iterator make_iterator(container_type::iterator i) {
