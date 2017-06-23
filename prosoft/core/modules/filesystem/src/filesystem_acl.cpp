@@ -469,7 +469,11 @@ struct to_acl {
         return al;
     }
 
-    SECURITY_DESCRIPTOR_PTR operator()(const ifilesystem::native_path_type& p, acl_type_t kind, error_code& ec, bool link) noexcept {
+    SECURITY_DESCRIPTOR_PTR operator()(const ifilesystem::native_path_type& p, acl_type_t kind, error_code& ec, bool link)
+#if PS_HAVE_SYMLINK_ACL
+    noexcept
+#endif
+    {
         __typeof__(::acl_get_file)* getacl;
         __typeof__(::stat)* getstat;
         if (!link) {

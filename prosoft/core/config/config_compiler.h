@@ -51,12 +51,19 @@
 
 //// Compiler versions ////
 
-#define PS_CLANG_REQ(_M, _m, _p) (defined(__clang__) && ((__clang_major__ > _M) || (__clang_major__ >= _M && __clang_minor__ > _m) || (__clang_major__ >= _M && __clang_minor__ >= _m) && __clang_patchlevel__ >= _p))
+#ifdef __clang__
+#define PS_CLANG_REQ(_M, _m, _p) ((__clang_major__ > _M) || (__clang_major__ >= _M && __clang_minor__ > _m) || (__clang_major__ >= _M && __clang_minor__ >= _m) && __clang_patchlevel__ >= _p)
+#else
+#define PS_CLANG_REQ(_M, _m, _p) 0
+#endif
 
-#define PS_GCC_REQ(_M, _m, _p) (defined(__GNUC__) && ((__GNUC__ > _M) || (__GNUC__ >= _M && __GNUC_MINOR__ > _m) || (__GNUC__ >= _M && __GNUC_MINOR__ >= _m) && __GNUC_PATCHLEVEL__ >= _p))
+#ifdef __GNUC__
+#define PS_GCC_REQ(_M, _m, _p) ((__GNUC__ > _M) || (__GNUC__ >= _M && __GNUC_MINOR__ > _m) || (__GNUC__ >= _M && __GNUC_MINOR__ >= _m) && __GNUC_PATCHLEVEL__ >= _p)
+#else
+#define PS_GCC_REQ(_M, _m, _p) 0
+#endif
 
 // No patch level.
-// XXX: MSVC's (<= 2013, 2015?) non-c99 preprocessor does not support nested "defined()" clauses in a #define properly.
 #ifdef _MSC_VER
 #define PS_MSVC_REQ(_M, _m) (_MSC_VER >= (_M * 100 + _m * 10))
 #else
