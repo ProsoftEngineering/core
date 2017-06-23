@@ -240,6 +240,7 @@ struct to_string_type {
     String operator()(InputIterator, InputIterator);
 };
 
+// u8string iterators need specific handling since they iterate over u32 codepoints
 template <class Source>
 struct to_string_type<u8string, Source> {
     using String = u8string;
@@ -252,9 +253,20 @@ struct to_string_type<u8string, Source> {
         return String{std::move(source)};
     }
 
-    template <class InputIterator>
+    static_assert(!std::is_pointer<typename std::iterator_traits<u8string::iterator>::pointer>::value, "Broken assumption");
+    template <class InputIterator,
+        // disable u8string reverse iterators assuming pointer_type is not a pointer
+        typename = typename std::enable_if<std::is_pointer<typename std::iterator_traits<InputIterator>::pointer>::value>::type>
     String operator()(InputIterator i1, InputIterator i2) {
         return String{std::string{i1, i2}};
+    }
+    
+    String operator()(u8string::iterator i1, u8string::iterator i2) {
+        return String{i1, i2};
+    }
+    
+    String operator()(u8string::const_iterator i1, u8string::const_iterator i2) {
+        return String{i1, i2};
     }
 };
 
@@ -269,8 +281,11 @@ struct to_string_type<std::string, Source> {
     String operator()(Source&& source) {
         return String{std::move(source)};
     }
-
-    template <class InputIterator>
+    
+    static_assert(!std::is_pointer<typename std::iterator_traits<u8string::iterator>::pointer>::value, "Broken assumption");
+    template <class InputIterator,
+        // disable u8string iterators assuming pointer_type is not a pointer
+        typename = typename std::enable_if<std::is_pointer<typename std::iterator_traits<InputIterator>::pointer>::value>::type>
     String operator()(InputIterator i1, InputIterator i2) {
         return String{i1, i2};
     }
@@ -288,7 +303,10 @@ struct to_string_type<prosoft::u16string, Source> {
         return String{std::move(source)};
     }
 
-    template <class InputIterator>
+    static_assert(!std::is_pointer<typename std::iterator_traits<u8string::iterator>::pointer>::value, "Broken assumption");
+    template <class InputIterator,
+        // disable u8string iterators assuming pointer_type is not a pointer
+        typename = typename std::enable_if<std::is_pointer<typename std::iterator_traits<InputIterator>::pointer>::value>::type>
     String operator()(InputIterator i1, InputIterator i2) {
         return String{i1, i2};
     }

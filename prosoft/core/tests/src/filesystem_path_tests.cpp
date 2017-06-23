@@ -715,6 +715,17 @@ TEST_CASE("filesystem_path") {
                 CHECK((i == p.end())); // XXX: we should have to increment again to get to the end, iterator::see next_element()
             }
         }
+        
+        WHEN("path contains unicode") {
+            p = prosoft::filesystem::u8path(u8"/Applications/Adobe Extension Manager CS4/ReadMe/Fontos tudnivalók.pdf");
+            i = p.begin();
+            CHECK((*i++).native() == PS_TEXT("/"));
+            CHECK((*i++).native() == PS_TEXT("Applications"));
+            CHECK((*i++).native() == PS_TEXT("Adobe Extension Manager CS4"));
+            CHECK((*i++).native() == PS_TEXT("ReadMe"));
+            CHECK((*i++) == prosoft::filesystem::u8path(u8"Fontos tudnivalók.pdf"));
+            CHECK((i == p.end()));
+        }
     }
     
     WHEN("constructing from a path range") {
@@ -1746,6 +1757,11 @@ TEST_CASE("filesystem_path") {
             THEN("path contains the expected content") {
                 CHECK(to_u8string<typename path::string_type>{}(p.native()) == as_utf8(precomposed_actue_aaa));
             }
+        }
+        WHEN("path is created for u8string iterators") {
+            prosoft::u8string us{u8"/Applications/Adobe Extension Manager CS4/ReadMe/Fontos tudnivalók.pdf"};
+            const auto p = prosoft::filesystem::u8path(us.begin(), us.end());
+            CHECK(p.u8string() == us);
         }
     }
     

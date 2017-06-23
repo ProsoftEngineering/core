@@ -131,9 +131,21 @@ inline path u8path(const Source& s) {
     return path{u8string{s}};
 }
 
-template <class InputIterator>
+// u8string iterators need specific handling since they iterate over u32 codepoints
+static_assert(!std::is_pointer<typename std::iterator_traits<u8string::iterator>::pointer>::value, "Broken assumption");
+template <class InputIterator,
+    // disable u8string reverse iterators assuming pointer_type is not a pointer
+    typename = typename std::enable_if<std::is_pointer<typename std::iterator_traits<InputIterator>::pointer>::value>::type>
 inline path u8path(InputIterator first, InputIterator last) {
     return path{u8string{std::string{first, last}}};
+}
+
+inline path u8path(u8string::iterator first, u8string::iterator last) {
+    return path{u8string{first, last}};
+}
+
+inline path u8path(u8string::const_iterator first, u8string::const_iterator last) {
+    return path{u8string{first, last}};
 }
 
 inline const std::error_category& filesystem_category() noexcept { // Extension
