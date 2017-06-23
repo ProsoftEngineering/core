@@ -717,9 +717,9 @@ TEST_CASE("filesystem_path") {
         }
         
         WHEN("path contains unicode") {
-            p = prosoft::filesystem::u8path(u8"/Applications/Adobe Extension Manager CS4/ReadMe/Fontos tudnivalók.pdf");
+            p = prosoft::filesystem::u8path(u8"/Applications/Adobe Extension Manager CS4/ReadMe/Fontos tudnivalók.pdf").make_preferred();
             i = p.begin();
-            CHECK((*i++).native() == PS_TEXT("/"));
+            CHECK((*i++).native() == separator);
             CHECK((*i++).native() == PS_TEXT("Applications"));
             CHECK((*i++).native() == PS_TEXT("Adobe Extension Manager CS4"));
             CHECK((*i++).native() == PS_TEXT("ReadMe"));
