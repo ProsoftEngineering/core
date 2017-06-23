@@ -55,10 +55,15 @@
 #define PS_COMPLETE_CPP14_STDLIB (PS_CPP14_STDLIB && (PS_CLANG_REQ(3, 5, 0) || PS_GCC_REQ(5, 1, 0)))
 #else
 // XXX: Xcode 6.1 claims to fully support C++14.
-// However libc++ as distributed with 10.10.5 and 10.11.0 does not appear to be compiled with C++14 support as shared_timed_mutex fails to link.
-// If future OSX versions add a new version of libc++ we'll have to bring in the AvailibilityMacros.h platform header.
+// However the libc++ lib does not provide C++14 support until 10.12. (e.g. shared_timed_mutex fails to link)
+#include <AvailabilityMacros.h>
+#ifdef MAC_OS_X_VERSION_10_12
+#define PS_PREFERRED_CPP14_STDLIB (MAC_OS_X_VERSION_MIN_REQUIRED >= MAC_OS_X_VERSION_10_12)
+#define PS_COMPLETE_CPP14_STDLIB (MAC_OS_X_VERSION_MIN_REQUIRED >= MAC_OS_X_VERSION_10_12)
+#else
 #define PS_PREFERRED_CPP14_STDLIB 0
 #define PS_COMPLETE_CPP14_STDLIB 0
+#endif
 #endif // !__APPLE__
 
 //// C++ features ////
