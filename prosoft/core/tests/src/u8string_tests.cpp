@@ -237,6 +237,19 @@ TEST_CASE("u8string") {
         
         CHECK_THROWS_AS(u8string(s.crbegin(), s.crend()), u8string::invalid_utf8);
     }
+    
+    WHEN("constructing from wide string iterators") {
+        const u8string source{"\xC3\xA1\xC3\xA1"};
+        
+        const u16string u16{unicode::u16(source)};
+        u8string u8{u16.begin(), u16.end()};
+        CHECK(u8 == source);
+        
+        u8.clear();
+        const u32string u32{unicode::u32(source)};
+        u8 = u8string{u32.begin(), u32.end()};
+        CHECK(u8 == source);
+    }
 
     SECTION("assignment") {
         u8string s(u8test);

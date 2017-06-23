@@ -297,16 +297,6 @@ void u8string::_init(container_type::const_reverse_iterator first, container_typ
     initialize(_u8, first, last);
 }
 
-u8string::u8string(const_iterator& start, const_iterator& fin)
-    // XXX: The iters are external; thus we cannot assume that movement() is correct for either. Therefore we don't cache the length here.
-    : u8string(std::string(start.base(), fin.base()), npos, false) {
-}
-
-// Unlike std::, utf8 does not provide conversion from non-const to const iters.
-u8string::u8string(iterator& start, iterator& fin)
-    : u8string(std::string(start.base(), fin.base()), npos, false) {
-}
-
 u8string::u8string(std::string&& other, size_type count, bool ASCII) {
     PSASSERT((ASCII ? is_ascii(other) : is_valid(other)), "Broken assumption");
     // XXX: other is assumed to be a copy/substr of our container string, so we don't normalize. DO NOT BREAK THIS ASSUMPTION.

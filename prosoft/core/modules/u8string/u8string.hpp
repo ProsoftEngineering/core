@@ -1,4 +1,4 @@
-// Copyright © 2013-2015, Prosoft Engineering, Inc. (A.K.A "Prosoft")
+// Copyright © 2013-2017, Prosoft Engineering, Inc. (A.K.A "Prosoft")
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without
@@ -81,8 +81,13 @@ public:
         _u8 = std::move(other._u8);
     }
 
-    PS_EXPORT u8string(const_iterator&, const_iterator&); // substring extraction only
-    PS_EXPORT u8string(iterator&, iterator&);
+    u8string(const_iterator&, const_iterator&);
+    u8string(iterator&, iterator&);
+    
+    // These are dangerous. We don't currently support grapheme clusters so reversing a u32 codepoint sequence could result in invalid UTF.
+    // There are ways to do it, if you really want.
+    u8string(const_reverse_iterator&, const_reverse_iterator&) = delete;
+    u8string(reverse_iterator&, reverse_iterator&) = delete;
 
     // XXX: conversions from other types are explicit as they may throw exceptions
     // XXX: DO NOT RELY on the resulting u8string raw bytes (str(), c_str()) comparing to the raw input bytes!
@@ -398,8 +403,19 @@ private:
     PS_EXPORT void _init(const char*, const char*);
     PS_EXPORT void _init(container_type::iterator, container_type::iterator);
     PS_EXPORT void _init(container_type::const_iterator, container_type::const_iterator);
+    // Reverse iterators are dangerous for unicode, but not ASCII. We'll leave these for now.
     PS_EXPORT void _init(container_type::reverse_iterator, container_type::reverse_iterator);
     PS_EXPORT void _init(container_type::const_reverse_iterator, container_type::const_reverse_iterator);
+    
+    
+    //  Again reverse iterators are dangerous, see u8string(reverse_iterator,reverse_iterator).
+    inline void _init(u16string::const_iterator i1, u16string::const_iterator i2) {
+        *this = u16string{i1, i2};
+    }
+    
+    inline void _init(u32string::const_iterator i1, u32string::const_iterator i2) {
+        *this = u8string{u32string{i1, i2}};
+    }
 
     void _invalidate_cache() {
         _u8.invalidate();
@@ -414,6 +430,15 @@ private:
         return const_iterator(i, _u8._s.begin(), _u8._s.end());
     }
 };
+
+inline u8string::u8string(const_iterator& start, const_iterator& fin)
+    // XXX: The iters are external; thus we cannot assume that movement() is correct for either. Therefore we don't cache the length here.
+    : u8string(std::string(start.base(), fin.base()), npos, false) {
+}
+
+inline u8string::u8string(iterator& start, iterator& fin) // Unlike std::, utf8 does not provide conversion from non-const to const iters.
+    : u8string(std::string(start.base(), fin.base()), npos, false) {
+}
 
 inline void swap(u8string& lhs, u8string& rhs) {
     lhs.swap(rhs);
