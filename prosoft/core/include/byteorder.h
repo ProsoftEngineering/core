@@ -1,4 +1,4 @@
-// Copyright © 2012-2015, Prosoft Engineering, Inc. (A.K.A "Prosoft")
+// Copyright © 2012-2017, Prosoft Engineering, Inc. (A.K.A "Prosoft")
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without
@@ -56,35 +56,35 @@ PS_STATIC_ASSERT(sizeof(short) == 2 && sizeof(int) == 4 && sizeof(long) == 4, "B
 
 namespace prosoft {
 
-// Templates are used to avoid signed/unsigned casting.
+// Templates are used to avoid signed/unsigned casting and to support enum class types.
 // Depending on the version of GCC the intrinsics may not produce the most optimal code for non-X86 archs.
 // Linux pollutes the preprocessor with bswapXX macros, thus we have to use byteswapXX
 template <typename T>
 PS_BSWAP_CONSTEXPR inline T byteswap16(T x) {
-    static_assert(2 == sizeof(x), "BUG");
+    static_assert(2 == sizeof(x), "invalid integral size");
     return static_cast<T>(__builtin_bswap16(static_cast<uint16_t>(x & 0xFFFFU)));
 }
 
 template <typename T>
 PS_BSWAP_CONSTEXPR inline T byteswap32(T x) {
-    static_assert(4 == sizeof(x), "BUG");
+    static_assert(4 == sizeof(x), "invalid integral size");
     return static_cast<T>(__builtin_bswap32(static_cast<uint32_t>(x & 0xFFFFFFFFU)));
 }
 
 template <typename T>
 PS_BSWAP_CONSTEXPR inline T byteswap64(T x) {
-    static_assert(8 == sizeof(x), "BUG");
+    static_assert(8 == sizeof(x), "invalid integral size");
     return static_cast<T>(__builtin_bswap64(static_cast<uint64_t>(x)));
 }
 
 #if __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__
 
 template <typename T>
-PS_BSWAP_CONSTEXPR inline T host_to_le16(T x) { return x; }
+PS_BSWAP_CONSTEXPR inline T host_to_le16(T x) { static_assert(2 == sizeof(x), "invalid integral size"); return x; }
 template <typename T>
-PS_BSWAP_CONSTEXPR inline T host_to_le32(T x) { return x; }
+PS_BSWAP_CONSTEXPR inline T host_to_le32(T x) { static_assert(4 == sizeof(x), "invalid integral size"); return x; }
 template <typename T>
-PS_BSWAP_CONSTEXPR inline T host_to_le64(T x) { return x; }
+PS_BSWAP_CONSTEXPR inline T host_to_le64(T x) { static_assert(8 == sizeof(x), "invalid integral size"); return x; }
 
 template <typename T>
 PS_BSWAP_CONSTEXPR inline T host_to_be16(T x) { return byteswap16(x); }
@@ -94,11 +94,11 @@ template <typename T>
 PS_BSWAP_CONSTEXPR inline T host_to_be64(T x) { return byteswap64(x); }
 
 template <typename T>
-PS_BSWAP_CONSTEXPR inline T le16_to_host(T x) { return x; }
+PS_BSWAP_CONSTEXPR inline T le16_to_host(T x) { static_assert(2 == sizeof(x), "invalid integral size"); return x; }
 template <typename T>
-PS_BSWAP_CONSTEXPR inline T le32_to_host(T x) { return x; }
+PS_BSWAP_CONSTEXPR inline T le32_to_host(T x) { static_assert(4 == sizeof(x), "invalid integral size"); return x; }
 template <typename T>
-PS_BSWAP_CONSTEXPR inline T le64_to_host(T x) { return x; }
+PS_BSWAP_CONSTEXPR inline T le64_to_host(T x) { static_assert(8 == sizeof(x), "invalid integral size"); return x; }
 
 template <typename T>
 PS_BSWAP_CONSTEXPR inline T be16_to_host(T x) { return byteswap16(x); }
@@ -117,11 +117,11 @@ template <typename T>
 PS_BSWAP_CONSTEXPR inline T host_to_le64(T x) { return byteswap64(x); }
 
 template <typename T>
-PS_BSWAP_CONSTEXPR inline T host_to_be16(T x) { return x; }
+PS_BSWAP_CONSTEXPR inline T host_to_be16(T x) { static_assert(2 == sizeof(x), "invalid integral size"); return x; }
 template <typename T>
-PS_BSWAP_CONSTEXPR inline T host_to_be32(T x) { return x; }
-template <typename T>
-PS_BSWAP_CONSTEXPR inline T host_to_be64(T x) { return x; }
+PS_BSWAP_CONSTEXPR inline T host_to_be32(T x) { static_assert(4 == sizeof(x), "invalid integral size"); return x; }
+template <typename T
+PS_BSWAP_CONSTEXPR inline T host_to_be64(T x) { static_assert(8 == sizeof(x), "invalid integral size"); return x; }
 
 template <typename T>
 PS_BSWAP_CONSTEXPR inline T le16_to_host(T x) { return byteswap16(x); }
@@ -131,11 +131,11 @@ template <typename T>
 PS_BSWAP_CONSTEXPR inline T le64_to_host(T x) { return byteswap64(x); }
 
 template <typename T>
-PS_BSWAP_CONSTEXPR inline T be16_to_host(T x) { return x; }
+PS_BSWAP_CONSTEXPR inline T be16_to_host(T x) { static_assert(2 == sizeof(x), "invalid integral size"); return x; }
 template <typename T>
-PS_BSWAP_CONSTEXPR inline T be32_to_host(T x) { return x; }
+PS_BSWAP_CONSTEXPR inline T be32_to_host(T x) { static_assert(4 == sizeof(x), "invalid integral size"); return x; }
 template <typename T>
-PS_BSWAP_CONSTEXPR inline T be64_to_host(T x) { return x; }
+PS_BSWAP_CONSTEXPR inline T be64_to_host(T x) { static_assert(8 == sizeof(x), "invalid integral size"); return x; }
 
 #else
 
