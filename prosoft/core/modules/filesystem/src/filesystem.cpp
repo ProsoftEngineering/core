@@ -180,12 +180,14 @@ struct to_file_type {
         auto ft = file_type::unknown; // default to unknown
         if (link && (attrs & FILE_ATTRIBUTE_REPARSE_POINT)) {
             ::WIN32_FIND_DATAW data;
-            if (::FindFirstFile(p.c_str(), &data)) {
+            auto h = ::FindFirstFile(p.c_str(), &data);
+            if (INVALID_HANDLE_VALUE != h) {
                 if (IO_REPARSE_TAG_SYMLINK == data.dwReserved0) {
                     ft = file_type::symlink;
                 } else if (IO_REPARSE_TAG_MOUNT_POINT == data.dwReserved0) {
                     ft = file_type::directory;
                 }
+                ::FindClose(h);
             }
         } else if (is_device_path(p)) {
             ft = file_type::character;
