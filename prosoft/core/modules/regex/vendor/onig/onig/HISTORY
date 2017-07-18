@@ -1,5 +1,30 @@
 History
 
+2017/07/03: Version 6.4.0
+
+2017/06/30: fix memory leaks
+2017/06/29: fix memory leaks
+2017/06/28: change encoding of doc/XXXX.ja from EUC-JP to UTF-8
+2017/06/28: update doc/RE, and doc/RE.ja
+2017/06/26: fix fatal bug of endless repeat check on Windows
+2017/06/26: PR #62 : add check for return values
+2017/06/23: [new] support call zero (\g{0})
+2017/06/23: [new] support relative call by positive number
+2017/06/23: [new] support relative back-reference by positive number
+2017/06/15: fix #60 : check value type
+2017/06/02: change output format for ONIG_DEBUG_COMPILE and ONIG_DEBUG_MATCH
+
+2017/05/29: Version 6.3.0
+
+2017/05/24: fix #60 : invalid state(CCS_VALUE) in parse_char_class()
+2017/05/24: fix #59 : access to invalid address by reg->dmax value
+2017/05/23: fix invalid increment of start position in onig_scan()
+2017/05/23: fix #58 : access to invalid address by reg->dmin value
+2017/05/23: fix #57 : DATA_ENSURE() check must be before data access
+2017/05/22: fix #56 : return invalid result for codepoint 0xFFFFFFFF
+2017/05/19: [new] add \o{17777777777} syntax.
+2017/05/19: fix #55 : Byte value expressed in octal must be smaller than 256
+
 2017/04/08: Version 6.2.0
 
 2017/03/15: fix: size in xmemcpy in stack_double (PR #51)
