@@ -67,7 +67,7 @@ struct access_traits<T*, typename std::enable_if<std::is_integral<T>::value>::ty
     using const_value_pointer = const T*;
     
     constexpr size_t data_size(const_value_pointer t) const {
-#if _MSC_VER == 1910
+#if PS_COMPLETE_CPP14
 // Bug in VS 2017.0: https://developercommunity.visualstudio.com/content/problem/10720/constexpr-function-accessing-character-array-leads.html
 // Requires C++14 expanded constexpr.
         int i = 0;
