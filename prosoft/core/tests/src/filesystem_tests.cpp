@@ -97,6 +97,17 @@ TEST_CASE("filesystem") {
             auto de = directory_entry{};
             THEN("the path is empty") {
                 CHECK(de.path().empty());
+            } AND_THEN ("status is invalid") {
+                CHECK_THROWS_AS(de.refresh(), filesystem_error);
+                error_code ec;
+                CHECK_FALSE(de.exists(ec));
+                CHECK(ec);
+                ec.assign(0, ec.category());
+                CHECK(de.file_size(ec) == directory_entry::unknown_size);
+                CHECK(ec);
+                ec.assign(0, ec.category());
+                CHECK(de.last_write_time(ec) == times::make_invalid());
+                CHECK(ec);
             }
         }
         

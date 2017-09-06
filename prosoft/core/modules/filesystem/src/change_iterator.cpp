@@ -79,6 +79,7 @@ notification_ptr call(const fs::change_iterator_config::filters_type& fl, notifi
 }
 
 using fsiterator_state = fs::ifilesystem::iterator_state;
+using fsiterator_cache = fs::ifilesystem::cache_info;
 
 struct test_state; // for testing
 
@@ -128,7 +129,7 @@ public:
     
     extraction_type extract();
     
-    virtual fs::path next(prosoft::system::error_code&) override;
+    virtual fs::path next(fsiterator_cache&, prosoft::system::error_code&) override;
     virtual bool at_end() const override;
 };
 
@@ -194,7 +195,7 @@ extraction_type state::extract() {
     return paths;
 }
 
-fs::path state::next(prosoft::system::error_code&) {
+fs::path state::next(fsiterator_cache&, prosoft::system::error_code&) {
     {
         lock_guard lg{m_lock};
         if (!m_entries.empty()) {

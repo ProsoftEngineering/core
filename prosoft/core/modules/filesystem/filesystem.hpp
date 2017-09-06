@@ -415,8 +415,11 @@ inline bool status_known(const file_status& s) noexcept {
     return s.type() != file_type::none;
 }
 
+inline bool exists(file_type t) noexcept {
+    return t != file_type::none && t != file_type::not_found;
+}
 inline bool exists(const file_status& s) noexcept {
-    return status_known(s) && s.type() != file_type::not_found;
+    return exists(s.type());
 }
 bool exists(const path&);
 bool exists(const path&, error_code&) noexcept;
@@ -518,6 +521,9 @@ inline bool is_symlink(const path& p, error_code& ec) noexcept {
     return is_symlink(symlink_status(p, status_info::basic, ec));
 }
 
+inline bool is_other(file_type t) noexcept {
+    return exists(t) && t != file_type::regular && t != file_type::directory && t != file_type::symlink;
+}
 inline bool is_other(const file_status& s) noexcept {
     return exists(s) && !is_regular_file(s) && !is_directory(s) && !is_symlink(s);
 }
@@ -543,6 +549,74 @@ inline file_status directory_entry::symlink_status() const {
 }
 inline file_status directory_entry::symlink_status(error_code& ec) const noexcept {
     return prosoft::filesystem::symlink_status(this->path(), ec);
+}
+
+// cache ops
+inline bool directory_entry::exists() const {
+    return filesystem::exists(get_type());
+}
+inline bool directory_entry::exists(error_code& ec) const noexcept {
+    return filesystem::exists(get_type(ec));
+}
+inline bool directory_entry::is_block_file() const {
+    return file_type::block == get_type();
+}
+inline bool directory_entry::is_block_file(error_code& ec) const noexcept {
+    return file_type::block == get_type(ec);
+}
+inline bool directory_entry::is_character_file() const {
+    return file_type::character == get_type();
+}
+inline bool directory_entry::is_character_file(error_code& ec) const noexcept {
+    return file_type::character == get_type(ec);
+}
+inline bool directory_entry::is_directory() const {
+    return file_type::directory == get_type();
+}
+inline bool directory_entry::is_directory(error_code& ec) const noexcept {
+    return file_type::directory == get_type(ec);
+}
+inline bool directory_entry::is_fifo() const {
+    return file_type::fifo == get_type();
+}
+inline bool directory_entry::is_fifo(error_code& ec) const noexcept {
+    return file_type::fifo == get_type(ec);
+}
+inline bool directory_entry::is_other() const {
+    return filesystem::is_other(get_type());
+}
+inline bool directory_entry::is_other(error_code& ec) const noexcept {
+    return filesystem::is_other(get_type(ec));
+}
+inline bool directory_entry::is_regular_file() const {
+    return file_type::regular == get_type();
+}
+inline bool directory_entry::is_regular_file(error_code& ec) const noexcept {
+    return file_type::regular == get_type(ec);
+}
+inline bool directory_entry::is_socket() const {
+    return file_type::socket == get_type();
+}
+inline bool directory_entry::is_socket(error_code& ec) const noexcept {
+    return file_type::socket == get_type(ec);
+}
+inline bool directory_entry::is_symlink() const {
+    return file_type::symlink == get_type();
+}
+inline bool directory_entry::is_symlink(error_code& ec) const noexcept {
+    return file_type::symlink == get_type(ec);
+}
+inline file_size_type directory_entry::file_size() const {
+    return get_size();
+}
+inline file_size_type directory_entry::file_size(error_code& ec) const noexcept {
+    return get_size(ec);
+}
+inline file_time_type directory_entry::last_write_time() const {
+    return get_last_write();
+}
+inline file_time_type directory_entry::last_write_time(error_code& ec) const noexcept {
+    return get_last_write(ec);
 }
 
 inline bool operator==(const directory_entry& lhs, const directory_entry& rhs) {

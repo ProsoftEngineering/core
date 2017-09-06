@@ -126,6 +126,8 @@ inline bool fattrs(const path& p, DWORD flags) {
     error_code ec;
     return fattrs(p, flags, ec);
 }
+
+file_time_type to_filetime(const ::FILETIME&);
 #endif
 
 } // ifilesystem

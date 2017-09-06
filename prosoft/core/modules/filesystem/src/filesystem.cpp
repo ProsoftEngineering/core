@@ -202,9 +202,9 @@ struct to_file_type {
         auto ft = file_type::unknown; // default to unknown
         if ((attrs & FILE_ATTRIBUTE_REPARSE_POINT)) {
             ft = file_type::directory; // backwards compat with pre-NT Win32 which did not have a notion of symlinks
-        } else if (attrs & FILE_ATTRIBUTE_DIRECTORY) {
+        } else if ((attrs & FILE_ATTRIBUTE_DIRECTORY)) {
             ft = file_type::directory;
-        } else if (attrs & FILE_ATTRIBUTE_DEVICE) {
+        } else if ((attrs & FILE_ATTRIBUTE_DEVICE)) {
             ft = file_type::character;
         } else {
             ft = file_type::regular;
@@ -601,6 +601,10 @@ bool finfo(const path& p, ::BY_HANDLE_FILE_INFORMATION* info, error_code& ec) {
         }
     }
     return false;
+}
+
+file_time_type to_filetime(const ::FILETIME& ft) {
+    return to_times{}(ft);
 }
 
 } // ifilesystem

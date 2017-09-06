@@ -36,7 +36,6 @@ inline namespace v1 {
 using file_time_type = std::chrono::time_point<std::chrono::system_clock>;
 using file_size_type = std::uintmax_t;
 
-
 enum class file_type {
     none = 0,
     not_found = -1,

@@ -108,8 +108,23 @@ TEST_CASE("filesystem_iterator") {
                 auto e = *i;
                 CHECK(i.recursion_pending());
                 CHECK(e.path().filename().native() == PS_TEXT("1"));
+                CHECK(e.cached_type() == file_type::directory);
+                CHECK(e.is_directory());
                 e = *i++;
                 CHECK(e.path().filename().native() == PS_TEXT("._2"));
+                CHECK(e.cached_type() == file_type::regular);
+            #if _WIN32
+                CHECK(e.cached_size() == 0);
+                CHECK(e.cached_write_time() > 0);
+            #else
+                CHECK(e.cached_size() == e.unknown_size);
+                CHECK(e.cached_write_time() == PS_FS_ENTRY_INVALID_TIME_VALUE);
+            #endif
+                CHECK(e.is_regular_file());
+                CHECK(e.last_write_time() > times::make_invalid());
+                CHECK(e.file_size() == 0);
+                CHECK(e.cached_size() == 0);
+                CHECK(e.cached_write_time() > 0);
                 CHECK(i.depth() == 1);
                 CHECK_FALSE(i.recursion_pending());
                 CHECK(i != end(i));
@@ -288,6 +303,7 @@ TEST_CASE("filesystem_iterator") {
                 auto e = *i;
                 CHECK(i.recursion_pending());
                 CHECK(e.path().filename().native() == PS_TEXT("1"));
+                CHECK(e.is_directory());
                 e = *i++;
                 CHECK(e.path().filename().native() == PS_TEXT("._2"));
                 CHECK(i.depth() == 1);
@@ -296,6 +312,7 @@ TEST_CASE("filesystem_iterator") {
                 e = *i++;
                 CHECK(i.is_postorder());
                 CHECK(e.path().filename().native() == PS_TEXT("1"));
+                CHECK(e.is_directory());
                 CHECK(i.depth() == 0);
                 CHECK_FALSE(i.recursion_pending());
                 CHECK(i != end(i));

@@ -26,7 +26,9 @@
 #ifndef PS_CORE_FILESYSTEM_ITERATOR_HPP
 #define PS_CORE_FILESYSTEM_ITERATOR_HPP
 
+#include <atomic>
 #include <iterator>
+#include <limits>
 #include <memory>
 #include <type_traits>
 
@@ -38,7 +40,12 @@ inline namespace v1 {
 
 class file_status;
 
-template <class> class basic_iterator;
+namespace ifilesystem {
+class iterator_state;
+}
+
+// define and not constexpr as not all libraries implement time_since_epoch as constexpr
+#define PS_FS_ENTRY_INVALID_TIME_VALUE times::make_invalid().time_since_epoch().count()
 
 class directory_entry {
     // C++ states that a name within a scope must have a unique meaning.
@@ -47,18 +54,61 @@ class directory_entry {
     using path_type = prosoft::filesystem::path;
     path_type m_path;
     
-    template <class> friend class basic_iterator;
-    
 public:
-    directory_entry() noexcept(std::is_nothrow_constructible<path_type>::value) : m_path() {}
-    ~directory_entry() = default;
-    PS_DEFAULT_COPY(directory_entry);
-    PS_DEFAULT_MOVE(directory_entry);
+    static constexpr file_size_type unknown_size = std::numeric_limits<file_size_type>::max();
+    
+    directory_entry() noexcept(std::is_nothrow_constructible<path_type>::value)
+        : m_path()
+        , m_type(file_type::none)
+        , m_size(unknown_size)
+        , m_last_write(PS_FS_ENTRY_INVALID_TIME_VALUE)
+    {
+    }
     explicit directory_entry(const path_type& p)
-        : m_path(p) {}
+        : m_path(p)
+        , m_type(file_type::none)
+        , m_size(unknown_size)
+        , m_last_write(PS_FS_ENTRY_INVALID_TIME_VALUE)
+    {
+        
+    }
+    ~directory_entry() = default;
+    directory_entry(const directory_entry& other)
+        : m_path(other.m_path)
+        , m_type(other.m_type.load())
+        , m_size(other.m_size.load())
+        , m_last_write(other.m_last_write.load()) {
+    }
+    directory_entry(directory_entry&& other) noexcept(std::is_nothrow_move_constructible<path_type>::value)
+        : m_path(std::move(other.m_path))
+        , m_type(other.m_type.load())
+        , m_size(other.m_size.load())
+        , m_last_write(other.m_last_write.load()) {
+    }
+    
+    directory_entry& operator=(const directory_entry& other) {
+        m_path = other.m_path;
+        m_type = other.m_type.load();
+        m_size = other.m_size.load();
+        m_last_write = other.m_last_write.load();
+        return *this;
+    }
+    
+    directory_entry& operator=(directory_entry&& other) noexcept(std::is_nothrow_move_assignable<path_type>::value) {
+        m_path = std::move(other.m_path);
+        m_type = other.m_type.load();
+        m_size = other.m_size.load();
+        m_last_write = other.m_last_write.load();
+        return *this;
+    }
+    
     // Extensions //
     explicit directory_entry(path_type&& p) noexcept(std::is_nothrow_move_constructible<path_type>::value)
-        : m_path(std::move(p)) {}
+        : m_path(std::move(p))
+        , m_type(file_type::none)
+        , m_size(unknown_size)
+        , m_last_write(PS_FS_ENTRY_INVALID_TIME_VALUE) {
+    }
     
     void assign(path_type&& p) {
         m_path = std::move(p);
@@ -94,6 +144,95 @@ public:
 
     file_status symlink_status() const;
     file_status symlink_status(error_code&) const noexcept;
+    
+    // Cache: http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2016/p0317r1.html
+    void refresh();
+    void refresh(error_code&);
+    
+    bool exists() const;
+    bool exists(error_code& ec) const noexcept;
+    bool is_block_file() const;
+    bool is_block_file(error_code& ec) const noexcept;
+    bool is_character_file() const;
+    bool is_character_file(error_code& ec) const noexcept;
+    bool is_directory() const;
+    bool is_directory(error_code& ec) const noexcept;
+    bool is_fifo() const;
+    bool is_fifo(error_code& ec) const noexcept;
+    bool is_other() const;
+    bool is_other(error_code& ec) const noexcept;
+    bool is_regular_file() const;
+    bool is_regular_file(error_code& ec) const noexcept;
+    bool is_socket() const;
+    bool is_socket(error_code& ec) const noexcept;
+    bool is_symlink() const;
+    bool is_symlink(error_code& ec) const noexcept;
+    file_size_type file_size() const;
+    file_size_type file_size(error_code& ec) const noexcept;
+    file_time_type last_write_time() const;
+    file_time_type last_write_time(error_code& ec) const noexcept;
+    
+    // for testing
+    file_type cached_type() const {
+        return m_type.load();
+    }
+    file_size_type cached_size() const {
+        return m_size.load();
+    }
+    file_time_type::duration::rep cached_write_time() const {
+        return m_last_write.load();
+    }
+    
+private:
+    // Cache
+    friend ifilesystem::iterator_state;
+    std::atomic<file_type> mutable m_type;
+    std::atomic<size_t> mutable m_size;
+    std::atomic<file_time_type::duration::rep> mutable m_last_write;
+
+    template <typename T>
+    T load(std::atomic<T>& aval, T badVal) const {
+        auto val = aval.load();
+        if (badVal != val) {
+            return val;
+        } else {
+            const_cast<directory_entry*>(this)->refresh();
+            return aval.load();
+        }
+    }
+    
+    template <typename T>
+    T load(std::atomic<T>& aval, T badVal, error_code& ec) const {
+        auto val = aval.load();
+        if (badVal != val) {
+            return val;
+        } else {
+            const_cast<directory_entry*>(this)->refresh(ec);
+            return aval.load();
+        }
+    }
+    
+    file_type get_type() const {
+        return load(m_type, file_type::none);
+    }
+    file_type get_type(error_code& ec) const {
+        return load(m_type, file_type::none, ec);
+    }
+    
+    size_t get_size() const {
+        return load(m_size, unknown_size);
+    }
+    size_t get_size(error_code& ec) const {
+        return load(m_size, unknown_size, ec);
+    }
+    
+    file_time_type get_last_write() const {
+        return file_time_type{file_time_type::duration{load(m_last_write, PS_FS_ENTRY_INVALID_TIME_VALUE)}};
+    }
+    
+    file_time_type get_last_write(error_code& ec) const {
+        return file_time_type{file_time_type::duration{load(m_last_write, PS_FS_ENTRY_INVALID_TIME_VALUE, ec)}};
+    }
 };
 
 enum class directory_options : unsigned {
@@ -130,12 +269,28 @@ constexpr directory_options make_public(directory_options opts) {
 using iterator_depth_type = int;
 
 namespace ifilesystem {
+struct cache_info {
+    file_type ftype;
+#if _WIN32
+    file_size_type fsize;
+    file_time_type fwrite_time;
+#endif
+    cache_info()
+        : ftype(file_type::none)
+#if _WIN32
+        , fsize()
+        , fwrite_time(times::make_invalid())
+#endif
+    {
+    }
+};
+
 class iterator_state {
     directory_entry m_current;
     directory_options m_opts;
     
 protected:
-    virtual path next(error_code&) = 0;
+    virtual path next(cache_info&, error_code&) = 0;
     
     void set(directory_options opts) noexcept {
         m_opts |= opts & directory_options::reserved_state_mask;
@@ -167,7 +322,19 @@ public:
     }
     
     void increment(error_code& ec) {
-        m_current = directory_entry{next(ec)};
+        cache_info cinfo;
+        m_current = directory_entry{next(cinfo, ec)};
+        if (cinfo.ftype != file_type::unknown) {
+            m_current.m_type = cinfo.ftype;
+        }
+#if _WIN32
+        if (cinfo.fsize > 0) {
+            m_current.m_size = cinfo.fsize;
+        }
+        if (cinfo.fwrite_time != times::make_invalid()) {
+            m_current.m_last_write = cinfo.fwrite_time.time_since_epoch().count();
+        }
+#endif
     }
     
     PS_WARN_UNUSED_RESULT directory_entry extract() noexcept(std::is_nothrow_move_constructible<directory_entry>::value) {

@@ -92,6 +92,35 @@ inline bool is_directory(const native_dirent* e) {
 inline bool is_symlink(const native_dirent* e) {
     return e->d_type == DT_LNK;
 }
+
+void cache_info(fs::ifilesystem::cache_info& ci, const native_dirent* e) {
+    switch(e->d_type) {
+        case DT_REG:
+            ci.ftype = fs::file_type::regular;
+        break;
+        case DT_DIR:
+            ci.ftype = fs::file_type::directory;
+        break;
+        case DT_LNK:
+            ci.ftype = fs::file_type::symlink;
+        break;
+        case DT_BLK:
+            ci.ftype = fs::file_type::block;
+        break;
+        case DT_CHR:
+            ci.ftype = fs::file_type::character;
+        break;
+        case DT_FIFO:
+            ci.ftype = fs::file_type::fifo;
+        break;
+        case DT_SOCK:
+            ci.ftype = fs::file_type::socket;
+        break;
+        default:
+            ci.ftype = fs::file_type::unknown;
+        break;
+    }
+}
 #else
 using native_dirent = ::WIN32_FIND_DATAW;
 struct native_dir {
@@ -111,6 +140,26 @@ inline bool is_directory(const native_dirent* e) {
 
 inline bool is_symlink(const native_dirent* e) {
     return 0 != (e->dwFileAttributes & FILE_ATTRIBUTE_REPARSE_POINT);
+}
+
+void cache_info(fs::ifilesystem::cache_info& ci, const native_dirent* e) {
+    if (is_directory(e)) {
+        ci.ftype = fs::file_type::directory;
+    } else if (is_symlink(e)) {
+        ci.ftype = fs::file_type::symlink;
+    } else if ((e->dwFileAttributes & FILE_ATTRIBUTE_DEVICE)) {
+        ci.ftype = fs::file_type::character;
+    } else {
+        ci.ftype = fs::file_type::regular;
+    }
+    
+    ci.fwrite_time = fs::ifilesystem::to_filetime(e->ftLastWriteTime);
+    
+    if (fs::file_type::regular == ci.ftype) {
+        ci.fsize = file_size_type(e->nFileSizeLow) | (file_size_type(e->nFileSizeHigh) >> 32)
+    } else {
+        ci.fsize = 0;
+    }
 }
 #endif //!_WIN32
 
@@ -243,6 +292,7 @@ struct stack_entry {
 };
 
 using fsiterator_state = fs::ifilesystem::iterator_state;
+using fsiterator_cache = fs::ifilesystem::cache_info;
 
 template <class Ops> // Template used for testing
 class state : public fsiterator_state {
@@ -299,7 +349,13 @@ public:
     
     virtual ~state() {};
     
-    virtual fs::path next(prosoft::system::error_code&) override;
+    virtual fs::path next(fsiterator_cache&, prosoft::system::error_code&) override;
+#if PSTEST_HARNESS
+    fs::path next(prosoft::system::error_code& ec) {
+        fsiterator_cache dummy;
+        return next(dummy, ec);
+    }
+#endif
     
     virtual void pop() override;
     
@@ -392,7 +448,7 @@ state<Ops>::state(const fs::path& p, fs::directory_options opts, fs::error_code&
 }
 
 template <class Ops>
-fs::path state<Ops>::next(prosoft::system::error_code& ec) {
+fs::path state<Ops>::next(fsiterator_cache& cinfo, prosoft::system::error_code& ec) {
     const bool postorder = is_set(options() & fs::directory_options::include_postorder_directories);
 
     base::clear(fs::directory_options::reserved_state_mask);
@@ -403,6 +459,7 @@ fs::path state<Ops>::next(prosoft::system::error_code& ec) {
         set(fs::directory_options::reserved_state_postorder);
         auto p = peek_unsafe().m_path;
         pop();
+        cinfo.ftype = fs::file_type::directory;
         return p;
     }
     
@@ -477,6 +534,7 @@ fs::path state<Ops>::next(prosoft::system::error_code& ec) {
                     }
                 }
                 
+                cache_info(cinfo, ent);
                 return cpath;
             } else {
                 // we've read all entries in the current dir
@@ -567,6 +625,24 @@ const error_code& ifilesystem::permission_denied_error() {
 #endif
     static const error_code denied{ec, system::error_category()};
     return denied;
+}
+
+constexpr file_size_type directory_entry::unknown_size;
+
+void directory_entry::refresh() {
+    error_code ec;
+    refresh(ec);
+    PS_THROW_IF(ec.value() != 0, filesystem_error("Failed to refresh dir ent.", m_path, ec));
+}
+
+void directory_entry::refresh(error_code& ec) {
+    constexpr status_info info = status_info::basic | status_info::times |status_info::size;
+    const auto st = filesystem::symlink_status(m_path, info, ec);
+    if (!ec) {
+        m_type = st.type();
+        m_size = st.size();
+        m_last_write = st.times().modified().time_since_epoch().count();
+    }
 }
 
 } // v1
