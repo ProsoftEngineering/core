@@ -156,7 +156,7 @@ void cache_info(fs::ifilesystem::cache_info& ci, const native_dirent* e) {
     ci.fwrite_time = fs::ifilesystem::to_filetime(e->ftLastWriteTime);
     
     if (fs::file_type::regular == ci.ftype) {
-        ci.fsize = file_size_type(e->nFileSizeLow) | (file_size_type(e->nFileSizeHigh) >> 32)
+        ci.fsize = fs::file_size_type(e->nFileSizeLow) | (fs::file_size_type(e->nFileSizeHigh) >> 32);
     } else {
         ci.fsize = 0;
     }
@@ -636,7 +636,7 @@ void directory_entry::refresh() {
 }
 
 void directory_entry::refresh(error_code& ec) {
-    constexpr status_info info = status_info::basic | status_info::times |status_info::size;
+    constexpr status_info info = status_info::basic | status_info::times | status_info::size;
     const auto st = filesystem::symlink_status(m_path, info, ec);
     if (!ec) {
         m_type = st.type();

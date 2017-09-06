@@ -399,12 +399,12 @@ file_status file_stat(const path& p, status_info what, error_code& ec, bool link
         auto&& np = ifilesystem::to_native_path{}(p.native());
         times t;
         file_size_type sz{};
-        if (is_set(what & (status_info::times|status_info::size)) {
+        if (is_set(what & (status_info::times|status_info::size))) {
             ::BY_HANDLE_FILE_INFORMATION info;
             if (ifilesystem::finfo(np, &info, lec)) {
                 t = to_times{}(info);
                 if (get_type(attrs) == file_type::regular) {
-                    sz = to_size(&info);
+                    sz = to_size(info);
                 }
             }
         }
@@ -604,7 +604,7 @@ bool finfo(const path& p, ::BY_HANDLE_FILE_INFORMATION* info, error_code& ec) {
 }
 
 file_time_type to_filetime(const ::FILETIME& ft) {
-    return to_times{}(ft);
+    return to_times{}.from(ft);
 }
 
 } // ifilesystem
