@@ -433,6 +433,10 @@ inline file_size_type file_size(const path& p, error_code& ec) noexcept {
     return status(p, status_info::size, ec).size();
 }
 
+inline file_time_type last_write_time(const file_status& st) noexcept { // extension
+    return st.times().modified();
+}
+
 inline file_time_type last_write_time(const path& p) {
     return status(p, status_info::times).times().modified();
 }
