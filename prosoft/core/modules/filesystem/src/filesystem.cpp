@@ -153,7 +153,8 @@ file_status file_stat(decltype(::stat) statcall, const path& p, status_info what
         if (status_info::basic == what) {
             return file_status{to_file_type{}(sb)};
         } else {
-            return file_status{to_file_type{}(sb), to_perms{}(sb), to_owner{}(sb), to_times{}(sb)};
+            static_assert(sizeof(file_size_type) >= sizeof(sb.st_size), "Broken assumption");
+            return file_status{to_file_type{}(sb), to_perms{}(sb), file_size_type(sb.st_size), to_owner{}(sb), to_times{}(sb)};
         }
     } else {
         ifilesystem::system_error(ec);
@@ -362,19 +363,28 @@ struct to_times {
     ::FILETIME to_filetime(const file_time_type& t) {
         return from_utc(t.time_since_epoch());
     }
-
-    times operator()(const path& p, error_code& ec) {
+    
+    times operator()(const ::BY_HANDLE_FILE_INFORMATION& info) {
         times t;
-        ::BY_HANDLE_FILE_INFORMATION info;
-        if (ifilesystem::finfo(p, &info, ec)) {
-            t.modified(from(info.ftLastWriteTime));
-            t.metadata_modified(t.modified());
-            t.accessed(from(info.ftLastAccessTime));
-            t.created(from(info.ftCreationTime));
-        }
+        t.modified(from(info.ftLastWriteTime));
+        t.metadata_modified(t.modified());
+        t.accessed(from(info.ftLastAccessTime));
+        t.created(from(info.ftCreationTime));
         return t;
     }
+    
+    times operator()(const path& p, error_code& ec) {
+        ::BY_HANDLE_FILE_INFORMATION info;
+        if (ifilesystem::finfo(p, &info, ec)) {
+            return operator()(info);
+        }
+        return times{};
+    }
 };
+
+file_size_type to_size(const ::BY_HANDLE_FILE_INFORMATION& info) {
+    return file_size_type(info.nFileSizeLow) | (file_size_type(info.nFileSizeHigh) >> 32);
+}
 
 file_status file_stat(const path& p, status_info what, error_code& ec, bool link) noexcept {
     if (const auto attrs = ifilesystem::fattrs(p, ec)) {
@@ -388,10 +398,17 @@ file_status file_stat(const path& p, status_info what, error_code& ec, bool link
         }
         auto&& np = ifilesystem::to_native_path{}(p.native());
         times t;
-        if (is_set(what & status_info::times)) {
-            t = to_times{}(np, lec);
+        file_size_type sz{};
+        if (is_set(what & (status_info::times|status_info::size)) {
+            ::BY_HANDLE_FILE_INFORMATION info;
+            if (ifilesystem::finfo(np, &info, lec)) {
+                t = to_times{}(info);
+                if (get_type(attrs) == file_type::regular) {
+                    sz = to_size(&info);
+                }
+            }
         }
-        return file_status{get_type(np, attrs, link), ap, std::move(o), t};
+        return file_status{get_type(np, attrs, link), ap, sz, std::move(o), t};
     } else {
         if (is_device_path(p)) {
             return file_status{to_file_type{}(FILE_ATTRIBUTE_DEVICE)}; // We know the type from the path, so return it.

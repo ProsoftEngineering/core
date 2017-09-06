@@ -235,15 +235,16 @@ class file_status {
     using times_type = filesystem::times;
     
 public:
-    file_status(file_type ft, perms p, owner_type&& o, const times_type& t)
+    file_status(file_type ft, perms p, file_size_type sz, owner_type&& o, const times_type& t)
         : m_owner(std::move(o))
         , m_times(t)
+        , m_size(sz)
         , m_type(ft)
         , m_perms(p) {}
-    file_status(file_type ft, perms p, const owner_type& o, const times_type& t)
-        : file_status(ft, p, owner_type{o}, t) {}
+    file_status(file_type ft, perms p, file_size_type sz, const owner_type& o, const times_type& t)
+        : file_status(ft, p, sz, owner_type{o}, t) {}
     explicit file_status(file_type ft = file_type::none, perms p = perms::unknown)
-        : file_status(ft, p, owner_type::invalid_owner(), times_type()) {}
+        : file_status(ft, p, file_size_type(), owner_type::invalid_owner(), times_type()) {}
     PS_DEFAULT_DESTRUCTOR(file_status);
     PS_DEFAULT_COPY(file_status);
     PS_DEFAULT_MOVE(file_status);
@@ -264,7 +265,7 @@ public:
         m_perms = p;
     }
 
-    // Extensions
+    // Extensions -- seems silly to make multiple calls on non-Windows when one call provides all info.
 
     const owner_type& owner() const noexcept {
         return m_owner;
@@ -285,10 +286,19 @@ public:
     void times(const times_type& val) {
         m_times = val;
     }
+    
+    file_size_type size() const noexcept {
+        return m_size;
+    }
+    
+    void size(file_size_type sz) noexcept {
+        m_size = sz;
+    }
 
 private:
-    owner_type m_owner;
-    times_type m_times;
+    owner_type m_owner; // extension
+    times_type m_times; // extension
+    file_size_type m_size; // extension
     file_type m_type;
     perms m_perms;
 };
@@ -373,8 +383,9 @@ enum class status_info {
     basic = 0,
     perms = 0x1,
     times = 0x2,
+    size = 0x4,
     
-    all = basic|perms|times,
+    all = basic|perms|times|size,
 };
 PS_ENUM_BITMASK_OPS(status_info);
 
@@ -409,6 +420,18 @@ inline bool exists(const file_status& s) noexcept {
 }
 bool exists(const path&);
 bool exists(const path&, error_code&) noexcept;
+    
+inline file_size_type file_size(const file_status& st) noexcept { // extension
+    return st.size();
+}
+
+inline file_size_type file_size(const path& p) {
+    return status(p, status_info::size).size();
+}
+
+inline file_size_type file_size(const path& p, error_code& ec) noexcept {
+    return status(p, status_info::size, ec).size();
+}
 
 inline file_time_type last_write_time(const path& p) {
     return status(p, status_info::times).times().modified();

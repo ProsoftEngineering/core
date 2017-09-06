@@ -175,6 +175,8 @@ TEST_CASE("filesystem") {
         const auto p = temp_directory_path() / PS_TEXT("fs17test");
         {
             create_file(p);
+            std::fstream os{p.string().c_str()};
+            os << "hello";
         }
         const auto st = status(p);
         CHECK(is_regular_file(p));
@@ -190,6 +192,7 @@ TEST_CASE("filesystem") {
         CHECK_FALSE(is_device_file(st));
 
         CHECK(last_write_time(p) > times::make_invalid());
+        CHECK(file_size(p) > 0);
         
         using namespace std::chrono;
         const auto now = std::chrono::system_clock::now();
