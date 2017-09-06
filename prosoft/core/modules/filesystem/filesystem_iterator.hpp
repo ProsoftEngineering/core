@@ -278,7 +278,7 @@ struct cache_info {
     cache_info()
         : ftype(file_type::none)
 #if _WIN32
-        , fsize()
+        , fsize(directory_entry::unknown_size)
         , fwrite_time(times::make_invalid())
 #endif
     {
@@ -328,7 +328,7 @@ public:
             m_current.m_type = cinfo.ftype;
         }
 #if _WIN32
-        if (cinfo.fsize > 0) {
+        if (cinfo.fsize != directory_entry::unknown_size) {
             m_current.m_size = cinfo.fsize;
         }
         if (cinfo.fwrite_time != times::make_invalid()) {
