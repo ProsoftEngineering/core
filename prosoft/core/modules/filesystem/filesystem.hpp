@@ -30,7 +30,6 @@
 
 #include <prosoft/core/config/config_platform.h>
 
-#include <chrono>
 #include <functional>
 #include <iomanip>
 #include <iostream>
@@ -52,8 +51,6 @@ using error_code = std::error_code; // Extension
 namespace prosoft {
 namespace filesystem {
 inline namespace v1 {
-
-using file_time_type = std::chrono::time_point<std::chrono::system_clock>;
 
 inline void swap(path& lhs, path& rhs) noexcept(noexcept(std::declval<path>().swap(std::declval<path&>()))) {
     lhs.swap(rhs);
@@ -169,52 +166,6 @@ private:
     path mPath2;
 };
 
-enum class file_type {
-    none = 0,
-    not_found = -1,
-    regular = 1,
-    directory = 2,
-    symlink = 3,
-    block = 4,
-    character = 5,
-    fifo = 6,
-    socket = 7,
-    unknown = 8
-};
-
-enum class perms {
-    none = 0,
-    owner_read = 0400,
-    owner_write = 0200,
-    owner_exec = 0100,
-    owner_all = 0700,
-
-    group_read = 040,
-    group_write = 020,
-    group_exec = 010,
-    group_all = 070,
-
-    others_read = 04,
-    others_write = 02,
-    others_exec = 01,
-    others_all = 07,
-
-    all = 0777,
-    set_uid = 04000,
-    set_gid = 02000,
-    sticky_bit = 01000,
-
-    mask = 07777,
-
-    unknown = 0xffff,
-
-    add_perms = 0x10000,
-    remove_perms = 0x20000,
-    resolve_symlinks = 0x40000,
-};
-
-PS_ENUM_BITMASK_OPS(perms);
-
 // Extensions
 
 class owner {
@@ -276,76 +227,6 @@ inline void swap(owner& lhs, owner& rhs) {
 inline bool operator!=(const owner& lhs, const owner& rhs) {
     return !lhs.operator==(rhs);
 }
-
-class times {
-    file_time_type m_modifyTime;
-    file_time_type m_changeTime;
-    file_time_type m_accessTime;
-    file_time_type m_createTime;
-    
-    static constexpr file_time_type m_invalidTime = file_time_type::min();
-    
-public:
-    times()
-        : m_modifyTime(m_invalidTime)
-        , m_changeTime(m_invalidTime)
-        , m_accessTime(m_invalidTime)
-        , m_createTime(m_invalidTime) {}
-    PS_DEFAULT_COPY(times);
-    PS_DEFAULT_MOVE(times);
-    
-    const file_time_type& modified() const noexcept {
-        return m_modifyTime;
-    }
-    
-    void modified(const file_time_type& val) {
-        m_modifyTime = val;
-    }
-    
-    bool has_modified() const noexcept {
-        return m_modifyTime != m_invalidTime;
-    }
-    
-    const file_time_type& metadata_modified() const noexcept {
-        return m_changeTime;
-    }
-    
-    void metadata_modified(const file_time_type& val) {
-        m_changeTime = val;
-    }
-    
-    bool has_metadata_modified() const noexcept {
-        return m_changeTime != m_invalidTime;
-    }
-    
-    const file_time_type& accessed() const noexcept {
-        return m_accessTime;
-    }
-    
-    void accessed(const file_time_type& val) {
-        m_accessTime = val;
-    }
-    
-    bool has_accessed() const noexcept {
-        return m_accessTime != m_invalidTime;
-    }
-    
-    const file_time_type& created() const noexcept {
-        return m_createTime;
-    }
-    
-    void created(const file_time_type& val) {
-        m_createTime = val;
-    }
-    
-    bool has_created() const noexcept {
-        return m_createTime != m_invalidTime;
-    }
-
-    static constexpr file_time_type make_invalid() {
-        return m_invalidTime;
-    }
-};
 
 // Extensions
 

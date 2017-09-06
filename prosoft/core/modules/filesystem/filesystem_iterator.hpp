@@ -30,11 +30,15 @@
 #include <memory>
 #include <type_traits>
 
+#include "filesystem_primatives.hpp"
+
 namespace prosoft {
 namespace filesystem {
 inline namespace v1 {
 
 class file_status;
+
+template <class> class basic_iterator;
 
 class directory_entry {
     // C++ states that a name within a scope must have a unique meaning.
@@ -42,7 +46,9 @@ class directory_entry {
     // GCC warns about this, clang does not.
     using path_type = prosoft::filesystem::path;
     path_type m_path;
-
+    
+    template <class> friend class basic_iterator;
+    
 public:
     directory_entry() noexcept(std::is_nothrow_constructible<path_type>::value) : m_path() {}
     ~directory_entry() = default;
