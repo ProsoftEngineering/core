@@ -111,7 +111,7 @@ public:
         , m_last_write(PS_FS_ENTRY_INVALID_TIME_VALUE) {
     }
     
-    void assign(path_type&& p) {
+    void assign(path_type&& p) noexcept(std::is_nothrow_move_assignable<path_type>::value) {
         m_path = std::move(p);
     }
     
