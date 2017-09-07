@@ -61,24 +61,25 @@ public:
         : m_path()
         , m_type(file_type::none)
         , m_size(unknown_size)
-        , m_last_write(PS_FS_ENTRY_INVALID_TIME_VALUE)
-    {
+        , m_last_write(PS_FS_ENTRY_INVALID_TIME_VALUE) {
     }
+    
     explicit directory_entry(const path_type& p)
         : m_path(p)
         , m_type(file_type::none)
         , m_size(unknown_size)
-        , m_last_write(PS_FS_ENTRY_INVALID_TIME_VALUE)
-    {
-        
+        , m_last_write(PS_FS_ENTRY_INVALID_TIME_VALUE) {
     }
+    
     ~directory_entry() = default;
+    
     directory_entry(const directory_entry& other)
         : m_path(other.m_path)
         , m_type(other.m_type.load())
         , m_size(other.m_size.load())
         , m_last_write(other.m_last_write.load()) {
     }
+    
     directory_entry(directory_entry&& other) noexcept(std::is_nothrow_move_constructible<path_type>::value)
         : m_path(std::move(other.m_path))
         , m_type(other.m_type.load())
