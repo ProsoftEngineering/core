@@ -187,7 +187,7 @@ private:
     // Cache
     friend ifilesystem::iterator_state;
     std::atomic<file_type> mutable m_type;
-    std::atomic<size_t> mutable m_size;
+    std::atomic<file_size_type> mutable m_size;
     std::atomic<file_time_type::duration::rep> mutable m_last_write;
 
     template <typename T>
@@ -219,10 +219,10 @@ private:
         return load(m_type, file_type::none, ec);
     }
     
-    size_t get_size() const {
+    file_size_type get_size() const {
         return load(m_size, unknown_size);
     }
-    size_t get_size(error_code& ec) const {
+    file_size_type get_size(error_code& ec) const {
         return load(m_size, unknown_size, ec);
     }
     
