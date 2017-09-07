@@ -173,7 +173,7 @@ public:
     file_time_type last_write_time() const;
     file_time_type last_write_time(error_code& ec) const noexcept;
     
-    // for testing
+    // testing
     file_type cached_type() const {
         return m_type.load();
     }
@@ -183,6 +183,13 @@ public:
     file_time_type::duration::rep cached_write_time() const {
         return m_last_write.load();
     }
+    directory_entry(file_type ft, file_size_type fsz, file_time_type::duration ftime) // no path -- testing only
+        : m_path()
+        , m_type(ft)
+        , m_size(fsz)
+        , m_last_write(ftime.count()) {
+    }
+    // testing
     
 private:
     // Cache
