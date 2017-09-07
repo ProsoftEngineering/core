@@ -57,7 +57,7 @@ class directory_entry {
 public:
     static constexpr file_size_type unknown_size = std::numeric_limits<file_size_type>::max();
     
-    directory_entry() noexcept(std::is_nothrow_constructible<path_type>::value)
+    directory_entry() noexcept(std::is_nothrow_default_constructible<path_type>::value)
         : m_path()
         , m_type(file_type::none)
         , m_size(unknown_size)
