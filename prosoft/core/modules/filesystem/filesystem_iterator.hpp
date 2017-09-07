@@ -205,6 +205,7 @@ private:
     T load(std::atomic<T>& aval, T badVal, error_code& ec) const {
         auto val = aval.load();
         if (badVal != val) {
+            ec.clear();
             return val;
         } else {
             const_cast<directory_entry*>(this)->refresh(ec);
