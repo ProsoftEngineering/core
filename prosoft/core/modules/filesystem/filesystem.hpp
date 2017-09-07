@@ -724,6 +724,7 @@ enum class domain {
 enum class standard_directory {
     app_data,
     cache,
+    resources, // Library on macOS, app_data for others
 };
 
 enum class standard_directory_options {

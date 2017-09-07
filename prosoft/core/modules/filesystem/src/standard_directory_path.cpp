@@ -104,6 +104,9 @@ std::string tostring(standard_directory sd) {
         case standard_directory::cache:
             return "cache";
         break;
+        case standard_directory::resources:
+            return "resources";
+        break;
 #if !__clang__
         default:
         break;
@@ -124,17 +127,18 @@ NativeSearchType search(domain, standard_directory sd, error_code& ec) {
     static const std::unordered_map<standard_directory, NativeSearchType> sdmap {
 #if __APPLE__
         {standard_directory::app_data, NSApplicationSupportDirectory},
-        {standard_directory::cache, NSCachesDirectory}
+        {standard_directory::cache, NSCachesDirectory},
+        {standard_directory::resources, NSLibraryDirectory}
 #elif _WIN32
 #ifdef __MINGW32__
-        {standard_directory::app_data, CSIDL_APPDATA},
+        {standard_directory::app_data, CSIDL_APPDATA}, {standard_directory::resources, CSIDL_APPDATA},
         {standard_directory::cache, CSIDL_LOCAL_APPDATA}
 #else
-        {standard_directory::app_data, FOLDERID_RoamingAppData},
+        {standard_directory::app_data, FOLDERID_RoamingAppData}, {standard_directory::resources, FOLDERID_RoamingAppData},
         {standard_directory::cache, FOLDERID_LocalAppData}
 #endif
 #else
-        {standard_directory::app_data, "~/.config"},
+        {standard_directory::app_data, "~/.config"}, {standard_directory::resources, "~/.config"},
         {standard_directory::cache, "~/.cache"}
 #endif
     };
