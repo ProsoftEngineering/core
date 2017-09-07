@@ -54,8 +54,7 @@ matrix:
             apt:
                 sources: ['ubuntu-toolchain-r-test']
                 packages: ['gcc-5', 'g++-5', 'libacl1-dev']
-        # onig apparently has some leaks (or ASAN thinks it does), disable for now
-        env: PSCC=gcc-5 PSCXX=g++-5 ASAN_OPTIONS=detect_leaks=0
+        env: PSCC=gcc-5 PSCXX=g++-5
         # enable Ubuntu 14 image
         sudo: required
         dist: trusty
