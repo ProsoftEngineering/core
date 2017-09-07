@@ -55,7 +55,16 @@ matrix:
                 sources: ['ubuntu-toolchain-r-test']
                 packages: ['gcc-5', 'g++-5', 'libacl1-dev']
         env: PSCC=gcc-5 PSCXX=g++-5
-        # enable Ubuntu 14 image
+        sudo: required
+        dist: trusty
+        
+      - os: linux
+        compiler: gcc
+        addons: &gcc6
+            apt:
+                sources: ['ubuntu-toolchain-r-test']
+                packages: ['gcc-6', 'g++-6', 'libacl1-dev']
+        env: PSCC=gcc-6 PSCXX=g++-6
         sudo: required
         dist: trusty
         
