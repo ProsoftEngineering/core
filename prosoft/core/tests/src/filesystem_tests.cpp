@@ -130,20 +130,39 @@ TEST_CASE("filesystem") {
         }
         
         WHEN("assigning a path to an entry") {
-            auto de = directory_entry{};
+            auto de = directory_entry{file_type::unknown, 0, file_time_type::duration(0)};
+            CHECK(de.cached_type() == file_type::unknown);
+            CHECK(de.cached_size() == 0);
+            CHECK(de.cached_write_time() == 0);
+            
             const auto p = path{"/a/b/c/"}.make_preferred();
             de.assign(p);
             THEN("the entry path equals the input path") {
                 CHECK(de.path() == p);
+            } AND_THEN("the cached values update") {
+                // Assuming path does not exist
+                CHECK(de.cached_type() == file_type::none);
+                CHECK(de.cached_size() == de.unknown_size);
+                CHECK(de.cached_write_time() == PS_FS_ENTRY_INVALID_TIME_VALUE);
             }
         }
         
         WHEN("replacing an entry filename") {
             const auto p = path{"/a/b/c"}.make_preferred();
-            auto de = directory_entry{p};
+            auto de = directory_entry{file_type::unknown, 0, file_time_type::duration(0)};
+            de.assign_no_refresh(p);
+            CHECK(de.cached_type() == file_type::unknown);
+            CHECK(de.cached_size() == 0);
+            CHECK(de.cached_write_time() == 0);
+            
             de.replace_filename(path{"d"});
             THEN("the entry path equals the input path") {
                 CHECK(de.path() == p.parent_path()/path{"d"});
+            } AND_THEN("the cached values update") {
+                // Assuming path does not exist
+                CHECK(de.cached_type() == file_type::none);
+                CHECK(de.cached_size() == de.unknown_size);
+                CHECK(de.cached_write_time() == PS_FS_ENTRY_INVALID_TIME_VALUE);
             }
         }
         

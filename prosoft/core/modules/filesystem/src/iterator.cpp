@@ -642,6 +642,8 @@ void directory_entry::refresh(error_code& ec) {
         m_type = st.type();
         m_size = st.size();
         m_last_write = st.times().modified().time_since_epoch().count();
+    } else {
+        clear_cache();
     }
 }
 

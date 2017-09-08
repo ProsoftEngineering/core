@@ -111,8 +111,15 @@ public:
         , m_last_write(PS_FS_ENTRY_INVALID_TIME_VALUE) {
     }
     
-    void assign(path_type&& p) noexcept(std::is_nothrow_move_assignable<path_type>::value) {
+    void assign(path_type&& p) {
+        // Cache spec says we should call the throwable refresh(), but to maintain compat with the C++17 std we just ignore errors
+        error_code ignored;
+        assign(std::move(p), ignored);
+    }
+    
+    void assign(path_type&& p, error_code& ec) {
         m_path = std::move(p);
+        refresh(ec);
     }
     
     bool empty() const noexcept(noexcept(std::declval<path_type>().empty())) {
@@ -121,11 +128,25 @@ public:
     // Extensions //
 
     void assign(const path_type& p) {
+        // Cache spec says we should call the throwable refresh(), but to maintain compat with the C++17 std we just ignore errors
+        error_code ignored;
+        assign(p, ignored);
+    }
+    
+    void assign(const path_type& p, error_code& ec) {
         m_path = p;
+        refresh(ec);
     }
 
     void replace_filename(const path_type& p) {
+        // Cache spec says we should call the throwable refresh(), but to maintain compat with the C++17 std we just ignore errors
+        error_code ignored;
+        replace_filename(p, ignored);
+    }
+    
+    void replace_filename(const path_type& p, error_code& ec) {
         m_path.replace_filename(p);
+        refresh(ec);
     }
 
     operator const path_type&() const noexcept {
@@ -137,6 +158,7 @@ public:
     }
     
     PS_WARN_UNUSED_RESULT path_type path() && noexcept(std::is_nothrow_move_constructible<path_type>::value) {
+        clear_cache();
         return path_type{std::move(m_path)};
     }
 
@@ -188,6 +210,9 @@ public:
         , m_type(ft)
         , m_size(fsz)
         , m_last_write(ftime.count()) {
+    }
+    void assign_no_refresh(const path_type& p) {
+        m_path = p;
     }
     // testing
     
@@ -241,6 +266,12 @@ private:
     
     file_time_type get_last_write(error_code& ec) const {
         return file_time_type{file_time_type::duration{load(m_last_write, PS_FS_ENTRY_INVALID_TIME_VALUE, ec)}};
+    }
+    
+    void clear_cache() noexcept {
+        m_type = file_type::none;
+        m_size = unknown_size;
+        m_last_write = PS_FS_ENTRY_INVALID_TIME_VALUE;
     }
 };
 
