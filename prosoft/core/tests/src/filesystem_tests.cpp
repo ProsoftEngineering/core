@@ -166,6 +166,25 @@ TEST_CASE("filesystem") {
             }
         }
         
+        WHEN("extracting path") {
+            const auto p = path{"/a/b/c"}.make_preferred();
+            auto de = directory_entry{file_type::unknown, 0, file_time_type::duration(0)};
+            de.assign_no_refresh(p);
+            CHECK(de.cached_type() == file_type::unknown);
+            CHECK(de.cached_size() == 0);
+            CHECK(de.cached_write_time() == 0);
+            
+            auto ep = std::move(de).path();
+            THEN("then entry path is empty") {
+                CHECK(de.path().empty());
+            } AND_THEN("the cached values update") {
+                // Assuming path does not exist
+                CHECK(de.cached_type() == file_type::none);
+                CHECK(de.cached_size() == de.unknown_size);
+                CHECK(de.cached_write_time() == PS_FS_ENTRY_INVALID_TIME_VALUE);
+            }
+        }
+        
         WHEN("comparing entries") {
             const auto de = directory_entry{path{"a"}};
             THEN("compare result is the expected value") {
