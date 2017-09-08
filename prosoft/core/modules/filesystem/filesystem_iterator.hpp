@@ -257,7 +257,8 @@ private:
         return load(m_size, unknown_size);
     }
     file_size_type get_size(error_code& ec) const {
-        return load(m_size, unknown_size, ec);
+        auto val = load(m_size, unknown_size, ec);
+        return val != unknown_size ? val : 0;
     }
     
     file_time_type get_last_write() const {

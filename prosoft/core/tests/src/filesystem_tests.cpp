@@ -103,8 +103,9 @@ TEST_CASE("filesystem") {
                 CHECK_FALSE(de.exists(ec));
                 CHECK(ec);
                 ec.assign(0, ec.category());
-                CHECK(de.file_size(ec) == directory_entry::unknown_size);
+                CHECK(de.file_size(ec) == 0);
                 CHECK(ec);
+                CHECK(de.cached_size() == directory_entry::unknown_size);
                 ec.assign(0, ec.category());
                 CHECK(de.last_write_time(ec) == times::make_invalid());
                 CHECK(ec);
