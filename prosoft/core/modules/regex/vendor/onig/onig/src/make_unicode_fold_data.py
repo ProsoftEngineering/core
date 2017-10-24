@@ -1,5 +1,7 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
+# make_unicode_fold_data.py
+# Copyright (c) 2016-2017  K.Kosako
 
 import sys
 import re
@@ -15,7 +17,7 @@ DataName = 'OnigUnicodeFolds'
 ENCODING = 'utf-8'
 
 LINE_REG = re.compile("([0-9A-F]{1,6}); (.); ([0-9A-F]{1,6})(?: ([0-9A-F]{1,6}))?(?: ([0-9A-F]{1,6}))?;(?:\s*#\s*)(.*)")
-VERSION_REG  = re.compile("#.*-(\d\.\d\.\d)\.txt")
+VERSION_REG  = re.compile("#.*-(\d+\.\d+\.\d+)\.txt")
 
 VERSION_INFO = None
 

@@ -35,8 +35,8 @@ extern "C" {
 
 #define ONIGURUMA
 #define ONIGURUMA_VERSION_MAJOR   6
-#define ONIGURUMA_VERSION_MINOR   4
-#define ONIGURUMA_VERSION_TEENY   0
+#define ONIGURUMA_VERSION_MINOR   6
+#define ONIGURUMA_VERSION_TEENY   1
 
 #ifdef __cplusplus
 # ifndef  HAVE_PROTOTYPES
@@ -270,7 +270,7 @@ ONIG_EXTERN OnigEncodingType OnigEncodingGB18030;
 #define ONIGENC_IS_CODE_ASCII(code)       ((code) < 128)
 #define ONIGENC_IS_MBC_WORD(enc,s,end) \
    ONIGENC_IS_CODE_WORD(enc,ONIGENC_MBC_TO_CODE(enc,s,end))
-
+#define ONIGENC_IS_MBC_WORD_ASCII(enc,s,end) onigenc_is_mbc_word_ascii(enc,s,end)
 
 #define ONIGENC_NAME(enc)                      ((enc)->name)
 
@@ -385,6 +385,7 @@ typedef unsigned int        OnigOptionType;
 
 /* options */
 #define ONIG_OPTION_NONE                 0U
+/* options (compile time) */
 #define ONIG_OPTION_IGNORECASE           1U
 #define ONIG_OPTION_EXTEND               (ONIG_OPTION_IGNORECASE         << 1)
 #define ONIG_OPTION_MULTILINE            (ONIG_OPTION_EXTEND             << 1)
@@ -395,11 +396,18 @@ typedef unsigned int        OnigOptionType;
 #define ONIG_OPTION_DONT_CAPTURE_GROUP   (ONIG_OPTION_NEGATE_SINGLELINE  << 1)
 #define ONIG_OPTION_CAPTURE_GROUP        (ONIG_OPTION_DONT_CAPTURE_GROUP << 1)
 /* options (search time) */
-#define ONIG_OPTION_NOTBOL               (ONIG_OPTION_CAPTURE_GROUP << 1)
-#define ONIG_OPTION_NOTEOL               (ONIG_OPTION_NOTBOL << 1)
-#define ONIG_OPTION_POSIX_REGION         (ONIG_OPTION_NOTEOL << 1)
-#define ONIG_OPTION_CHECK_VALIDITY_OF_STRING   (ONIG_OPTION_POSIX_REGION << 1)
-#define ONIG_OPTION_MAXBIT               ONIG_OPTION_CHECK_VALIDITY_OF_STRING  /* limit */
+#define ONIG_OPTION_NOTBOL                    (ONIG_OPTION_CAPTURE_GROUP << 1)
+#define ONIG_OPTION_NOTEOL                    (ONIG_OPTION_NOTBOL << 1)
+#define ONIG_OPTION_POSIX_REGION              (ONIG_OPTION_NOTEOL << 1)
+#define ONIG_OPTION_CHECK_VALIDITY_OF_STRING  (ONIG_OPTION_POSIX_REGION << 1)
+/* #define ONIG_OPTION_CRLF_AS_LINE_SEPARATOR    (ONIG_OPTION_CHECK_VALIDITY_OF_STRING << 1) */
+/* options (compile time) */
+#define ONIG_OPTION_WORD_IS_ASCII        (ONIG_OPTION_CHECK_VALIDITY_OF_STRING << 4)
+#define ONIG_OPTION_DIGIT_IS_ASCII       (ONIG_OPTION_WORD_IS_ASCII << 1)
+#define ONIG_OPTION_SPACE_IS_ASCII       (ONIG_OPTION_DIGIT_IS_ASCII << 1)
+#define ONIG_OPTION_POSIX_IS_ASCII       (ONIG_OPTION_SPACE_IS_ASCII << 1)
+
+#define ONIG_OPTION_MAXBIT               ONIG_OPTION_POSIX_IS_ASCII  /* limit */
 
 #define ONIG_OPTION_ON(options,regopt)      ((options) |= (regopt))
 #define ONIG_OPTION_OFF(options,regopt)     ((options) &= ~(regopt))
@@ -496,6 +504,12 @@ ONIG_EXTERN OnigSyntaxType*   OnigDefaultSyntax;
 /* #define ONIG_SYN_OP2_CHAR_PROPERTY_PREFIX_IS (1U<<18) */
 #define ONIG_SYN_OP2_ESC_H_XDIGIT               (1U<<19) /* \h, \H */
 #define ONIG_SYN_OP2_INEFFECTIVE_ESCAPE         (1U<<20) /* \ */
+#define ONIG_SYN_OP2_QMARK_LPAREN_IF_ELSE       (1U<<21) /* (?(n)) (?(...)...|...) */
+#define ONIG_SYN_OP2_ESC_CAPITAL_K_KEEP         (1U<<22) /* \K */
+#define ONIG_SYN_OP2_ESC_CAPITAL_R_GENERAL_NEWLINE (1U<<23) /* \R \r\n else [\x0a-\x0d] */
+#define ONIG_SYN_OP2_ESC_CAPITAL_N_O_SUPER_DOT  (1U<<24) /* \N (?-m:.), \O (?m:.) */
+#define ONIG_SYN_OP2_QMARK_TILDE_ABSENT_GROUP   (1U<<25) /* (?~...) */
+#define ONIG_SYN_OP2_ESC_X_Y_GRAPHEME_CLUSTER   (1U<<26) /* \X \y \Y */
 
 /* syntax (behavior) */
 #define ONIG_SYN_CONTEXT_INDEP_ANCHORS           (1U<<31) /* not implemented */
@@ -596,6 +610,9 @@ ONIG_EXTERN OnigSyntaxType*   OnigDefaultSyntax;
 #define ONIGERR_NEVER_ENDING_RECURSION                       -221
 #define ONIGERR_GROUP_NUMBER_OVER_FOR_CAPTURE_HISTORY        -222
 #define ONIGERR_INVALID_CHAR_PROPERTY_NAME                   -223
+#define ONIGERR_INVALID_IF_ELSE_SYNTAX                       -224
+#define ONIGERR_INVALID_ABSENT_GROUP_PATTERN                 -225
+#define ONIGERR_INVALID_ABSENT_GROUP_GENERATOR_PATTERN       -226
 #define ONIGERR_INVALID_CODE_POINT_VALUE                     -400
 #define ONIGERR_INVALID_WIDE_CHAR_VALUE                      -400
 #define ONIGERR_TOO_BIG_WIDE_CHAR_VALUE                      -401
