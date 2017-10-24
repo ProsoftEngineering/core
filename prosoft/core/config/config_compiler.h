@@ -126,6 +126,7 @@
 // VS 2013 is decent, and 2015 much better (basically complete excepting SFINAE)
 // Clang: https://clang.llvm.org/cxx_status.html
 // GCC: https://gcc.gnu.org/projects/cxx0x.html, https://gcc.gnu.org/projects/cxx1y.html
+// MSVC (2017): https://docs.microsoft.com/en-us/cpp/visual-cpp-language-conformance
 // MSVC: http://msdn.microsoft.com/en-us/library/vstudio/hh567368.aspx
 // All: http://en.cppreference.com/w/cpp/compiler_support
 //
@@ -257,6 +258,12 @@
 #define PS_ALWAYS_INLINE __attribute__((always_inline))
 #elif _MSC_VER
 #define PS_ALWAYS_INLINE __forceinline
+#endif
+
+#if __clang__ || __GNUC__
+#define PS_NOINLINE __attribute__((noinline))
+#elif _MSC_VER
+#define PS_NOINLINE __declspec(noinline)
 #endif
 
 #if __cplusplus
