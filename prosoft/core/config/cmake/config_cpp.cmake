@@ -29,6 +29,7 @@ endif()
 
 macro(ps_core_config_cpp_version TARGET_NAME)
 	include(CheckCXXSourceCompiles)
+	set_property(TARGET ${TARGET_NAME} PROPERTY CXX_EXTENSIONS OFF) # Don't use GNU extensions. They are not portable.
 	if(NOT MSVC)
 		include(CheckCXXCompilerFlag)
 		check_cxx_compiler_flag("-std=c++11" HAVE_STD_CPP11_FLAG)
