@@ -1,4 +1,4 @@
-# Copyright © 2013-2015, Prosoft Engineering, Inc. (A.K.A "Prosoft")
+# Copyright © 2013-2017, Prosoft Engineering, Inc. (A.K.A "Prosoft")
 # All rights reserved.
 # 
 # Redistribution and use in source and binary forms, with or without
@@ -34,7 +34,7 @@ macro(ps_core_config_cpp_version TARGET_NAME)
 		include(CheckCXXCompilerFlag)
 		check_cxx_compiler_flag("-std=c++11" HAVE_STD_CPP11_FLAG)
 		if(HAVE_STD_CPP11_FLAG)
-			# Cmake 3.8 adds C++17 support
+			# Cmake 3.8 adds C++17 support. CMake < 3.10 ignores this property for MSVC, so C++17 support in VS2017 would require manual flags.
 			set_property(TARGET ${TARGET_NAME} PROPERTY CXX_STANDARD 14)
 		else()
 			message(FATAL_ERROR "Your compiler doesn't support C++11.")
