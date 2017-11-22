@@ -53,7 +53,7 @@ if [ -z $CMAKE_VER ]; then
 CMAKE_VER=3.9.4
 fi
 
-VROOT=`echo ${CMAKE_VER} | grep -oE '[0-9]\.[0-9]'`
+VROOT=`echo ${CMAKE_VER} | grep -oE '[0-9]+\.[0-9]+'`
 # cmake.org (as of 2015-11) returns a 301 error for HTTP pointing to HTTPS.
 URL=https://cmake.org/files/v${VROOT}/cmake-${CMAKE_VER}.tar.gz
 
