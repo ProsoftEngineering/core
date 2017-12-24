@@ -51,7 +51,7 @@ TEST_CASE("filesystem_iterator") {
     
     SECTION("iterator") {
         SECTION("recurse option is always disabled") {
-            const auto p = create_file(temp_directory_path() / PS_TEXT("fs17test"));
+            const auto p = create_file(temp_directory_path() / process_name("fs17test"));
             REQUIRE(exists(p));
             
             directory_iterator i{temp_directory_path()};
@@ -86,7 +86,7 @@ TEST_CASE("filesystem_iterator") {
         }
         
         SECTION("operations") {
-            const auto root = temp_directory_path() / PS_TEXT("fs17iter");
+            const auto root = temp_directory_path() / process_name("fs17iter");
             create_directory(root);
             REQUIRE(exists(root));
             PS_RAII_REMOVE(root);

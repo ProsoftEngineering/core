@@ -222,7 +222,7 @@ TEST_CASE("filesystem") {
     }
     
     WHEN("path is a file") {
-        const auto p = temp_directory_path() / PS_TEXT("fs17test");
+        const auto p = temp_directory_path() / process_name("fs17test");
         {
             create_file(p);
             std::fstream os{p.string().c_str()};
@@ -482,7 +482,7 @@ TEST_CASE("filesystem") {
     }
 
     SECTION("create and remove dirs") {
-        const auto p  = temp_directory_path() / PS_TEXT("fs17test");
+        const auto p  = temp_directory_path() / process_name("fs17test");
         
         WHEN("creating a directory that does not exist") {
             error_code ec;
@@ -511,7 +511,7 @@ TEST_CASE("filesystem") {
             error_code ec;
             REQUIRE(create_directory(p));
             
-            const auto np = temp_directory_path() / PS_TEXT("fs17test2");
+            const auto np = temp_directory_path() / process_name("fs17test2");
             REQUIRE_FALSE(exists(np, ec));
             CHECK(create_directory(np, p));
             
@@ -575,7 +575,7 @@ TEST_CASE("filesystem") {
     } // create/remove dirs
 
     SECTION("symlink") {
-        const auto root = temp_directory_path() / PS_TEXT("fs17test");
+        const auto root = temp_directory_path() / process_name("fs17test");
 
         const auto lnk = root / PS_TEXT("lnk");
 
@@ -645,8 +645,8 @@ TEST_CASE("filesystem") {
     } // symlink
     
     SECTION("rename") {
-        const auto op = temp_directory_path() / PS_TEXT("fs171");
-        const auto np = temp_directory_path() / PS_TEXT("fs172");
+        const auto op = temp_directory_path() / process_name("fs171");
+        const auto np = temp_directory_path() / process_name("fs172");
         error_code ec;
         remove(np, ec);
         REQUIRE_FALSE(exists(np, ec));

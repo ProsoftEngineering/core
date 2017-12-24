@@ -87,7 +87,7 @@ TEST_CASE("filesystem_monitor") {
     }
     
     SECTION("recursive monitor") {
-        const auto root = canonical(temp_directory_path()) / PS_TEXT("fs17test");
+        const auto root = canonical(temp_directory_path()) / process_name("fs17test");
         create_directory(root);
         REQUIRE(exists(root));
         
@@ -232,7 +232,7 @@ TEST_CASE("filesystem_monitor") {
             })};
             CHECK(reg);
             
-            const auto np = root.parent_path() / PS_TEXT("fs17test2");
+            const auto np = root.parent_path() / process_name("fs17test2");
             rename(root, np);
             
             std::this_thread::sleep_for(sleep_duration);

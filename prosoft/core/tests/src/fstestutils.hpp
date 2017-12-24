@@ -23,9 +23,32 @@
 // (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
+#if !_WIN32
+#include <unistd.h>
+#else
+#include <windows.h>
+#include <process.h> // _getpid()
+#endif
+
 #include <fstream>
+#include <string>
 
 namespace {
+    prosoft::filesystem::path process_name() {
+        const int mypid =
+        #if !_WIN32
+            ::getpid();
+        #else
+            ::_getpid();
+        #endif
+        using namespace prosoft::filesystem;
+        return path{std::to_string(mypid)};
+    }
+    
+    prosoft::filesystem::path process_name(const char* s) {
+        return  process_name().concat("_").concat(s);
+    }
+
     template<typename T>
     const T& create_file(const T& p, std::ios::openmode mode = std::ios::binary) {
         std::ofstream stream(p.c_str(), mode);

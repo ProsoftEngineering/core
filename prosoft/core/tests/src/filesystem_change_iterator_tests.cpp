@@ -49,7 +49,7 @@ TEST_CASE("filesystem_change_iterator") {
     }
     
     SECTION("event test") {
-        const auto root = canonical(temp_directory_path()) / PS_TEXT("fs17test");
+        const auto root = canonical(temp_directory_path()) / process_name("fs17test");
         create_directory(root);
         REQUIRE(exists(root));
         PS_RAII_REMOVE(root);
@@ -73,7 +73,7 @@ TEST_CASE("filesystem_change_iterator") {
         // sleep enough to deliver the above events, otherwise we might see the root rename only
         std::this_thread::sleep_for(std::chrono::milliseconds(500));
         
-        const auto newroot = root.parent_path() / PS_TEXT("fs17test2");
+        const auto newroot = root.parent_path() / process_name("fs17test2");
         rename(root, newroot); // this will terminate the iterator
         
         int j{};
