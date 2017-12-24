@@ -29,6 +29,11 @@
 
 #include "regint.h"
 
+struct PoolPropertyNameCtype {
+  short int name;
+  short int ctype;
+};
+
 #define ONIGENC_IS_UNICODE_ISO_8859_1_CTYPE(code,ctype) \
   ((EncUNICODE_ISO_8859_1_CtypeTable[code] & CTYPE_TO_BIT(ctype)) != 0)
 
@@ -67,182 +72,9 @@ static const unsigned short EncUNICODE_ISO_8859_1_CtypeTable[256] = {
   0x30e2, 0x30e2, 0x30e2, 0x30e2, 0x30e2, 0x30e2, 0x30e2, 0x30e2
 };
 
-#ifdef USE_UNICODE_PROPERTIES
-#include "unicode_property_data.c"
-#else
-#include "unicode_property_data_posix.c"
-#endif
-
 #include "st.h"
 
-#define USER_DEFINED_PROPERTY_MAX_NUM  20
-
-typedef struct {
-  int ctype;
-  OnigCodePoint* ranges;
-} UserDefinedPropertyValue;
-
-static int UserDefinedPropertyNum;
-static UserDefinedPropertyValue
-UserDefinedPropertyRanges[USER_DEFINED_PROPERTY_MAX_NUM];
-static st_table* UserDefinedPropertyTable;
-
-extern int
-onig_unicode_define_user_property(const char* name, OnigCodePoint* ranges)
-{
-  UserDefinedPropertyValue* e;
-  int r;
-  int i;
-  int n;
-  int len;
-  int c;
-  char* s;
-
-  if (UserDefinedPropertyNum >= USER_DEFINED_PROPERTY_MAX_NUM)
-    return ONIGERR_TOO_MANY_USER_DEFINED_OBJECTS;
-
-  len = strlen(name);
-  if (len >= PROPERTY_NAME_MAX_SIZE)
-    return ONIGERR_TOO_LONG_PROPERTY_NAME;
-
-  s = (char* )xmalloc(len + 1);
-  if (s == 0)
-    return ONIGERR_MEMORY;
-
-  n = 0;
-  for (i = 0; i < len; i++) {
-    c = name[i];
-    if (c <= 0 || c >= 0x80) {
-      xfree(s);
-      return ONIGERR_INVALID_CHAR_PROPERTY_NAME;
-    }
-
-    if (c != ' ' && c != '-' && c != '_') {
-      s[n] = c;
-      n++;
-    }
-  }
-  s[n] = '\0';
-
-  if (UserDefinedPropertyTable == 0) {
-    UserDefinedPropertyTable = onig_st_init_strend_table_with_size(10);
-  }
-
-  e = UserDefinedPropertyRanges + UserDefinedPropertyNum;
-  e->ctype = CODE_RANGES_NUM + UserDefinedPropertyNum;
-  e->ranges = ranges;
-  r = onig_st_insert_strend(UserDefinedPropertyTable,
-                            (const UChar* )s, (const UChar* )s + n,
-                            (hash_data_type )((void* )e));
-  if (r < 0) return r;
-
-  UserDefinedPropertyNum++;
-  return 0;
-}
-
-extern int
-onigenc_unicode_is_code_ctype(OnigCodePoint code, unsigned int ctype)
-{
-  if (
-#ifdef USE_UNICODE_PROPERTIES
-      ctype <= ONIGENC_MAX_STD_CTYPE &&
-#endif
-      code < 256) {
-    return ONIGENC_IS_UNICODE_ISO_8859_1_CTYPE(code, ctype);
-  }
-
-  if (ctype >= CODE_RANGES_NUM) {
-    int index = ctype - CODE_RANGES_NUM;
-    if (index < UserDefinedPropertyNum)
-      return onig_is_in_code_range((UChar* )UserDefinedPropertyRanges[index].ranges, code);
-    else
-      return ONIGERR_TYPE_BUG;
-  }
-
-  return onig_is_in_code_range((UChar* )CodeRanges[ctype], code);
-}
-
-
-extern int
-onigenc_unicode_ctype_code_range(OnigCtype ctype, const OnigCodePoint* ranges[])
-{
-  if (ctype >= CODE_RANGES_NUM) {
-    int index = ctype - CODE_RANGES_NUM;
-    if (index < UserDefinedPropertyNum) {
-      *ranges = UserDefinedPropertyRanges[index].ranges;
-      return 0;
-    }
-    else
-      return ONIGERR_TYPE_BUG;
-  }
-
-  *ranges = CodeRanges[ctype];
-  return 0;
-}
-
-extern int
-onigenc_utf16_32_get_ctype_code_range(OnigCtype ctype, OnigCodePoint* sb_out,
-                                      const OnigCodePoint* ranges[])
-{
-  *sb_out = 0x00;
-  return onigenc_unicode_ctype_code_range(ctype, ranges);
-}
-
-extern int
-onigenc_unicode_property_name_to_ctype(OnigEncoding enc, UChar* name, UChar* end)
-{
-  int len;
-  UChar *p;
-  OnigCodePoint code;
-  const struct PropertyNameCtype* pc;
-  char buf[PROPERTY_NAME_MAX_SIZE];
-
-  p = name;
-  len = 0;
-  while (p < end) {
-    code = ONIGENC_MBC_TO_CODE(enc, p, end);
-    if (code >= 0x80)
-      return ONIGERR_INVALID_CHAR_PROPERTY_NAME;
-
-    if (code != ' ' && code != '-' && code != '_') {
-      buf[len++] = (char )code;
-      if (len >= PROPERTY_NAME_MAX_SIZE)
-        return ONIGERR_INVALID_CHAR_PROPERTY_NAME;
-    }
-
-    p += enclen(enc, p);
-  }
-
-  buf[len] = 0;
-
-  if (UserDefinedPropertyTable != 0) {
-    UserDefinedPropertyValue* e;
-    e = (UserDefinedPropertyValue* )NULL;
-    onig_st_lookup_strend(UserDefinedPropertyTable,
-			  (const UChar* )buf, (const UChar* )buf + len,
-			  (hash_data_type* )((void* )(&e)));
-    if (e != 0) {
-      return e->ctype;
-    }
-  }
-
-  pc = unicode_lookup_property_name(buf, len);
-  if (pc != 0) {
-    /* fprintf(stderr, "LOOKUP: %s: %d\n", buf, pc->ctype); */
-#ifndef USE_UNICODE_PROPERTIES
-    if (pc->ctype > ONIGENC_MAX_STD_CTYPE)
-      return ONIGERR_INVALID_CHAR_PROPERTY_NAME;
-#endif
-
-    return pc->ctype;
-  }
-
-  return ONIGERR_INVALID_CHAR_PROPERTY_NAME;
-}
-
-/* for use macros in unicode_fold_data.c */
 #include "unicode_fold_data.c"
-
 
 extern int
 onigenc_unicode_mbc_case_fold(OnigEncoding enc,
@@ -389,7 +221,7 @@ apply_case_fold3(int from, int to, OnigApplyAllCaseFoldFunc f, void* arg)
 
 extern int
 onigenc_unicode_apply_all_case_fold(OnigCaseFoldType flag,
-				    OnigApplyAllCaseFoldFunc f, void* arg)
+                                    OnigApplyAllCaseFoldFunc f, void* arg)
 {
   int r;
 
@@ -710,7 +542,7 @@ egcb_get_type(OnigCodePoint code)
   OnigCodePoint low, high, x;
   enum EGCB_TYPE type;
 
-  for (low = 0, high = EGCB_RANGE_NUM; low < high; ) {
+  for (low = 0, high = (OnigCodePoint )EGCB_RANGE_NUM; low < high; ) {
     x = (low + high) >> 1;
     if (code > EGCB_RANGES[x].end)
       low = x + 1;
@@ -718,8 +550,10 @@ egcb_get_type(OnigCodePoint code)
       high = x;
   }
 
-  type = (low < EGCB_RANGE_NUM && code >= EGCB_RANGES[low].start) ?
+  type = (low < (OnigCodePoint )EGCB_RANGE_NUM &&
+          code >= EGCB_RANGES[low].start) ?
     EGCB_RANGES[low].type : EGCB_Other;
+
   return type;
 }
 
@@ -863,4 +697,189 @@ onigenc_egcb_is_break_position(OnigEncoding enc, UChar* p, UChar* prev,
   if (from == 0x000d && to == 0x000a) return 0;
   else return 1;
 #endif /* USE_UNICODE_EXTENDED_GRAPHEME_CLUSTER */
+}
+
+
+/*
+ Undefine __GNUC__ for Escape warnings in Clang.
+
+./unicode_property_data.c:26730:44: warning: static variable
+      'unicode_prop_name_pool_contents' is used in an inline function with
+      external linkage [-Wstatic-in-inline]
+              register const char *s = o + unicode_prop_name_pool;
+*/
+
+#ifdef __clang__
+#undef __GNUC__
+#endif
+
+#ifdef USE_UNICODE_PROPERTIES
+#include "unicode_property_data.c"
+#else
+#include "unicode_property_data_posix.c"
+#endif
+
+#define USER_DEFINED_PROPERTY_MAX_NUM  20
+
+typedef struct {
+  int ctype;
+  OnigCodePoint* ranges;
+} UserDefinedPropertyValue;
+
+static int UserDefinedPropertyNum;
+static UserDefinedPropertyValue
+UserDefinedPropertyRanges[USER_DEFINED_PROPERTY_MAX_NUM];
+static st_table* UserDefinedPropertyTable;
+
+extern int
+onig_unicode_define_user_property(const char* name, OnigCodePoint* ranges)
+{
+  UserDefinedPropertyValue* e;
+  int r;
+  int i;
+  int n;
+  int len;
+  int c;
+  char* s;
+
+  if (UserDefinedPropertyNum >= USER_DEFINED_PROPERTY_MAX_NUM)
+    return ONIGERR_TOO_MANY_USER_DEFINED_OBJECTS;
+
+  len = (int )strlen(name);
+  if (len >= PROPERTY_NAME_MAX_SIZE)
+    return ONIGERR_TOO_LONG_PROPERTY_NAME;
+
+  s = (char* )xmalloc(len + 1);
+  if (s == 0)
+    return ONIGERR_MEMORY;
+
+  n = 0;
+  for (i = 0; i < len; i++) {
+    c = name[i];
+    if (c <= 0 || c >= 0x80) {
+      xfree(s);
+      return ONIGERR_INVALID_CHAR_PROPERTY_NAME;
+    }
+
+    if (c != ' ' && c != '-' && c != '_') {
+      s[n] = c;
+      n++;
+    }
+  }
+  s[n] = '\0';
+
+  if (UserDefinedPropertyTable == 0) {
+    UserDefinedPropertyTable = onig_st_init_strend_table_with_size(10);
+  }
+
+  e = UserDefinedPropertyRanges + UserDefinedPropertyNum;
+  e->ctype = CODE_RANGES_NUM + UserDefinedPropertyNum;
+  e->ranges = ranges;
+  r = onig_st_insert_strend(UserDefinedPropertyTable,
+                            (const UChar* )s, (const UChar* )s + n,
+                            (hash_data_type )((void* )e));
+  if (r < 0) return r;
+
+  UserDefinedPropertyNum++;
+  return 0;
+}
+
+extern int
+onigenc_unicode_is_code_ctype(OnigCodePoint code, unsigned int ctype)
+{
+  if (
+#ifdef USE_UNICODE_PROPERTIES
+      ctype <= ONIGENC_MAX_STD_CTYPE &&
+#endif
+      code < 256) {
+    return ONIGENC_IS_UNICODE_ISO_8859_1_CTYPE(code, ctype);
+  }
+
+  if (ctype >= CODE_RANGES_NUM) {
+    int index = ctype - CODE_RANGES_NUM;
+    if (index < UserDefinedPropertyNum)
+      return onig_is_in_code_range((UChar* )UserDefinedPropertyRanges[index].ranges, code);
+    else
+      return ONIGERR_TYPE_BUG;
+  }
+
+  return onig_is_in_code_range((UChar* )CodeRanges[ctype], code);
+}
+
+
+extern int
+onigenc_unicode_ctype_code_range(OnigCtype ctype, const OnigCodePoint* ranges[])
+{
+  if (ctype >= CODE_RANGES_NUM) {
+    int index = ctype - CODE_RANGES_NUM;
+    if (index < UserDefinedPropertyNum) {
+      *ranges = UserDefinedPropertyRanges[index].ranges;
+      return 0;
+    }
+    else
+      return ONIGERR_TYPE_BUG;
+  }
+
+  *ranges = CodeRanges[ctype];
+  return 0;
+}
+
+extern int
+onigenc_utf16_32_get_ctype_code_range(OnigCtype ctype, OnigCodePoint* sb_out,
+                                      const OnigCodePoint* ranges[])
+{
+  *sb_out = 0x00;
+  return onigenc_unicode_ctype_code_range(ctype, ranges);
+}
+
+extern int
+onigenc_unicode_property_name_to_ctype(OnigEncoding enc, UChar* name, UChar* end)
+{
+  int len;
+  UChar *p;
+  OnigCodePoint code;
+  const struct PoolPropertyNameCtype* pc;
+  char buf[PROPERTY_NAME_MAX_SIZE];
+
+  p = name;
+  len = 0;
+  while (p < end) {
+    code = ONIGENC_MBC_TO_CODE(enc, p, end);
+    if (code >= 0x80)
+      return ONIGERR_INVALID_CHAR_PROPERTY_NAME;
+
+    if (code != ' ' && code != '-' && code != '_') {
+      buf[len++] = (char )code;
+      if (len >= PROPERTY_NAME_MAX_SIZE)
+        return ONIGERR_INVALID_CHAR_PROPERTY_NAME;
+    }
+
+    p += enclen(enc, p);
+  }
+
+  buf[len] = 0;
+
+  if (UserDefinedPropertyTable != 0) {
+    UserDefinedPropertyValue* e;
+    e = (UserDefinedPropertyValue* )NULL;
+    onig_st_lookup_strend(UserDefinedPropertyTable,
+                          (const UChar* )buf, (const UChar* )buf + len,
+                          (hash_data_type* )((void* )(&e)));
+    if (e != 0) {
+      return e->ctype;
+    }
+  }
+
+  pc = unicode_lookup_property_name(buf, len);
+  if (pc != 0) {
+    /* fprintf(stderr, "LOOKUP: %s: %d\n", buf, pc->ctype); */
+#ifndef USE_UNICODE_PROPERTIES
+    if (pc->ctype > ONIGENC_MAX_STD_CTYPE)
+      return ONIGERR_INVALID_CHAR_PROPERTY_NAME;
+#endif
+
+    return (int )pc->ctype;
+  }
+
+  return ONIGERR_INVALID_CHAR_PROPERTY_NAME;
 }

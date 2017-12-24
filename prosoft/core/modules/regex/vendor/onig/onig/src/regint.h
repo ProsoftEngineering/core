@@ -61,7 +61,6 @@
 #define USE_INSISTENT_CHECK_CAPTURES_STATUS_IN_ENDLESS_REPEAT  /* /(?:()|())*\2/ */
 #define USE_NEWLINE_AT_END_OF_STRING_HAS_EMPTY_LINE     /* /\n$/ =~ "\n" */
 #define USE_WARNING_REDUNDANT_NESTED_REPEAT_OPERATOR
-/* !!! moved to regenc.h. */ /* #define USE_CRNL_AS_LINE_TERMINATOR */
 
 /* internal config */
 #define USE_OP_PUSH_OR_JUMP_EXACT
@@ -139,8 +138,14 @@
 #endif
 
 
+#include <stddef.h>
+
 #ifdef HAVE_STDLIB_H
 #include <stdlib.h>
+#endif
+
+#ifdef HAVE_STDINT_H
+#include <stdint.h>
 #endif
 
 #if defined(HAVE_ALLOCA_H) && !defined(__GNUC__)
@@ -174,7 +179,8 @@
 
 #ifdef _WIN32
 #if defined(_MSC_VER) && (_MSC_VER < 1300)
-typedef int intptr_t;
+typedef int  intptr_t;
+typedef unsigned int  uintptr_t;
 #endif
 #endif
 
@@ -186,6 +192,7 @@ typedef int intptr_t;
 #ifdef MAX
 #undef MAX
 #endif
+
 #define MIN(a,b) (((a)>(b))?(b):(a))
 #define MAX(a,b) (((a)<(b))?(b):(a))
 
@@ -219,20 +226,19 @@ typedef int intptr_t;
 #endif
 
 #define GET_ALIGNMENT_PAD_SIZE(addr,pad_size) do {\
-  (pad_size) = WORD_ALIGNMENT_SIZE \
-               - ((unsigned int )(addr) % WORD_ALIGNMENT_SIZE);\
+  (pad_size) = WORD_ALIGNMENT_SIZE - ((uintptr_t )(addr) % WORD_ALIGNMENT_SIZE);\
   if ((pad_size) == WORD_ALIGNMENT_SIZE) (pad_size) = 0;\
 } while (0)
 
 #define ALIGNMENT_RIGHT(addr) do {\
   (addr) += (WORD_ALIGNMENT_SIZE - 1);\
-  (addr) -= ((unsigned int )(addr) % WORD_ALIGNMENT_SIZE);\
+  (addr) -= ((uintptr_t )(addr) % WORD_ALIGNMENT_SIZE);\
 } while (0)
 
 #endif /* PLATFORM_UNALIGNED_WORD_ACCESS */
 
 typedef struct {
-  int num_keeper;
+  int  num_keeper;
   int* keepers;
 } RegExt;
 
@@ -241,9 +247,9 @@ typedef struct {
 
 /* stack pop level */
 enum StackPopLevel {
-  STACK_POP_LEVEL_FREE = 0,
+  STACK_POP_LEVEL_FREE      = 0,
   STACK_POP_LEVEL_MEM_START = 1,
-  STACK_POP_LEVEL_ALL =2
+  STACK_POP_LEVEL_ALL       = 2
 };
 
 /* optimize flags */
@@ -353,7 +359,7 @@ typedef Bits*          BitSetRef;
 
 #define BITSET_CLEAR(bs) do {\
   int i;\
-  for (i = 0; i < (int )BITSET_SIZE; i++) { (bs)[i] = 0; }	\
+  for (i = 0; i < (int )BITSET_SIZE; i++) { (bs)[i] = 0; } \
 } while (0)
 
 #define BS_ROOM(bs,pos)            (bs)[pos / BITS_IN_ROOM]
@@ -538,7 +544,7 @@ enum OpCode {
   OP_BACKREF_MULTI_IC,
   OP_BACKREF_WITH_LEVEL,        /* \k<xxx+n>, \k<xxx-n> */
   OP_BACKREF_CHECK,             /* (?(n)), (?('name')) */
-  OP_BACKREF_CHECK_WITH_LEVEL,  /* (?(n)), (?('name')) */
+  OP_BACKREF_CHECK_WITH_LEVEL,  /* (?(n-level)), (?('name-level')) */
 
   OP_MEMORY_START,
   OP_MEMORY_START_PUSH,   /* push back-tracker to stack */
@@ -565,15 +571,15 @@ enum OpCode {
   OP_EMPTY_CHECK_END_MEMST, /* null loop checker end (with capture status) */
   OP_EMPTY_CHECK_END_MEMST_PUSH, /* with capture status and push check-end */
 
-  OP_PREC_READ_START,             /* (?=...)  start */
-  OP_PREC_READ_END,              /* (?=...)  end   */
-  OP_PUSH_PREC_READ_NOT,   /* (?!...)  start */
-  OP_FAIL_PREC_READ_NOT,   /* (?!...)  end   */
-  OP_PUSH_STOP_BT,         /* (?>...)  start */
-  OP_POP_STOP_BT,          /* (?>...)  end   */
-  OP_LOOK_BEHIND,          /* (?<=...) start (no needs end opcode) */
-  OP_PUSH_LOOK_BEHIND_NOT, /* (?<!...) start */
-  OP_FAIL_LOOK_BEHIND_NOT, /* (?<!...) end   */
+  OP_PREC_READ_START,       /* (?=...)  start */
+  OP_PREC_READ_END,         /* (?=...)  end   */
+  OP_PREC_READ_NOT_START,   /* (?!...)  start */
+  OP_PREC_READ_NOT_END,     /* (?!...)  end   */
+  OP_ATOMIC_START,          /* (?>...)  start */
+  OP_ATOMIC_END,            /* (?>...)  end   */
+  OP_LOOK_BEHIND,           /* (?<=...) start (no needs end opcode) */
+  OP_LOOK_BEHIND_NOT_START, /* (?<!...) start */
+  OP_LOOK_BEHIND_NOT_END,   /* (?<!...) end   */
 
   OP_CALL,                 /* \g<name> */
   OP_RETURN,
@@ -663,9 +669,9 @@ typedef int ModeType;
 #define SIZE_OP_REPEAT_INC_NG          (SIZE_OPCODE + SIZE_MEMNUM)
 #define SIZE_OP_WORD_BOUNDARY          (SIZE_OPCODE + SIZE_MODE)
 #define SIZE_OP_PREC_READ_START         SIZE_OPCODE
-#define SIZE_OP_PUSH_PREC_READ_NOT     (SIZE_OPCODE + SIZE_RELADDR)
+#define SIZE_OP_PREC_READ_NOT_START    (SIZE_OPCODE + SIZE_RELADDR)
 #define SIZE_OP_PREC_READ_END           SIZE_OPCODE
-#define SIZE_OP_FAIL_PREC_READ_NOT      SIZE_OPCODE
+#define SIZE_OP_PREC_READ_NOT_END       SIZE_OPCODE
 #define SIZE_OP_SET_OPTION             (SIZE_OPCODE + SIZE_OPTION)
 #define SIZE_OP_SET_OPTION_PUSH        (SIZE_OPCODE + SIZE_OPTION)
 #define SIZE_OP_FAIL                    SIZE_OPCODE
@@ -675,13 +681,13 @@ typedef int ModeType;
 #define SIZE_OP_MEMORY_END_PUSH_REC    (SIZE_OPCODE + SIZE_MEMNUM)
 #define SIZE_OP_MEMORY_END             (SIZE_OPCODE + SIZE_MEMNUM)
 #define SIZE_OP_MEMORY_END_REC         (SIZE_OPCODE + SIZE_MEMNUM)
-#define SIZE_OP_PUSH_STOP_BT            SIZE_OPCODE
-#define SIZE_OP_POP_STOP_BT             SIZE_OPCODE
+#define SIZE_OP_ATOMIC_START            SIZE_OPCODE
+#define SIZE_OP_ATOMIC_END              SIZE_OPCODE
 #define SIZE_OP_EMPTY_CHECK_START       (SIZE_OPCODE + SIZE_MEMNUM)
 #define SIZE_OP_EMPTY_CHECK_END         (SIZE_OPCODE + SIZE_MEMNUM)
 #define SIZE_OP_LOOK_BEHIND            (SIZE_OPCODE + SIZE_LENGTH)
-#define SIZE_OP_PUSH_LOOK_BEHIND_NOT   (SIZE_OPCODE + SIZE_RELADDR + SIZE_LENGTH)
-#define SIZE_OP_FAIL_LOOK_BEHIND_NOT    SIZE_OPCODE
+#define SIZE_OP_LOOK_BEHIND_NOT_START  (SIZE_OPCODE + SIZE_RELADDR + SIZE_LENGTH)
+#define SIZE_OP_LOOK_BEHIND_NOT_END     SIZE_OPCODE
 #define SIZE_OP_CALL                   (SIZE_OPCODE + SIZE_ABSADDR)
 #define SIZE_OP_RETURN                  SIZE_OPCODE
 #define SIZE_OP_PUSH_SAVE_VAL          (SIZE_OPCODE + SIZE_SAVE_TYPE + SIZE_MEMNUM)
@@ -790,16 +796,17 @@ extern int  onig_print_statistics P_((FILE* f));
 #endif
 #endif
 
-extern void onig_warning(const char* s);
+extern void   onig_warning(const char* s);
 extern UChar* onig_error_code_to_format P_((int code));
-extern void  onig_snprintf_with_pattern PV_((UChar buf[], int bufsize, OnigEncoding enc, UChar* pat, UChar* pat_end, const UChar *fmt, ...));
-extern int  onig_bbuf_init P_((BBuf* buf, int size));
-extern int  onig_compile P_((regex_t* reg, const UChar* pattern, const UChar* pattern_end, OnigErrorInfo* einfo));
-extern void onig_transfer P_((regex_t* to, regex_t* from));
-extern int  onig_is_code_in_cc_len P_((int enclen, OnigCodePoint code, void* /* CClassNode* */ cc));
+extern void   onig_snprintf_with_pattern PV_((UChar buf[], int bufsize, OnigEncoding enc, UChar* pat, UChar* pat_end, const UChar *fmt, ...));
+extern int    onig_bbuf_init P_((BBuf* buf, int size));
+extern int    onig_compile P_((regex_t* reg, const UChar* pattern, const UChar* pattern_end, OnigErrorInfo* einfo));
+extern void   onig_transfer P_((regex_t* to, regex_t* from));
+extern int    onig_is_code_in_cc_len P_((int enclen, OnigCodePoint code, void* /* CClassNode* */ cc));
 
 /* strend hash */
 typedef void hash_table_type;
+
 #ifdef _WIN32
 # include <windows.h>
 typedef ULONG_PTR hash_data_type;

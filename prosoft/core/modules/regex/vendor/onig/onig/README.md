@@ -26,6 +26,15 @@ Supported character encodings:
 * CP1251:  contributed by Byte
 
 
+New feature of version 6.7.0
+--------------------------
+
+* NEW: hexadecimal codepoint \uHHHH
+* NEW: add ONIG_SYNTAX_ONIGURUMA (== ONIG_SYNTAX_DEFAULT)
+* Disabled \N and \O on ONIG_SYNTAX_RUBY
+* Reduced object size
+
+
 New feature of version 6.6.1
 --------------------------
 

@@ -1051,7 +1051,20 @@ extern int main(int argc, char* argv[])
 
   n("^\\X.$", "\xE0\xAE\xA8\xE0\xAE\xBF");
 
+  // a + COMBINING GRAVE ACCENT (U+0300)
+  x2("h\\Xllo", "ha\xCC\x80llo", 0, 7);
 
+  x2("\\x40", "@", 0, 1);
+  x2("\\x1", "\x01", 0, 1);
+  x2("\\x{1}", "\x01", 0, 1);
+  x2("\\x{4E38}", "\xE4\xB8\xB8", 0, 3);
+  x2("\\u4E38", "\xE4\xB8\xB8", 0, 3);
+  x2("\\u0040", "@", 0, 1);
+
+  x2("c.*\\b", "abc", 2, 3);
+  x2("\\b.*abc.*\\b", "abc", 0, 3);
+
+  e("\\u040", "@", ONIGERR_INVALID_CODE_POINT_VALUE);
   e("(?<abc>\\g<abc>)", "zzzz", ONIGERR_NEVER_ENDING_RECURSION);
   e("(?<=(?>abc))", "abc", ONIGERR_INVALID_LOOK_BEHIND_PATTERN);
 

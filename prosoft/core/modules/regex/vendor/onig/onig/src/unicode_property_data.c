@@ -1,5 +1,5 @@
 /* ANSI-C code produced by gperf version 3.0.4 */
-/* Command-line: gperf -T -C -c -t -j1 -L ANSI-C --ignore-case -N unicode_lookup_property_name --output-file gperf.tmp unicode_property_data.gperf  */
+/* Command-line: gperf -T -C -c -t -j1 -L ANSI-C --ignore-case --pic -Q unicode_prop_name_pool -N unicode_lookup_property_name --output-file gperf.tmp unicode_property_data.gperf  */
 /* Computed positions: -k'1-3,5-6,12,16,$' */
 
 #if !((' ' == 32) && ('!' == 33) && ('"' == 34) && ('#' == 35) \
@@ -22909,6 +22909,9 @@ const CodeRanges[] = {
   CR_In_No_Block,
 };
 
+#define pool_offset(s) offsetof(struct unicode_prop_name_pool_t, unicode_prop_name_pool_str##s)
+
+
 #define TOTAL_KEYWORDS 711
 #define MIN_WORD_LENGTH 1
 #define MAX_WORD_LENGTH 44
@@ -23038,2255 +23041,3684 @@ hash (register const char *str, register unsigned int len)
   return hval + asso_values[(unsigned char)str[len - 1]];
 }
 
+struct unicode_prop_name_pool_t
+  {
+    char unicode_prop_name_pool_str1[sizeof("n")];
+    char unicode_prop_name_pool_str3[sizeof("z")];
+    char unicode_prop_name_pool_str8[sizeof("zzzz")];
+    char unicode_prop_name_pool_str9[sizeof("mn")];
+    char unicode_prop_name_pool_str10[sizeof("cn")];
+    char unicode_prop_name_pool_str14[sizeof("ci")];
+    char unicode_prop_name_pool_str15[sizeof("m")];
+    char unicode_prop_name_pool_str17[sizeof("c")];
+    char unicode_prop_name_pool_str23[sizeof("inmanichaean")];
+    char unicode_prop_name_pool_str24[sizeof("mani")];
+    char unicode_prop_name_pool_str25[sizeof("mc")];
+    char unicode_prop_name_pool_str26[sizeof("cc")];
+    char unicode_prop_name_pool_str28[sizeof("qaai")];
+    char unicode_prop_name_pool_str34[sizeof("qaac")];
+    char unicode_prop_name_pool_str41[sizeof("incham")];
+    char unicode_prop_name_pool_str46[sizeof("mandaic")];
+    char unicode_prop_name_pool_str49[sizeof("sm")];
+    char unicode_prop_name_pool_str51[sizeof("sc")];
+    char unicode_prop_name_pool_str56[sizeof("cans")];
+    char unicode_prop_name_pool_str61[sizeof("ascii")];
+    char unicode_prop_name_pool_str64[sizeof("insamaritan")];
+    char unicode_prop_name_pool_str66[sizeof("incuneiform")];
+    char unicode_prop_name_pool_str67[sizeof("s")];
+    char unicode_prop_name_pool_str68[sizeof("inarmenian")];
+    char unicode_prop_name_pool_str69[sizeof("zs")];
+    char unicode_prop_name_pool_str76[sizeof("cs")];
+    char unicode_prop_name_pool_str85[sizeof("me")];
+    char unicode_prop_name_pool_str90[sizeof("incommonindicnumberforms")];
+    char unicode_prop_name_pool_str93[sizeof("inavestan")];
+    char unicode_prop_name_pool_str94[sizeof("inthai")];
+    char unicode_prop_name_pool_str103[sizeof("inipaextensions")];
+    char unicode_prop_name_pool_str108[sizeof("initialpunctuation")];
+    char unicode_prop_name_pool_str112[sizeof("inancientsymbols")];
+    char unicode_prop_name_pool_str114[sizeof("inthaana")];
+    char unicode_prop_name_pool_str116[sizeof("cf")];
+    char unicode_prop_name_pool_str118[sizeof("incuneiformnumbersandpunctuation")];
+    char unicode_prop_name_pool_str122[sizeof("mtei")];
+    char unicode_prop_name_pool_str124[sizeof("inspecials")];
+    char unicode_prop_name_pool_str133[sizeof("inmusicalsymbols")];
+    char unicode_prop_name_pool_str141[sizeof("inmiscellaneousmathematicalsymbolsa")];
+    char unicode_prop_name_pool_str145[sizeof("lm")];
+    char unicode_prop_name_pool_str146[sizeof("lina")];
+    char unicode_prop_name_pool_str147[sizeof("lc")];
+    char unicode_prop_name_pool_str149[sizeof("inlycian")];
+    char unicode_prop_name_pool_str155[sizeof("lana")];
+    char unicode_prop_name_pool_str157[sizeof("intaixuanjingsymbols")];
+    char unicode_prop_name_pool_str158[sizeof("inmyanmarextendeda")];
+    char unicode_prop_name_pool_str159[sizeof("alnum")];
+    char unicode_prop_name_pool_str161[sizeof("sterm")];
+    char unicode_prop_name_pool_str162[sizeof("intaitham")];
+    char unicode_prop_name_pool_str163[sizeof("intransportandmapsymbols")];
+    char unicode_prop_name_pool_str165[sizeof("taile")];
+    char unicode_prop_name_pool_str167[sizeof("inmalayalam")];
+    char unicode_prop_name_pool_str176[sizeof("inmiscellaneoussymbols")];
+    char unicode_prop_name_pool_str177[sizeof("incontrolpictures")];
+    char unicode_prop_name_pool_str185[sizeof("inmiscellaneoussymbolsandarrows")];
+    char unicode_prop_name_pool_str189[sizeof("inlineara")];
+    char unicode_prop_name_pool_str190[sizeof("inmiscellaneoussymbolsandpictographs")];
+    char unicode_prop_name_pool_str193[sizeof("sinhala")];
+    char unicode_prop_name_pool_str202[sizeof("taiviet")];
+    char unicode_prop_name_pool_str205[sizeof("ext")];
+    char unicode_prop_name_pool_str215[sizeof("latn")];
+    char unicode_prop_name_pool_str216[sizeof("latin")];
+    char unicode_prop_name_pool_str217[sizeof("ital")];
+    char unicode_prop_name_pool_str218[sizeof("intamil")];
+    char unicode_prop_name_pool_str220[sizeof("inmultani")];
+    char unicode_prop_name_pool_str222[sizeof("taml")];
+    char unicode_prop_name_pool_str229[sizeof("inrunic")];
+    char unicode_prop_name_pool_str230[sizeof("incarian")];
+    char unicode_prop_name_pool_str232[sizeof("armn")];
+    char unicode_prop_name_pool_str234[sizeof("armi")];
+    char unicode_prop_name_pool_str235[sizeof("cari")];
+    char unicode_prop_name_pool_str236[sizeof("inlatinextendedc")];
+    char unicode_prop_name_pool_str238[sizeof("armenian")];
+    char unicode_prop_name_pool_str239[sizeof("inmyanmar")];
+    char unicode_prop_name_pool_str240[sizeof("incyrillic")];
+    char unicode_prop_name_pool_str242[sizeof("inlatinextendeda")];
+    char unicode_prop_name_pool_str246[sizeof("carian")];
+    char unicode_prop_name_pool_str249[sizeof("intaile")];
+    char unicode_prop_name_pool_str253[sizeof("tale")];
+    char unicode_prop_name_pool_str256[sizeof("arabic")];
+    char unicode_prop_name_pool_str259[sizeof("l")];
+    char unicode_prop_name_pool_str260[sizeof("nl")];
+    char unicode_prop_name_pool_str261[sizeof("zl")];
+    char unicode_prop_name_pool_str263[sizeof("insyriac")];
+    char unicode_prop_name_pool_str265[sizeof("samr")];
+    char unicode_prop_name_pool_str267[sizeof("merc")];
+    char unicode_prop_name_pool_str269[sizeof("inlinearbideograms")];
+    char unicode_prop_name_pool_str272[sizeof("samaritan")];
+    char unicode_prop_name_pool_str273[sizeof("lt")];
+    char unicode_prop_name_pool_str276[sizeof("insharada")];
+    char unicode_prop_name_pool_str283[sizeof("inmeeteimayekextensions")];
+    char unicode_prop_name_pool_str292[sizeof("inruminumeralsymbols")];
+    char unicode_prop_name_pool_str295[sizeof("miao")];
+    char unicode_prop_name_pool_str296[sizeof("inlatinextendede")];
+    char unicode_prop_name_pool_str300[sizeof("zinh")];
+    char unicode_prop_name_pool_str304[sizeof("inahom")];
+    char unicode_prop_name_pool_str306[sizeof("incherokee")];
+    char unicode_prop_name_pool_str307[sizeof("han")];
+    char unicode_prop_name_pool_str310[sizeof("hani")];
+    char unicode_prop_name_pool_str311[sizeof("inosmanya")];
+    char unicode_prop_name_pool_str312[sizeof("inmiscellaneoustechnical")];
+    char unicode_prop_name_pool_str323[sizeof("cham")];
+    char unicode_prop_name_pool_str325[sizeof("inmahajani")];
+    char unicode_prop_name_pool_str326[sizeof("osma")];
+    char unicode_prop_name_pool_str329[sizeof("manichaean")];
+    char unicode_prop_name_pool_str330[sizeof("term")];
+    char unicode_prop_name_pool_str332[sizeof("sinh")];
+    char unicode_prop_name_pool_str342[sizeof("cntrl")];
+    char unicode_prop_name_pool_str347[sizeof("chakma")];
+    char unicode_prop_name_pool_str348[sizeof("insinhala")];
+    char unicode_prop_name_pool_str352[sizeof("tamil")];
+    char unicode_prop_name_pool_str353[sizeof("inethiopic")];
+    char unicode_prop_name_pool_str356[sizeof("connectorpunctuation")];
+    char unicode_prop_name_pool_str357[sizeof("shavian")];
+    char unicode_prop_name_pool_str361[sizeof("joinc")];
+    char unicode_prop_name_pool_str362[sizeof("inenclosedalphanumerics")];
+    char unicode_prop_name_pool_str368[sizeof("ahex")];
+    char unicode_prop_name_pool_str369[sizeof("inlatinextendedadditional")];
+    char unicode_prop_name_pool_str370[sizeof("lineara")];
+    char unicode_prop_name_pool_str377[sizeof("inenclosedcjklettersandmonths")];
+    char unicode_prop_name_pool_str378[sizeof("hex")];
+    char unicode_prop_name_pool_str381[sizeof("thai")];
+    char unicode_prop_name_pool_str382[sizeof("mahj")];
+    char unicode_prop_name_pool_str386[sizeof("math")];
+    char unicode_prop_name_pool_str389[sizeof("ll")];
+    char unicode_prop_name_pool_str390[sizeof("thaa")];
+    char unicode_prop_name_pool_str392[sizeof("hatran")];
+    char unicode_prop_name_pool_str399[sizeof("mahajani")];
+    char unicode_prop_name_pool_str400[sizeof("insinhalaarchaicnumbers")];
+    char unicode_prop_name_pool_str402[sizeof("taitham")];
+    char unicode_prop_name_pool_str403[sizeof("thaana")];
+    char unicode_prop_name_pool_str408[sizeof("ethi")];
+    char unicode_prop_name_pool_str409[sizeof("inenclosedalphanumericsupplement")];
+    char unicode_prop_name_pool_str414[sizeof("meroiticcursive")];
+    char unicode_prop_name_pool_str415[sizeof("inideographicdescriptioncharacters")];
+    char unicode_prop_name_pool_str419[sizeof("terminalpunctuation")];
+    char unicode_prop_name_pool_str426[sizeof("inemoticons")];
+    char unicode_prop_name_pool_str431[sizeof("intifinagh")];
+    char unicode_prop_name_pool_str433[sizeof("asciihexdigit")];
+    char unicode_prop_name_pool_str438[sizeof("tifinagh")];
+    char unicode_prop_name_pool_str451[sizeof("inearlydynasticcuneiform")];
+    char unicode_prop_name_pool_str457[sizeof("inopticalcharacterrecognition")];
+    char unicode_prop_name_pool_str479[sizeof("loe")];
+    char unicode_prop_name_pool_str486[sizeof("titlecaseletter")];
+    char unicode_prop_name_pool_str489[sizeof("inscriptionalparthian")];
+    char unicode_prop_name_pool_str510[sizeof("oriya")];
+    char unicode_prop_name_pool_str520[sizeof("hira")];
+    char unicode_prop_name_pool_str529[sizeof("sora")];
+    char unicode_prop_name_pool_str530[sizeof("mero")];
+    char unicode_prop_name_pool_str535[sizeof("inarrows")];
+    char unicode_prop_name_pool_str537[sizeof("inhiragana")];
+    char unicode_prop_name_pool_str544[sizeof("no")];
+    char unicode_prop_name_pool_str545[sizeof("inmahjongtiles")];
+    char unicode_prop_name_pool_str549[sizeof("innko")];
+    char unicode_prop_name_pool_str552[sizeof("co")];
+    char unicode_prop_name_pool_str553[sizeof("cher")];
+    char unicode_prop_name_pool_str556[sizeof("inmro")];
+    char unicode_prop_name_pool_str563[sizeof("common")];
+    char unicode_prop_name_pool_str564[sizeof("cwcm")];
+    char unicode_prop_name_pool_str568[sizeof("inmiao")];
+    char unicode_prop_name_pool_str573[sizeof("inscriptionalpahlavi")];
+    char unicode_prop_name_pool_str576[sizeof("inmathematicalalphanumericsymbols")];
+    char unicode_prop_name_pool_str577[sizeof("so")];
+    char unicode_prop_name_pool_str579[sizeof("hano")];
+    char unicode_prop_name_pool_str580[sizeof("tirh")];
+    char unicode_prop_name_pool_str584[sizeof("inhatran")];
+    char unicode_prop_name_pool_str585[sizeof("inolchiki")];
+    char unicode_prop_name_pool_str586[sizeof("ahom")];
+    char unicode_prop_name_pool_str588[sizeof("di")];
+    char unicode_prop_name_pool_str589[sizeof("hatr")];
+    char unicode_prop_name_pool_str591[sizeof("inogham")];
+    char unicode_prop_name_pool_str596[sizeof("intirhuta")];
+    char unicode_prop_name_pool_str601[sizeof("inmodi")];
+    char unicode_prop_name_pool_str603[sizeof("idc")];
+    char unicode_prop_name_pool_str604[sizeof("mand")];
+    char unicode_prop_name_pool_str608[sizeof("inmandaic")];
+    char unicode_prop_name_pool_str609[sizeof("dia")];
+    char unicode_prop_name_pool_str610[sizeof("cwcf")];
+    char unicode_prop_name_pool_str618[sizeof("xidc")];
+    char unicode_prop_name_pool_str621[sizeof("sind")];
+    char unicode_prop_name_pool_str622[sizeof("newline")];
+    char unicode_prop_name_pool_str631[sizeof("mend")];
+    char unicode_prop_name_pool_str635[sizeof("newtailue")];
+    char unicode_prop_name_pool_str638[sizeof("inshorthandformatcontrols")];
+    char unicode_prop_name_pool_str642[sizeof("anatolianhieroglyphs")];
+    char unicode_prop_name_pool_str643[sizeof("xids")];
+    char unicode_prop_name_pool_str653[sizeof("ids")];
+    char unicode_prop_name_pool_str659[sizeof("innewtailue")];
+    char unicode_prop_name_pool_str660[sizeof("insylotinagri")];
+    char unicode_prop_name_pool_str666[sizeof("insundanese")];
+    char unicode_prop_name_pool_str673[sizeof("lo")];
+    char unicode_prop_name_pool_str677[sizeof("indominotiles")];
+    char unicode_prop_name_pool_str678[sizeof("inlao")];
+    char unicode_prop_name_pool_str685[sizeof("lao")];
+    char unicode_prop_name_pool_str686[sizeof("laoo")];
+    char unicode_prop_name_pool_str687[sizeof("mongolian")];
+    char unicode_prop_name_pool_str690[sizeof("cwt")];
+    char unicode_prop_name_pool_str692[sizeof("idst")];
+    char unicode_prop_name_pool_str693[sizeof("format")];
+    char unicode_prop_name_pool_str696[sizeof("lineseparator")];
+    char unicode_prop_name_pool_str702[sizeof("letter")];
+    char unicode_prop_name_pool_str711[sizeof("idcontinue")];
+    char unicode_prop_name_pool_str714[sizeof("inanatolianhieroglyphs")];
+    char unicode_prop_name_pool_str723[sizeof("inlydian")];
+    char unicode_prop_name_pool_str725[sizeof("pi")];
+    char unicode_prop_name_pool_str726[sizeof("nchar")];
+    char unicode_prop_name_pool_str731[sizeof("inspacingmodifierletters")];
+    char unicode_prop_name_pool_str732[sizeof("oalpha")];
+    char unicode_prop_name_pool_str735[sizeof("indeseret")];
+    char unicode_prop_name_pool_str737[sizeof("pc")];
+    char unicode_prop_name_pool_str756[sizeof("xdigit")];
+    char unicode_prop_name_pool_str758[sizeof("inphaistosdisc")];
+    char unicode_prop_name_pool_str759[sizeof("joincontrol")];
+    char unicode_prop_name_pool_str760[sizeof("inlowsurrogates")];
+    char unicode_prop_name_pool_str762[sizeof("mro")];
+    char unicode_prop_name_pool_str763[sizeof("mroo")];
+    char unicode_prop_name_pool_str767[sizeof("xidstart")];
+    char unicode_prop_name_pool_str773[sizeof("wara")];
+    char unicode_prop_name_pool_str776[sizeof("inwarangciti")];
+    char unicode_prop_name_pool_str787[sizeof("ps")];
+    char unicode_prop_name_pool_str797[sizeof("pe")];
+    char unicode_prop_name_pool_str806[sizeof("cwl")];
+    char unicode_prop_name_pool_str816[sizeof("incoptic")];
+    char unicode_prop_name_pool_str824[sizeof("diacritic")];
+    char unicode_prop_name_pool_str827[sizeof("pf")];
+    char unicode_prop_name_pool_str844[sizeof("space")];
+    char unicode_prop_name_pool_str853[sizeof("hanunoo")];
+    char unicode_prop_name_pool_str856[sizeof("incyrillicextendeda")];
+    char unicode_prop_name_pool_str860[sizeof("odi")];
+    char unicode_prop_name_pool_str866[sizeof("modi")];
+    char unicode_prop_name_pool_str867[sizeof("oidc")];
+    char unicode_prop_name_pool_str868[sizeof("incopticepactnumbers")];
+    char unicode_prop_name_pool_str870[sizeof("palm")];
+    char unicode_prop_name_pool_str871[sizeof("insundanesesupplement")];
+    char unicode_prop_name_pool_str872[sizeof("patws")];
+    char unicode_prop_name_pool_str876[sizeof("inolditalic")];
+    char unicode_prop_name_pool_str877[sizeof("inlepcha")];
+    char unicode_prop_name_pool_str878[sizeof("shaw")];
+    char unicode_prop_name_pool_str880[sizeof("omath")];
+    char unicode_prop_name_pool_str886[sizeof("alpha")];
+    char unicode_prop_name_pool_str892[sizeof("oids")];
+    char unicode_prop_name_pool_str896[sizeof("control")];
+    char unicode_prop_name_pool_str897[sizeof("ideo")];
+    char unicode_prop_name_pool_str898[sizeof("lepc")];
+    char unicode_prop_name_pool_str899[sizeof("psalterpahlavi")];
+    char unicode_prop_name_pool_str900[sizeof("dsrt")];
+    char unicode_prop_name_pool_str902[sizeof("otheridcontinue")];
+    char unicode_prop_name_pool_str906[sizeof("inpalmyrene")];
+    char unicode_prop_name_pool_str907[sizeof("decimalnumber")];
+    char unicode_prop_name_pool_str915[sizeof("noncharactercodepoint")];
+    char unicode_prop_name_pool_str916[sizeof("idstart")];
+    char unicode_prop_name_pool_str917[sizeof("otheralphabetic")];
+    char unicode_prop_name_pool_str918[sizeof("letternumber")];
+    char unicode_prop_name_pool_str923[sizeof("dash")];
+    char unicode_prop_name_pool_str926[sizeof("xidcontinue")];
+    char unicode_prop_name_pool_str930[sizeof("finalpunctuation")];
+    char unicode_prop_name_pool_str931[sizeof("extender")];
+    char unicode_prop_name_pool_str935[sizeof("siddham")];
+    char unicode_prop_name_pool_str945[sizeof("inoldturkic")];
+    char unicode_prop_name_pool_str948[sizeof("sharada")];
+    char unicode_prop_name_pool_str951[sizeof("whitespace")];
+    char unicode_prop_name_pool_str956[sizeof("inmodifiertoneletters")];
+    char unicode_prop_name_pool_str958[sizeof("radical")];
+    char unicode_prop_name_pool_str960[sizeof("canadianaboriginal")];
+    char unicode_prop_name_pool_str969[sizeof("inethiopicextendeda")];
+    char unicode_prop_name_pool_str970[sizeof("imperialaramaic")];
+    char unicode_prop_name_pool_str978[sizeof("perm")];
+    char unicode_prop_name_pool_str979[sizeof("deseret")];
+    char unicode_prop_name_pool_str984[sizeof("casedletter")];
+    char unicode_prop_name_pool_str998[sizeof("inimperialaramaic")];
+    char unicode_prop_name_pool_str1001[sizeof("otheridstart")];
+    char unicode_prop_name_pool_str1006[sizeof("prti")];
+    char unicode_prop_name_pool_str1012[sizeof("cprt")];
+    char unicode_prop_name_pool_str1018[sizeof("othersymbol")];
+    char unicode_prop_name_pool_str1022[sizeof("coptic")];
+    char unicode_prop_name_pool_str1037[sizeof("otherlowercase")];
+    char unicode_prop_name_pool_str1038[sizeof("phnx")];
+    char unicode_prop_name_pool_str1042[sizeof("inphoenician")];
+    char unicode_prop_name_pool_str1049[sizeof("incaucasianalbanian")];
+    char unicode_prop_name_pool_str1050[sizeof("inlatin1supplement")];
+    char unicode_prop_name_pool_str1054[sizeof("xpeo")];
+    char unicode_prop_name_pool_str1058[sizeof("ininscriptionalparthian")];
+    char unicode_prop_name_pool_str1059[sizeof("ininscriptionalpahlavi")];
+    char unicode_prop_name_pool_str1060[sizeof("other")];
+    char unicode_prop_name_pool_str1061[sizeof("privateuse")];
+    char unicode_prop_name_pool_str1066[sizeof("othernumber")];
+    char unicode_prop_name_pool_str1071[sizeof("inenclosedideographicsupplement")];
+    char unicode_prop_name_pool_str1073[sizeof("copt")];
+    char unicode_prop_name_pool_str1078[sizeof("print")];
+    char unicode_prop_name_pool_str1080[sizeof("cuneiform")];
+    char unicode_prop_name_pool_str1081[sizeof("olditalic")];
+    char unicode_prop_name_pool_str1082[sizeof("xsux")];
+    char unicode_prop_name_pool_str1086[sizeof("inmongolian")];
+    char unicode_prop_name_pool_str1091[sizeof("inancientgreekmusicalnotation")];
+    char unicode_prop_name_pool_str1092[sizeof("sundanese")];
+    char unicode_prop_name_pool_str1093[sizeof("inoldnortharabian")];
+    char unicode_prop_name_pool_str1095[sizeof("patternsyntax")];
+    char unicode_prop_name_pool_str1098[sizeof("inherited")];
+    char unicode_prop_name_pool_str1099[sizeof("ingrantha")];
+    char unicode_prop_name_pool_str1100[sizeof("inphoneticextensions")];
+    char unicode_prop_name_pool_str1110[sizeof("saurashtra")];
+    char unicode_prop_name_pool_str1116[sizeof("inancientgreeknumbers")];
+    char unicode_prop_name_pool_str1122[sizeof("shrd")];
+    char unicode_prop_name_pool_str1126[sizeof("inoldsoutharabian")];
+    char unicode_prop_name_pool_str1127[sizeof("innabataean")];
+    char unicode_prop_name_pool_str1128[sizeof("inalphabeticpresentationforms")];
+    char unicode_prop_name_pool_str1129[sizeof("spaceseparator")];
+    char unicode_prop_name_pool_str1135[sizeof("olower")];
+    char unicode_prop_name_pool_str1137[sizeof("ingeneralpunctuation")];
+    char unicode_prop_name_pool_str1138[sizeof("inunifiedcanadianaboriginalsyllabics")];
+    char unicode_prop_name_pool_str1140[sizeof("bamum")];
+    char unicode_prop_name_pool_str1143[sizeof("inarabic")];
+    char unicode_prop_name_pool_str1147[sizeof("phli")];
+    char unicode_prop_name_pool_str1148[sizeof("inphoneticextensionssupplement")];
+    char unicode_prop_name_pool_str1150[sizeof("patternwhitespace")];
+    char unicode_prop_name_pool_str1152[sizeof("inbasiclatin")];
+    char unicode_prop_name_pool_str1154[sizeof("othermath")];
+    char unicode_prop_name_pool_str1155[sizeof("idsbinaryoperator")];
+    char unicode_prop_name_pool_str1156[sizeof("inmathematicaloperators")];
+    char unicode_prop_name_pool_str1157[sizeof("multani")];
+    char unicode_prop_name_pool_str1158[sizeof("ingujarati")];
+    char unicode_prop_name_pool_str1163[sizeof("inelbasan")];
+    char unicode_prop_name_pool_str1164[sizeof("inoldhungarian")];
+    char unicode_prop_name_pool_str1165[sizeof("innumberforms")];
+    char unicode_prop_name_pool_str1166[sizeof("nd")];
+    char unicode_prop_name_pool_str1168[sizeof("yi")];
+    char unicode_prop_name_pool_str1169[sizeof("lisu")];
+    char unicode_prop_name_pool_str1172[sizeof("yiii")];
+    char unicode_prop_name_pool_str1174[sizeof("inpsalterpahlavi")];
+    char unicode_prop_name_pool_str1178[sizeof("tagbanwa")];
+    char unicode_prop_name_pool_str1184[sizeof("bass")];
+    char unicode_prop_name_pool_str1189[sizeof("nbat")];
+    char unicode_prop_name_pool_str1190[sizeof("inbyzantinemusicalsymbols")];
+    char unicode_prop_name_pool_str1192[sizeof("closepunctuation")];
+    char unicode_prop_name_pool_str1194[sizeof("tfng")];
+    char unicode_prop_name_pool_str1195[sizeof("otherletter")];
+    char unicode_prop_name_pool_str1199[sizeof("sd")];
+    char unicode_prop_name_pool_str1202[sizeof("lowercase")];
+    char unicode_prop_name_pool_str1203[sizeof("sidd")];
+    char unicode_prop_name_pool_str1205[sizeof("nabataean")];
+    char unicode_prop_name_pool_str1207[sizeof("lepcha")];
+    char unicode_prop_name_pool_str1208[sizeof("inarabicpresentationformsa")];
+    char unicode_prop_name_pool_str1210[sizeof("modifierletter")];
+    char unicode_prop_name_pool_str1211[sizeof("intags")];
+    char unicode_prop_name_pool_str1212[sizeof("mult")];
+    char unicode_prop_name_pool_str1215[sizeof("insiddham")];
+    char unicode_prop_name_pool_str1216[sizeof("talu")];
+    char unicode_prop_name_pool_str1221[sizeof("cased")];
+    char unicode_prop_name_pool_str1223[sizeof("intibetan")];
+    char unicode_prop_name_pool_str1230[sizeof("separator")];
+    char unicode_prop_name_pool_str1232[sizeof("runic")];
+    char unicode_prop_name_pool_str1233[sizeof("inmiscellaneousmathematicalsymbolsb")];
+    char unicode_prop_name_pool_str1238[sizeof("linb")];
+    char unicode_prop_name_pool_str1239[sizeof("inbraillepatterns")];
+    char unicode_prop_name_pool_str1240[sizeof("oldpersian")];
+    char unicode_prop_name_pool_str1242[sizeof("inugaritic")];
+    char unicode_prop_name_pool_str1243[sizeof("telu")];
+    char unicode_prop_name_pool_str1245[sizeof("limb")];
+    char unicode_prop_name_pool_str1247[sizeof("oldpermic")];
+    char unicode_prop_name_pool_str1249[sizeof("bali")];
+    char unicode_prop_name_pool_str1250[sizeof("inmyanmarextendedb")];
+    char unicode_prop_name_pool_str1251[sizeof("tibt")];
+    char unicode_prop_name_pool_str1259[sizeof("saur")];
+    char unicode_prop_name_pool_str1263[sizeof("po")];
+    char unicode_prop_name_pool_str1265[sizeof("tibetan")];
+    char unicode_prop_name_pool_str1280[sizeof("insaurashtra")];
+    char unicode_prop_name_pool_str1284[sizeof("inbalinese")];
+    char unicode_prop_name_pool_str1285[sizeof("elba")];
+    char unicode_prop_name_pool_str1290[sizeof("bengali")];
+    char unicode_prop_name_pool_str1291[sizeof("gran")];
+    char unicode_prop_name_pool_str1295[sizeof("phoenician")];
+    char unicode_prop_name_pool_str1297[sizeof("ingurmukhi")];
+    char unicode_prop_name_pool_str1300[sizeof("caseignorable")];
+    char unicode_prop_name_pool_str1305[sizeof("lyci")];
+    char unicode_prop_name_pool_str1307[sizeof("inyijinghexagramsymbols")];
+    char unicode_prop_name_pool_str1309[sizeof("mlym")];
+    char unicode_prop_name_pool_str1316[sizeof("lycian")];
+    char unicode_prop_name_pool_str1321[sizeof("elbasan")];
+    char unicode_prop_name_pool_str1327[sizeof("balinese")];
+    char unicode_prop_name_pool_str1328[sizeof("narb")];
+    char unicode_prop_name_pool_str1330[sizeof("brai")];
+    char unicode_prop_name_pool_str1333[sizeof("insuttonsignwriting")];
+    char unicode_prop_name_pool_str1335[sizeof("insorasompeng")];
+    char unicode_prop_name_pool_str1336[sizeof("malayalam")];
+    char unicode_prop_name_pool_str1339[sizeof("arab")];
+    char unicode_prop_name_pool_str1341[sizeof("brahmi")];
+    char unicode_prop_name_pool_str1343[sizeof("incountingrodnumerals")];
+    char unicode_prop_name_pool_str1347[sizeof("rjng")];
+    char unicode_prop_name_pool_str1348[sizeof("mong")];
+    char unicode_prop_name_pool_str1352[sizeof("incyrillicsupplement")];
+    char unicode_prop_name_pool_str1359[sizeof("ogam")];
+    char unicode_prop_name_pool_str1361[sizeof("sarb")];
+    char unicode_prop_name_pool_str1362[sizeof("lower")];
+    char unicode_prop_name_pool_str1364[sizeof("inrejang")];
+    char unicode_prop_name_pool_str1370[sizeof("hmng")];
+    char unicode_prop_name_pool_str1373[sizeof("tirhuta")];
+    char unicode_prop_name_pool_str1374[sizeof("hang")];
+    char unicode_prop_name_pool_str1379[sizeof("wspace")];
+    char unicode_prop_name_pool_str1384[sizeof("inlatinextendedd")];
+    char unicode_prop_name_pool_str1387[sizeof("invai")];
+    char unicode_prop_name_pool_str1388[sizeof("incherokeesupplement")];
+    char unicode_prop_name_pool_str1390[sizeof("mymr")];
+    char unicode_prop_name_pool_str1394[sizeof("vai")];
+    char unicode_prop_name_pool_str1395[sizeof("vaii")];
+    char unicode_prop_name_pool_str1408[sizeof("ethiopic")];
+    char unicode_prop_name_pool_str1410[sizeof("sylotinagri")];
+    char unicode_prop_name_pool_str1415[sizeof("myanmar")];
+    char unicode_prop_name_pool_str1417[sizeof("syrc")];
+    char unicode_prop_name_pool_str1419[sizeof("inbrahmi")];
+    char unicode_prop_name_pool_str1423[sizeof("mathsymbol")];
+    char unicode_prop_name_pool_str1425[sizeof("runr")];
+    char unicode_prop_name_pool_str1431[sizeof("inshavian")];
+    char unicode_prop_name_pool_str1432[sizeof("gothic")];
+    char unicode_prop_name_pool_str1438[sizeof("syriac")];
+    char unicode_prop_name_pool_str1439[sizeof("p")];
+    char unicode_prop_name_pool_str1441[sizeof("zp")];
+    char unicode_prop_name_pool_str1442[sizeof("induployan")];
+    char unicode_prop_name_pool_str1444[sizeof("vs")];
+    char unicode_prop_name_pool_str1447[sizeof("ingreekandcoptic")];
+    char unicode_prop_name_pool_str1448[sizeof("ingothic")];
+    char unicode_prop_name_pool_str1451[sizeof("lowercaseletter")];
+    char unicode_prop_name_pool_str1455[sizeof("inoriya")];
+    char unicode_prop_name_pool_str1461[sizeof("grext")];
+    char unicode_prop_name_pool_str1462[sizeof("linearb")];
+    char unicode_prop_name_pool_str1463[sizeof("inyiradicals")];
+    char unicode_prop_name_pool_str1465[sizeof("inethiopicsupplement")];
+    char unicode_prop_name_pool_str1466[sizeof("inletterlikesymbols")];
+    char unicode_prop_name_pool_str1467[sizeof("ingeometricshapes")];
+    char unicode_prop_name_pool_str1469[sizeof("java")];
+    char unicode_prop_name_pool_str1470[sizeof("inblockelements")];
+    char unicode_prop_name_pool_str1472[sizeof("number")];
+    char unicode_prop_name_pool_str1473[sizeof("incombininghalfmarks")];
+    char unicode_prop_name_pool_str1474[sizeof("inbassavah")];
+    char unicode_prop_name_pool_str1489[sizeof("inlinearbsyllabary")];
+    char unicode_prop_name_pool_str1491[sizeof("osmanya")];
+    char unicode_prop_name_pool_str1495[sizeof("avst")];
+    char unicode_prop_name_pool_str1500[sizeof("hexdigit")];
+    char unicode_prop_name_pool_str1504[sizeof("injavanese")];
+    char unicode_prop_name_pool_str1513[sizeof("cyrl")];
+    char unicode_prop_name_pool_str1514[sizeof("avestan")];
+    char unicode_prop_name_pool_str1531[sizeof("intaiviet")];
+    char unicode_prop_name_pool_str1532[sizeof("inornamentaldingbats")];
+    char unicode_prop_name_pool_str1533[sizeof("tavt")];
+    char unicode_prop_name_pool_str1538[sizeof("javanese")];
+    char unicode_prop_name_pool_str1539[sizeof("inethiopicextended")];
+    char unicode_prop_name_pool_str1550[sizeof("inhalfwidthandfullwidthforms")];
+    char unicode_prop_name_pool_str1559[sizeof("ingeorgian")];
+    char unicode_prop_name_pool_str1561[sizeof("inarabicmathematicalalphabeticsymbols")];
+    char unicode_prop_name_pool_str1569[sizeof("hangul")];
+    char unicode_prop_name_pool_str1571[sizeof("insuperscriptsandsubscripts")];
+    char unicode_prop_name_pool_str1576[sizeof("inhanunoo")];
+    char unicode_prop_name_pool_str1578[sizeof("inhangulsyllables")];
+    char unicode_prop_name_pool_str1586[sizeof("inoldpersian")];
+    char unicode_prop_name_pool_str1589[sizeof("geor")];
+    char unicode_prop_name_pool_str1591[sizeof("otherpunctuation")];
+    char unicode_prop_name_pool_str1593[sizeof("inoldpermic")];
+    char unicode_prop_name_pool_str1598[sizeof("inalchemicalsymbols")];
+    char unicode_prop_name_pool_str1599[sizeof("sylo")];
+    char unicode_prop_name_pool_str1601[sizeof("hiragana")];
+    char unicode_prop_name_pool_str1604[sizeof("word")];
+    char unicode_prop_name_pool_str1612[sizeof("inmeroitichieroglyphs")];
+    char unicode_prop_name_pool_str1614[sizeof("insmallformvariants")];
+    char unicode_prop_name_pool_str1620[sizeof("sund")];
+    char unicode_prop_name_pool_str1621[sizeof("brah")];
+    char unicode_prop_name_pool_str1623[sizeof("insupplementalmathematicaloperators")];
+    char unicode_prop_name_pool_str1624[sizeof("glagolitic")];
+    char unicode_prop_name_pool_str1627[sizeof("braille")];
+    char unicode_prop_name_pool_str1639[sizeof("unassigned")];
+    char unicode_prop_name_pool_str1640[sizeof("sgnw")];
+    char unicode_prop_name_pool_str1644[sizeof("plrd")];
+    char unicode_prop_name_pool_str1648[sizeof("hebr")];
+    char unicode_prop_name_pool_str1649[sizeof("ogham")];
+    char unicode_prop_name_pool_str1654[sizeof("cyrillic")];
+    char unicode_prop_name_pool_str1658[sizeof("orya")];
+    char unicode_prop_name_pool_str1669[sizeof("grantha")];
+    char unicode_prop_name_pool_str1684[sizeof("invariationselectors")];
+    char unicode_prop_name_pool_str1693[sizeof("indingbats")];
+    char unicode_prop_name_pool_str1695[sizeof("inunifiedcanadianaboriginalsyllabicsextended")];
+    char unicode_prop_name_pool_str1702[sizeof("inhanguljamoextendeda")];
+    char unicode_prop_name_pool_str1705[sizeof("goth")];
+    char unicode_prop_name_pool_str1706[sizeof("graphemebase")];
+    char unicode_prop_name_pool_str1708[sizeof("bidic")];
+    char unicode_prop_name_pool_str1717[sizeof("ogrext")];
+    char unicode_prop_name_pool_str1724[sizeof("idsb")];
+    char unicode_prop_name_pool_str1732[sizeof("invariationselectorssupplement")];
+    char unicode_prop_name_pool_str1733[sizeof("assigned")];
+    char unicode_prop_name_pool_str1737[sizeof("symbol")];
+    char unicode_prop_name_pool_str1741[sizeof("ingreekextended")];
+    char unicode_prop_name_pool_str1743[sizeof("pauc")];
+    char unicode_prop_name_pool_str1752[sizeof("meroitichieroglyphs")];
+    char unicode_prop_name_pool_str1754[sizeof("logicalorderexception")];
+    char unicode_prop_name_pool_str1771[sizeof("incurrencysymbols")];
+    char unicode_prop_name_pool_str1775[sizeof("inarabicextendeda")];
+    char unicode_prop_name_pool_str1783[sizeof("insupplementalarrowsc")];
+    char unicode_prop_name_pool_str1786[sizeof("insupplementalarrowsa")];
+    char unicode_prop_name_pool_str1788[sizeof("inkannada")];
+    char unicode_prop_name_pool_str1792[sizeof("kana")];
+    char unicode_prop_name_pool_str1793[sizeof("phagspa")];
+    char unicode_prop_name_pool_str1796[sizeof("cakm")];
+    char unicode_prop_name_pool_str1797[sizeof("digit")];
+    char unicode_prop_name_pool_str1802[sizeof("softdotted")];
+    char unicode_prop_name_pool_str1806[sizeof("inchakma")];
+    char unicode_prop_name_pool_str1818[sizeof("inphagspa")];
+    char unicode_prop_name_pool_str1822[sizeof("inhighprivateusesurrogates")];
+    char unicode_prop_name_pool_str1836[sizeof("warangciti")];
+    char unicode_prop_name_pool_str1844[sizeof("incjkcompatibilityforms")];
+    char unicode_prop_name_pool_str1847[sizeof("idstrinaryoperator")];
+    char unicode_prop_name_pool_str1849[sizeof("incjkcompatibilityideographs")];
+    char unicode_prop_name_pool_str1851[sizeof("inkaithi")];
+    char unicode_prop_name_pool_str1857[sizeof("takri")];
+    char unicode_prop_name_pool_str1864[sizeof("phlp")];
+    char unicode_prop_name_pool_str1865[sizeof("mendekikakui")];
+    char unicode_prop_name_pool_str1867[sizeof("punct")];
+    char unicode_prop_name_pool_str1870[sizeof("otherdefaultignorablecodepoint")];
+    char unicode_prop_name_pool_str1871[sizeof("inkatakana")];
+    char unicode_prop_name_pool_str1878[sizeof("graph")];
+    char unicode_prop_name_pool_str1879[sizeof("lydi")];
+    char unicode_prop_name_pool_str1885[sizeof("pd")];
+    char unicode_prop_name_pool_str1887[sizeof("incjkstrokes")];
+    char unicode_prop_name_pool_str1890[sizeof("lydian")];
+    char unicode_prop_name_pool_str1895[sizeof("sorasompeng")];
+    char unicode_prop_name_pool_str1897[sizeof("incjkcompatibilityideographssupplement")];
+    char unicode_prop_name_pool_str1900[sizeof("meeteimayek")];
+    char unicode_prop_name_pool_str1909[sizeof("otheruppercase")];
+    char unicode_prop_name_pool_str1912[sizeof("kali")];
+    char unicode_prop_name_pool_str1915[sizeof("inhanguljamo")];
+    char unicode_prop_name_pool_str1917[sizeof("ideographic")];
+    char unicode_prop_name_pool_str1935[sizeof("inmeeteimayek")];
+    char unicode_prop_name_pool_str1948[sizeof("incyrillicextendedb")];
+    char unicode_prop_name_pool_str1964[sizeof("hluw")];
+    char unicode_prop_name_pool_str1969[sizeof("patsyn")];
+    char unicode_prop_name_pool_str1972[sizeof("incombiningdiacriticalmarks")];
+    char unicode_prop_name_pool_str1973[sizeof("inarabicsupplement")];
+    char unicode_prop_name_pool_str1975[sizeof("inkanasupplement")];
+    char unicode_prop_name_pool_str1977[sizeof("deprecated")];
+    char unicode_prop_name_pool_str1978[sizeof("inverticalforms")];
+    char unicode_prop_name_pool_str1982[sizeof("incombiningdiacriticalmarksforsymbols")];
+    char unicode_prop_name_pool_str1987[sizeof("indevanagari")];
+    char unicode_prop_name_pool_str1989[sizeof("inbuhid")];
+    char unicode_prop_name_pool_str1991[sizeof("alphabetic")];
+    char unicode_prop_name_pool_str1995[sizeof("oldhungarian")];
+    char unicode_prop_name_pool_str1998[sizeof("mark")];
+    char unicode_prop_name_pool_str2005[sizeof("inkharoshthi")];
+    char unicode_prop_name_pool_str2011[sizeof("deva")];
+    char unicode_prop_name_pool_str2012[sizeof("invedicextensions")];
+    char unicode_prop_name_pool_str2019[sizeof("devanagari")];
+    char unicode_prop_name_pool_str2020[sizeof("incombiningdiacriticalmarkssupplement")];
+    char unicode_prop_name_pool_str2024[sizeof("ingeometricshapesextended")];
+    char unicode_prop_name_pool_str2030[sizeof("inkhmer")];
+    char unicode_prop_name_pool_str2034[sizeof("changeswhencasemapped")];
+    char unicode_prop_name_pool_str2058[sizeof("intakri")];
+    char unicode_prop_name_pool_str2061[sizeof("dep")];
+    char unicode_prop_name_pool_str2062[sizeof("takr")];
+    char unicode_prop_name_pool_str2080[sizeof("changeswhencasefolded")];
+    char unicode_prop_name_pool_str2082[sizeof("kaithi")];
+    char unicode_prop_name_pool_str2093[sizeof("phag")];
+    char unicode_prop_name_pool_str2104[sizeof("inpahawhhmong")];
+    char unicode_prop_name_pool_str2106[sizeof("bidicontrol")];
+    char unicode_prop_name_pool_str2116[sizeof("inkhojki")];
+    char unicode_prop_name_pool_str2126[sizeof("bamu")];
+    char unicode_prop_name_pool_str2127[sizeof("inbamum")];
+    char unicode_prop_name_pool_str2128[sizeof("changeswhentitlecased")];
+    char unicode_prop_name_pool_str2131[sizeof("inkhmersymbols")];
+    char unicode_prop_name_pool_str2132[sizeof("uideo")];
+    char unicode_prop_name_pool_str2133[sizeof("lu")];
+    char unicode_prop_name_pool_str2136[sizeof("kthi")];
+    char unicode_prop_name_pool_str2145[sizeof("limbu")];
+    char unicode_prop_name_pool_str2147[sizeof("defaultignorablecodepoint")];
+    char unicode_prop_name_pool_str2151[sizeof("inplayingcards")];
+    char unicode_prop_name_pool_str2153[sizeof("inhebrew")];
+    char unicode_prop_name_pool_str2161[sizeof("modifiersymbol")];
+    char unicode_prop_name_pool_str2167[sizeof("ugaritic")];
+    char unicode_prop_name_pool_str2172[sizeof("inlisu")];
+    char unicode_prop_name_pool_str2173[sizeof("inglagolitic")];
+    char unicode_prop_name_pool_str2175[sizeof("inprivateusearea")];
+    char unicode_prop_name_pool_str2178[sizeof("olck")];
+    char unicode_prop_name_pool_str2182[sizeof("inbengali")];
+    char unicode_prop_name_pool_str2185[sizeof("olchiki")];
+    char unicode_prop_name_pool_str2195[sizeof("caucasianalbanian")];
+    char unicode_prop_name_pool_str2210[sizeof("oldturkic")];
+    char unicode_prop_name_pool_str2211[sizeof("beng")];
+    char unicode_prop_name_pool_str2212[sizeof("intelugu")];
+    char unicode_prop_name_pool_str2218[sizeof("hyphen")];
+    char unicode_prop_name_pool_str2221[sizeof("inbuginese")];
+    char unicode_prop_name_pool_str2225[sizeof("intagalog")];
+    char unicode_prop_name_pool_str2240[sizeof("cypriot")];
+    char unicode_prop_name_pool_str2249[sizeof("inlimbu")];
+    char unicode_prop_name_pool_str2252[sizeof("graphemeextend")];
+    char unicode_prop_name_pool_str2255[sizeof("tagb")];
+    char unicode_prop_name_pool_str2259[sizeof("incypriotsyllabary")];
+    char unicode_prop_name_pool_str2263[sizeof("intagbanwa")];
+    char unicode_prop_name_pool_str2268[sizeof("inaegeannumbers")];
+    char unicode_prop_name_pool_str2275[sizeof("inkatakanaphoneticextensions")];
+    char unicode_prop_name_pool_str2276[sizeof("glag")];
+    char unicode_prop_name_pool_str2277[sizeof("combiningmark")];
+    char unicode_prop_name_pool_str2278[sizeof("palmyrene")];
+    char unicode_prop_name_pool_str2280[sizeof("khmr")];
+    char unicode_prop_name_pool_str2284[sizeof("khar")];
+    char unicode_prop_name_pool_str2292[sizeof("ugar")];
+    char unicode_prop_name_pool_str2300[sizeof("inarabicpresentationformsb")];
+    char unicode_prop_name_pool_str2304[sizeof("insupplementaryprivateuseareaa")];
+    char unicode_prop_name_pool_str2306[sizeof("variationselector")];
+    char unicode_prop_name_pool_str2311[sizeof("nko")];
+    char unicode_prop_name_pool_str2312[sizeof("nkoo")];
+    char unicode_prop_name_pool_str2330[sizeof("inbamumsupplement")];
+    char unicode_prop_name_pool_str2336[sizeof("tglg")];
+    char unicode_prop_name_pool_str2338[sizeof("any")];
+    char unicode_prop_name_pool_str2339[sizeof("enclosingmark")];
+    char unicode_prop_name_pool_str2348[sizeof("gujr")];
+    char unicode_prop_name_pool_str2358[sizeof("changeswhenlowercased")];
+    char unicode_prop_name_pool_str2363[sizeof("knda")];
+    char unicode_prop_name_pool_str2364[sizeof("hung")];
+    char unicode_prop_name_pool_str2365[sizeof("gujarati")];
+    char unicode_prop_name_pool_str2368[sizeof("bopo")];
+    char unicode_prop_name_pool_str2373[sizeof("inmendekikakui")];
+    char unicode_prop_name_pool_str2376[sizeof("inbopomofo")];
+    char unicode_prop_name_pool_str2386[sizeof("kharoshthi")];
+    char unicode_prop_name_pool_str2388[sizeof("kannada")];
+    char unicode_prop_name_pool_str2401[sizeof("khoj")];
+    char unicode_prop_name_pool_str2422[sizeof("cherokee")];
+    char unicode_prop_name_pool_str2426[sizeof("inlatinextendedb")];
+    char unicode_prop_name_pool_str2432[sizeof("dashpunctuation")];
+    char unicode_prop_name_pool_str2435[sizeof("dupl")];
+    char unicode_prop_name_pool_str2443[sizeof("inyisyllables")];
+    char unicode_prop_name_pool_str2451[sizeof("georgian")];
+    char unicode_prop_name_pool_str2453[sizeof("rejang")];
+    char unicode_prop_name_pool_str2455[sizeof("oupper")];
+    char unicode_prop_name_pool_str2477[sizeof("aghb")];
+    char unicode_prop_name_pool_str2491[sizeof("khmer")];
+    char unicode_prop_name_pool_str2494[sizeof("grbase")];
+    char unicode_prop_name_pool_str2503[sizeof("currencysymbol")];
+    char unicode_prop_name_pool_str2529[sizeof("incombiningdiacriticalmarksextended")];
+    char unicode_prop_name_pool_str2542[sizeof("spacingmark")];
+    char unicode_prop_name_pool_str2544[sizeof("orkh")];
+    char unicode_prop_name_pool_str2550[sizeof("cwu")];
+    char unicode_prop_name_pool_str2552[sizeof("hebrew")];
+    char unicode_prop_name_pool_str2570[sizeof("insupplementalpunctuation")];
+    char unicode_prop_name_pool_str2581[sizeof("oldnortharabian")];
+    char unicode_prop_name_pool_str2587[sizeof("incjksymbolsandpunctuation")];
+    char unicode_prop_name_pool_str2590[sizeof("othergraphemeextend")];
+    char unicode_prop_name_pool_str2613[sizeof("indevanagariextended")];
+    char unicode_prop_name_pool_str2621[sizeof("tagalog")];
+    char unicode_prop_name_pool_str2628[sizeof("surrogate")];
+    char unicode_prop_name_pool_str2650[sizeof("bopomofo")];
+    char unicode_prop_name_pool_str2679[sizeof("ingeorgiansupplement")];
+    char unicode_prop_name_pool_str2704[sizeof("uppercase")];
+    char unicode_prop_name_pool_str2711[sizeof("unifiedideograph")];
+    char unicode_prop_name_pool_str2742[sizeof("inpaucinhau")];
+    char unicode_prop_name_pool_str2743[sizeof("paucinhau")];
+    char unicode_prop_name_pool_str2774[sizeof("insupplementalsymbolsandpictographs")];
+    char unicode_prop_name_pool_str2792[sizeof("nonspacingmark")];
+    char unicode_prop_name_pool_str2794[sizeof("inhanguljamoextendedb")];
+    char unicode_prop_name_pool_str2802[sizeof("inhighsurrogates")];
+    char unicode_prop_name_pool_str2803[sizeof("punctuation")];
+    char unicode_prop_name_pool_str2834[sizeof("openpunctuation")];
+    char unicode_prop_name_pool_str2835[sizeof("bassavah")];
+    char unicode_prop_name_pool_str2864[sizeof("upper")];
+    char unicode_prop_name_pool_str2878[sizeof("insupplementalarrowsb")];
+    char unicode_prop_name_pool_str2879[sizeof("inkanbun")];
+    char unicode_prop_name_pool_str2918[sizeof("inkangxiradicals")];
+    char unicode_prop_name_pool_str2922[sizeof("inmeroiticcursive")];
+    char unicode_prop_name_pool_str2925[sizeof("signwriting")];
+    char unicode_prop_name_pool_str2928[sizeof("incjkradicalssupplement")];
+    char unicode_prop_name_pool_str2930[sizeof("pahawhhmong")];
+    char unicode_prop_name_pool_str2952[sizeof("inkayahli")];
+    char unicode_prop_name_pool_str2953[sizeof("uppercaseletter")];
+    char unicode_prop_name_pool_str2955[sizeof("batk")];
+    char unicode_prop_name_pool_str2960[sizeof("inbatak")];
+    char unicode_prop_name_pool_str2968[sizeof("incjkcompatibility")];
+    char unicode_prop_name_pool_str2983[sizeof("buhd")];
+    char unicode_prop_name_pool_str2989[sizeof("egyp")];
+    char unicode_prop_name_pool_str3009[sizeof("innoblock")];
+    char unicode_prop_name_pool_str3043[sizeof("inegyptianhieroglyphs")];
+    char unicode_prop_name_pool_str3084[sizeof("grek")];
+    char unicode_prop_name_pool_str3176[sizeof("bugi")];
+    char unicode_prop_name_pool_str3230[sizeof("changeswhenuppercased")];
+    char unicode_prop_name_pool_str3234[sizeof("paragraphseparator")];
+    char unicode_prop_name_pool_str3254[sizeof("buginese")];
+    char unicode_prop_name_pool_str3282[sizeof("guru")];
+    char unicode_prop_name_pool_str3299[sizeof("inbopomofoextended")];
+    char unicode_prop_name_pool_str3312[sizeof("telugu")];
+    char unicode_prop_name_pool_str3343[sizeof("quotationmark")];
+    char unicode_prop_name_pool_str3364[sizeof("inkhudawadi")];
+    char unicode_prop_name_pool_str3370[sizeof("kayahli")];
+    char unicode_prop_name_pool_str3372[sizeof("oldsoutharabian")];
+    char unicode_prop_name_pool_str3396[sizeof("insupplementaryprivateuseareab")];
+    char unicode_prop_name_pool_str3479[sizeof("inhangulcompatibilityjamo")];
+    char unicode_prop_name_pool_str3491[sizeof("zyyy")];
+    char unicode_prop_name_pool_str3555[sizeof("qmark")];
+    char unicode_prop_name_pool_str3566[sizeof("buhid")];
+    char unicode_prop_name_pool_str3567[sizeof("sk")];
+    char unicode_prop_name_pool_str3582[sizeof("unknown")];
+    char unicode_prop_name_pool_str3619[sizeof("khudawadi")];
+    char unicode_prop_name_pool_str3644[sizeof("katakana")];
+    char unicode_prop_name_pool_str3670[sizeof("incjkunifiedideographsextensionc")];
+    char unicode_prop_name_pool_str3673[sizeof("incjkunifiedideographsextensiona")];
+    char unicode_prop_name_pool_str3685[sizeof("incjkunifiedideographs")];
+    char unicode_prop_name_pool_str3700[sizeof("incjkunifiedideographsextensione")];
+    char unicode_prop_name_pool_str3743[sizeof("duployan")];
+    char unicode_prop_name_pool_str3763[sizeof("egyptianhieroglyphs")];
+    char unicode_prop_name_pool_str3853[sizeof("inboxdrawing")];
+    char unicode_prop_name_pool_str4106[sizeof("khojki")];
+    char unicode_prop_name_pool_str4244[sizeof("incjkunifiedideographsextensiond")];
+    char unicode_prop_name_pool_str4722[sizeof("batak")];
+    char unicode_prop_name_pool_str4765[sizeof("incjkunifiedideographsextensionb")];
+    char unicode_prop_name_pool_str4780[sizeof("blank")];
+    char unicode_prop_name_pool_str4851[sizeof("greek")];
+    char unicode_prop_name_pool_str4943[sizeof("grlink")];
+    char unicode_prop_name_pool_str5054[sizeof("gurmukhi")];
+    char unicode_prop_name_pool_str5162[sizeof("graphemelink")];
+  };
+static const struct unicode_prop_name_pool_t unicode_prop_name_pool_contents =
+  {
+    "n",
+    "z",
+    "zzzz",
+    "mn",
+    "cn",
+    "ci",
+    "m",
+    "c",
+    "inmanichaean",
+    "mani",
+    "mc",
+    "cc",
+    "qaai",
+    "qaac",
+    "incham",
+    "mandaic",
+    "sm",
+    "sc",
+    "cans",
+    "ascii",
+    "insamaritan",
+    "incuneiform",
+    "s",
+    "inarmenian",
+    "zs",
+    "cs",
+    "me",
+    "incommonindicnumberforms",
+    "inavestan",
+    "inthai",
+    "inipaextensions",
+    "initialpunctuation",
+    "inancientsymbols",
+    "inthaana",
+    "cf",
+    "incuneiformnumbersandpunctuation",
+    "mtei",
+    "inspecials",
+    "inmusicalsymbols",
+    "inmiscellaneousmathematicalsymbolsa",
+    "lm",
+    "lina",
+    "lc",
+    "inlycian",
+    "lana",
+    "intaixuanjingsymbols",
+    "inmyanmarextendeda",
+    "alnum",
+    "sterm",
+    "intaitham",
+    "intransportandmapsymbols",
+    "taile",
+    "inmalayalam",
+    "inmiscellaneoussymbols",
+    "incontrolpictures",
+    "inmiscellaneoussymbolsandarrows",
+    "inlineara",
+    "inmiscellaneoussymbolsandpictographs",
+    "sinhala",
+    "taiviet",
+    "ext",
+    "latn",
+    "latin",
+    "ital",
+    "intamil",
+    "inmultani",
+    "taml",
+    "inrunic",
+    "incarian",
+    "armn",
+    "armi",
+    "cari",
+    "inlatinextendedc",
+    "armenian",
+    "inmyanmar",
+    "incyrillic",
+    "inlatinextendeda",
+    "carian",
+    "intaile",
+    "tale",
+    "arabic",
+    "l",
+    "nl",
+    "zl",
+    "insyriac",
+    "samr",
+    "merc",
+    "inlinearbideograms",
+    "samaritan",
+    "lt",
+    "insharada",
+    "inmeeteimayekextensions",
+    "inruminumeralsymbols",
+    "miao",
+    "inlatinextendede",
+    "zinh",
+    "inahom",
+    "incherokee",
+    "han",
+    "hani",
+    "inosmanya",
+    "inmiscellaneoustechnical",
+    "cham",
+    "inmahajani",
+    "osma",
+    "manichaean",
+    "term",
+    "sinh",
+    "cntrl",
+    "chakma",
+    "insinhala",
+    "tamil",
+    "inethiopic",
+    "connectorpunctuation",
+    "shavian",
+    "joinc",
+    "inenclosedalphanumerics",
+    "ahex",
+    "inlatinextendedadditional",
+    "lineara",
+    "inenclosedcjklettersandmonths",
+    "hex",
+    "thai",
+    "mahj",
+    "math",
+    "ll",
+    "thaa",
+    "hatran",
+    "mahajani",
+    "insinhalaarchaicnumbers",
+    "taitham",
+    "thaana",
+    "ethi",
+    "inenclosedalphanumericsupplement",
+    "meroiticcursive",
+    "inideographicdescriptioncharacters",
+    "terminalpunctuation",
+    "inemoticons",
+    "intifinagh",
+    "asciihexdigit",
+    "tifinagh",
+    "inearlydynasticcuneiform",
+    "inopticalcharacterrecognition",
+    "loe",
+    "titlecaseletter",
+    "inscriptionalparthian",
+    "oriya",
+    "hira",
+    "sora",
+    "mero",
+    "inarrows",
+    "inhiragana",
+    "no",
+    "inmahjongtiles",
+    "innko",
+    "co",
+    "cher",
+    "inmro",
+    "common",
+    "cwcm",
+    "inmiao",
+    "inscriptionalpahlavi",
+    "inmathematicalalphanumericsymbols",
+    "so",
+    "hano",
+    "tirh",
+    "inhatran",
+    "inolchiki",
+    "ahom",
+    "di",
+    "hatr",
+    "inogham",
+    "intirhuta",
+    "inmodi",
+    "idc",
+    "mand",
+    "inmandaic",
+    "dia",
+    "cwcf",
+    "xidc",
+    "sind",
+    "newline",
+    "mend",
+    "newtailue",
+    "inshorthandformatcontrols",
+    "anatolianhieroglyphs",
+    "xids",
+    "ids",
+    "innewtailue",
+    "insylotinagri",
+    "insundanese",
+    "lo",
+    "indominotiles",
+    "inlao",
+    "lao",
+    "laoo",
+    "mongolian",
+    "cwt",
+    "idst",
+    "format",
+    "lineseparator",
+    "letter",
+    "idcontinue",
+    "inanatolianhieroglyphs",
+    "inlydian",
+    "pi",
+    "nchar",
+    "inspacingmodifierletters",
+    "oalpha",
+    "indeseret",
+    "pc",
+    "xdigit",
+    "inphaistosdisc",
+    "joincontrol",
+    "inlowsurrogates",
+    "mro",
+    "mroo",
+    "xidstart",
+    "wara",
+    "inwarangciti",
+    "ps",
+    "pe",
+    "cwl",
+    "incoptic",
+    "diacritic",
+    "pf",
+    "space",
+    "hanunoo",
+    "incyrillicextendeda",
+    "odi",
+    "modi",
+    "oidc",
+    "incopticepactnumbers",
+    "palm",
+    "insundanesesupplement",
+    "patws",
+    "inolditalic",
+    "inlepcha",
+    "shaw",
+    "omath",
+    "alpha",
+    "oids",
+    "control",
+    "ideo",
+    "lepc",
+    "psalterpahlavi",
+    "dsrt",
+    "otheridcontinue",
+    "inpalmyrene",
+    "decimalnumber",
+    "noncharactercodepoint",
+    "idstart",
+    "otheralphabetic",
+    "letternumber",
+    "dash",
+    "xidcontinue",
+    "finalpunctuation",
+    "extender",
+    "siddham",
+    "inoldturkic",
+    "sharada",
+    "whitespace",
+    "inmodifiertoneletters",
+    "radical",
+    "canadianaboriginal",
+    "inethiopicextendeda",
+    "imperialaramaic",
+    "perm",
+    "deseret",
+    "casedletter",
+    "inimperialaramaic",
+    "otheridstart",
+    "prti",
+    "cprt",
+    "othersymbol",
+    "coptic",
+    "otherlowercase",
+    "phnx",
+    "inphoenician",
+    "incaucasianalbanian",
+    "inlatin1supplement",
+    "xpeo",
+    "ininscriptionalparthian",
+    "ininscriptionalpahlavi",
+    "other",
+    "privateuse",
+    "othernumber",
+    "inenclosedideographicsupplement",
+    "copt",
+    "print",
+    "cuneiform",
+    "olditalic",
+    "xsux",
+    "inmongolian",
+    "inancientgreekmusicalnotation",
+    "sundanese",
+    "inoldnortharabian",
+    "patternsyntax",
+    "inherited",
+    "ingrantha",
+    "inphoneticextensions",
+    "saurashtra",
+    "inancientgreeknumbers",
+    "shrd",
+    "inoldsoutharabian",
+    "innabataean",
+    "inalphabeticpresentationforms",
+    "spaceseparator",
+    "olower",
+    "ingeneralpunctuation",
+    "inunifiedcanadianaboriginalsyllabics",
+    "bamum",
+    "inarabic",
+    "phli",
+    "inphoneticextensionssupplement",
+    "patternwhitespace",
+    "inbasiclatin",
+    "othermath",
+    "idsbinaryoperator",
+    "inmathematicaloperators",
+    "multani",
+    "ingujarati",
+    "inelbasan",
+    "inoldhungarian",
+    "innumberforms",
+    "nd",
+    "yi",
+    "lisu",
+    "yiii",
+    "inpsalterpahlavi",
+    "tagbanwa",
+    "bass",
+    "nbat",
+    "inbyzantinemusicalsymbols",
+    "closepunctuation",
+    "tfng",
+    "otherletter",
+    "sd",
+    "lowercase",
+    "sidd",
+    "nabataean",
+    "lepcha",
+    "inarabicpresentationformsa",
+    "modifierletter",
+    "intags",
+    "mult",
+    "insiddham",
+    "talu",
+    "cased",
+    "intibetan",
+    "separator",
+    "runic",
+    "inmiscellaneousmathematicalsymbolsb",
+    "linb",
+    "inbraillepatterns",
+    "oldpersian",
+    "inugaritic",
+    "telu",
+    "limb",
+    "oldpermic",
+    "bali",
+    "inmyanmarextendedb",
+    "tibt",
+    "saur",
+    "po",
+    "tibetan",
+    "insaurashtra",
+    "inbalinese",
+    "elba",
+    "bengali",
+    "gran",
+    "phoenician",
+    "ingurmukhi",
+    "caseignorable",
+    "lyci",
+    "inyijinghexagramsymbols",
+    "mlym",
+    "lycian",
+    "elbasan",
+    "balinese",
+    "narb",
+    "brai",
+    "insuttonsignwriting",
+    "insorasompeng",
+    "malayalam",
+    "arab",
+    "brahmi",
+    "incountingrodnumerals",
+    "rjng",
+    "mong",
+    "incyrillicsupplement",
+    "ogam",
+    "sarb",
+    "lower",
+    "inrejang",
+    "hmng",
+    "tirhuta",
+    "hang",
+    "wspace",
+    "inlatinextendedd",
+    "invai",
+    "incherokeesupplement",
+    "mymr",
+    "vai",
+    "vaii",
+    "ethiopic",
+    "sylotinagri",
+    "myanmar",
+    "syrc",
+    "inbrahmi",
+    "mathsymbol",
+    "runr",
+    "inshavian",
+    "gothic",
+    "syriac",
+    "p",
+    "zp",
+    "induployan",
+    "vs",
+    "ingreekandcoptic",
+    "ingothic",
+    "lowercaseletter",
+    "inoriya",
+    "grext",
+    "linearb",
+    "inyiradicals",
+    "inethiopicsupplement",
+    "inletterlikesymbols",
+    "ingeometricshapes",
+    "java",
+    "inblockelements",
+    "number",
+    "incombininghalfmarks",
+    "inbassavah",
+    "inlinearbsyllabary",
+    "osmanya",
+    "avst",
+    "hexdigit",
+    "injavanese",
+    "cyrl",
+    "avestan",
+    "intaiviet",
+    "inornamentaldingbats",
+    "tavt",
+    "javanese",
+    "inethiopicextended",
+    "inhalfwidthandfullwidthforms",
+    "ingeorgian",
+    "inarabicmathematicalalphabeticsymbols",
+    "hangul",
+    "insuperscriptsandsubscripts",
+    "inhanunoo",
+    "inhangulsyllables",
+    "inoldpersian",
+    "geor",
+    "otherpunctuation",
+    "inoldpermic",
+    "inalchemicalsymbols",
+    "sylo",
+    "hiragana",
+    "word",
+    "inmeroitichieroglyphs",
+    "insmallformvariants",
+    "sund",
+    "brah",
+    "insupplementalmathematicaloperators",
+    "glagolitic",
+    "braille",
+    "unassigned",
+    "sgnw",
+    "plrd",
+    "hebr",
+    "ogham",
+    "cyrillic",
+    "orya",
+    "grantha",
+    "invariationselectors",
+    "indingbats",
+    "inunifiedcanadianaboriginalsyllabicsextended",
+    "inhanguljamoextendeda",
+    "goth",
+    "graphemebase",
+    "bidic",
+    "ogrext",
+    "idsb",
+    "invariationselectorssupplement",
+    "assigned",
+    "symbol",
+    "ingreekextended",
+    "pauc",
+    "meroitichieroglyphs",
+    "logicalorderexception",
+    "incurrencysymbols",
+    "inarabicextendeda",
+    "insupplementalarrowsc",
+    "insupplementalarrowsa",
+    "inkannada",
+    "kana",
+    "phagspa",
+    "cakm",
+    "digit",
+    "softdotted",
+    "inchakma",
+    "inphagspa",
+    "inhighprivateusesurrogates",
+    "warangciti",
+    "incjkcompatibilityforms",
+    "idstrinaryoperator",
+    "incjkcompatibilityideographs",
+    "inkaithi",
+    "takri",
+    "phlp",
+    "mendekikakui",
+    "punct",
+    "otherdefaultignorablecodepoint",
+    "inkatakana",
+    "graph",
+    "lydi",
+    "pd",
+    "incjkstrokes",
+    "lydian",
+    "sorasompeng",
+    "incjkcompatibilityideographssupplement",
+    "meeteimayek",
+    "otheruppercase",
+    "kali",
+    "inhanguljamo",
+    "ideographic",
+    "inmeeteimayek",
+    "incyrillicextendedb",
+    "hluw",
+    "patsyn",
+    "incombiningdiacriticalmarks",
+    "inarabicsupplement",
+    "inkanasupplement",
+    "deprecated",
+    "inverticalforms",
+    "incombiningdiacriticalmarksforsymbols",
+    "indevanagari",
+    "inbuhid",
+    "alphabetic",
+    "oldhungarian",
+    "mark",
+    "inkharoshthi",
+    "deva",
+    "invedicextensions",
+    "devanagari",
+    "incombiningdiacriticalmarkssupplement",
+    "ingeometricshapesextended",
+    "inkhmer",
+    "changeswhencasemapped",
+    "intakri",
+    "dep",
+    "takr",
+    "changeswhencasefolded",
+    "kaithi",
+    "phag",
+    "inpahawhhmong",
+    "bidicontrol",
+    "inkhojki",
+    "bamu",
+    "inbamum",
+    "changeswhentitlecased",
+    "inkhmersymbols",
+    "uideo",
+    "lu",
+    "kthi",
+    "limbu",
+    "defaultignorablecodepoint",
+    "inplayingcards",
+    "inhebrew",
+    "modifiersymbol",
+    "ugaritic",
+    "inlisu",
+    "inglagolitic",
+    "inprivateusearea",
+    "olck",
+    "inbengali",
+    "olchiki",
+    "caucasianalbanian",
+    "oldturkic",
+    "beng",
+    "intelugu",
+    "hyphen",
+    "inbuginese",
+    "intagalog",
+    "cypriot",
+    "inlimbu",
+    "graphemeextend",
+    "tagb",
+    "incypriotsyllabary",
+    "intagbanwa",
+    "inaegeannumbers",
+    "inkatakanaphoneticextensions",
+    "glag",
+    "combiningmark",
+    "palmyrene",
+    "khmr",
+    "khar",
+    "ugar",
+    "inarabicpresentationformsb",
+    "insupplementaryprivateuseareaa",
+    "variationselector",
+    "nko",
+    "nkoo",
+    "inbamumsupplement",
+    "tglg",
+    "any",
+    "enclosingmark",
+    "gujr",
+    "changeswhenlowercased",
+    "knda",
+    "hung",
+    "gujarati",
+    "bopo",
+    "inmendekikakui",
+    "inbopomofo",
+    "kharoshthi",
+    "kannada",
+    "khoj",
+    "cherokee",
+    "inlatinextendedb",
+    "dashpunctuation",
+    "dupl",
+    "inyisyllables",
+    "georgian",
+    "rejang",
+    "oupper",
+    "aghb",
+    "khmer",
+    "grbase",
+    "currencysymbol",
+    "incombiningdiacriticalmarksextended",
+    "spacingmark",
+    "orkh",
+    "cwu",
+    "hebrew",
+    "insupplementalpunctuation",
+    "oldnortharabian",
+    "incjksymbolsandpunctuation",
+    "othergraphemeextend",
+    "indevanagariextended",
+    "tagalog",
+    "surrogate",
+    "bopomofo",
+    "ingeorgiansupplement",
+    "uppercase",
+    "unifiedideograph",
+    "inpaucinhau",
+    "paucinhau",
+    "insupplementalsymbolsandpictographs",
+    "nonspacingmark",
+    "inhanguljamoextendedb",
+    "inhighsurrogates",
+    "punctuation",
+    "openpunctuation",
+    "bassavah",
+    "upper",
+    "insupplementalarrowsb",
+    "inkanbun",
+    "inkangxiradicals",
+    "inmeroiticcursive",
+    "signwriting",
+    "incjkradicalssupplement",
+    "pahawhhmong",
+    "inkayahli",
+    "uppercaseletter",
+    "batk",
+    "inbatak",
+    "incjkcompatibility",
+    "buhd",
+    "egyp",
+    "innoblock",
+    "inegyptianhieroglyphs",
+    "grek",
+    "bugi",
+    "changeswhenuppercased",
+    "paragraphseparator",
+    "buginese",
+    "guru",
+    "inbopomofoextended",
+    "telugu",
+    "quotationmark",
+    "inkhudawadi",
+    "kayahli",
+    "oldsoutharabian",
+    "insupplementaryprivateuseareab",
+    "inhangulcompatibilityjamo",
+    "zyyy",
+    "qmark",
+    "buhid",
+    "sk",
+    "unknown",
+    "khudawadi",
+    "katakana",
+    "incjkunifiedideographsextensionc",
+    "incjkunifiedideographsextensiona",
+    "incjkunifiedideographs",
+    "incjkunifiedideographsextensione",
+    "duployan",
+    "egyptianhieroglyphs",
+    "inboxdrawing",
+    "khojki",
+    "incjkunifiedideographsextensiond",
+    "batak",
+    "incjkunifiedideographsextensionb",
+    "blank",
+    "greek",
+    "grlink",
+    "gurmukhi",
+    "graphemelink"
+  };
+#define unicode_prop_name_pool ((const char *) &unicode_prop_name_pool_contents)
 #ifdef __GNUC__
 __inline
 #if defined __GNUC_STDC_INLINE__ || defined __GNUC_GNU_INLINE__
 __attribute__ ((__gnu_inline__))
 #endif
 #endif
-const struct PropertyNameCtype *
+const struct PoolPropertyNameCtype *
 unicode_lookup_property_name (register const char *str, register unsigned int len)
 {
-  static const struct PropertyNameCtype wordlist[] =
+  static const struct PoolPropertyNameCtype wordlist[] =
     {
-      {""},
+      {-1},
 
-      {"n",                                  144},
-      {""},
+      {pool_offset(1),                                  144},
+      {-1},
 
-      {"z",                                  234},
-      {""}, {""}, {""}, {""},
+      {pool_offset(3),                                  234},
+      {-1}, {-1}, {-1}, {-1},
 
-      {"zzzz",                               225},
+      {pool_offset(8),                               225},
 
-      {"mn",                                 138},
+      {pool_offset(9),                                 138},
 
-      {"cn",                                  51},
-      {""}, {""}, {""},
+      {pool_offset(10),                                  51},
+      {-1}, {-1}, {-1},
 
-      {"ci",                                  38},
+      {pool_offset(14),                                  38},
 
-      {"m",                                  125},
-      {""},
+      {pool_offset(15),                                  125},
+      {-1},
 
-      {"c",                                   35},
-      {""}, {""}, {""}, {""}, {""},
+      {pool_offset(17),                                   35},
+      {-1}, {-1}, {-1}, {-1}, {-1},
 
-      {"inmanichaean",                       430},
+      {pool_offset(23),                       430},
 
-      {"mani",                               129},
+      {pool_offset(24),                               129},
 
-      {"mc",                                 131},
+      {pool_offset(25),                                 131},
 
-      {"cc",                                  41},
-      {""},
+      {pool_offset(26),                                  41},
+      {-1},
 
-      {"qaai",                                94},
-      {""}, {""}, {""}, {""}, {""},
+      {pool_offset(28),                                94},
+      {-1}, {-1}, {-1}, {-1}, {-1},
 
-      {"qaac",                                54},
-      {""}, {""}, {""}, {""}, {""}, {""},
+      {pool_offset(34),                                54},
+      {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
 
-      {"incham",                             373},
-      {""}, {""}, {""}, {""},
+      {pool_offset(41),                             373},
+      {-1}, {-1}, {-1}, {-1},
 
-      {"mandaic",                            128},
-      {""}, {""},
+      {pool_offset(46),                            128},
+      {-1}, {-1},
 
-      {"sm",                                 202},
-      {""},
+      {pool_offset(49),                                 202},
+      {-1},
 
-      {"sc",                                 195},
-      {""}, {""}, {""}, {""},
+      {pool_offset(51),                                 195},
+      {-1}, {-1}, {-1}, {-1},
 
-      {"cans",                                36},
-      {""}, {""}, {""}, {""},
+      {pool_offset(56),                                36},
+      {-1}, {-1}, {-1}, {-1},
 
-      {"ascii",                               14},
-      {""}, {""},
+      {pool_offset(61),                               14},
+      {-1}, {-1},
 
-      {"insamaritan",                        255},
-      {""},
+      {pool_offset(64),                        255},
+      {-1},
 
-      {"incuneiform",                        456},
+      {pool_offset(66),                        456},
 
-      {"s",                                  191},
+      {pool_offset(67),                                  191},
 
-      {"inarmenian",                         248},
+      {pool_offset(68),                         248},
 
-      {"zs",                                 237},
-      {""}, {""}, {""}, {""}, {""}, {""},
+      {pool_offset(69),                                 237},
+      {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
 
-      {"cs",                                  55},
-      {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""},
+      {pool_offset(76),                                  55},
+      {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
 
-      {"me",                                 132},
-      {""}, {""}, {""}, {""},
+      {pool_offset(85),                                 132},
+      {-1}, {-1}, {-1}, {-1},
 
-      {"incommonindicnumberforms",           364},
-      {""}, {""},
+      {pool_offset(90),           364},
+      {-1}, {-1},
 
-      {"inavestan",                          431},
+      {pool_offset(93),                          431},
 
-      {"inthai",                             268},
-      {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""},
+      {pool_offset(94),                             268},
+      {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
 
-      {"inipaextensions",                    242},
-      {""}, {""}, {""}, {""},
+      {pool_offset(103),                    242},
+      {-1}, {-1}, {-1}, {-1},
 
-      {"initialpunctuation",                 183},
-      {""}, {""}, {""},
+      {pool_offset(108),                 183},
+      {-1}, {-1}, {-1},
 
-      {"inancientsymbols",                   402},
-      {""},
+      {pool_offset(112),                   402},
+      {-1},
 
-      {"inthaana",                           253},
-      {""},
+      {pool_offset(114),                           253},
+      {-1},
 
-      {"cf",                                  42},
-      {""},
+      {pool_offset(116),                                  42},
+      {-1},
 
-      {"incuneiformnumbersandpunctuation",   457},
-      {""}, {""}, {""},
+      {pool_offset(118),   457},
+      {-1}, {-1}, {-1},
 
-      {"mtei",                               133},
-      {""},
+      {pool_offset(122),                               133},
+      {-1},
 
-      {"inspecials",                         397},
-      {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""},
+      {pool_offset(124),                         397},
+      {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
 
-      {"inmusicalsymbols",                   470},
-      {""}, {""}, {""}, {""}, {""}, {""}, {""},
+      {pool_offset(133),                   470},
+      {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
 
-      {"inmiscellaneousmathematicalsymbolsa", 323},
-      {""}, {""}, {""},
+      {pool_offset(141), 323},
+      {-1}, {-1}, {-1},
 
-      {"lm",                                 117},
+      {pool_offset(145),                                 117},
 
-      {"lina",                               113},
+      {pool_offset(146),                               113},
 
-      {"lc",                                 108},
-      {""},
+      {pool_offset(147),                                 108},
+      {-1},
 
-      {"inlycian",                           404},
-      {""}, {""}, {""}, {""}, {""},
+      {pool_offset(149),                           404},
+      {-1}, {-1}, {-1}, {-1}, {-1},
 
-      {"lana",                               212},
-      {""},
+      {pool_offset(155),                               212},
+      {-1},
 
-      {"intaixuanjingsymbols",               472},
+      {pool_offset(157),               472},
 
-      {"inmyanmarextendeda",                 374},
+      {pool_offset(158),                 374},
 
-      {"alnum",                               13},
-      {""},
+      {pool_offset(159),                               13},
+      {-1},
 
-      {"sterm",                              192},
+      {pool_offset(161),                              192},
 
-      {"intaitham",                          292},
+      {pool_offset(162),                          292},
 
-      {"intransportandmapsymbols",           486},
-      {""},
+      {pool_offset(163),           486},
+      {-1},
 
-      {"taile",                              211},
-      {""},
+      {pool_offset(165),                              211},
+      {-1},
 
-      {"inmalayalam",                        266},
-      {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""},
+      {pool_offset(167),                        266},
+      {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
 
-      {"inmiscellaneoussymbols",             321},
+      {pool_offset(176),             321},
 
-      {"incontrolpictures",                  315},
-      {""}, {""}, {""}, {""}, {""}, {""}, {""},
+      {pool_offset(177),                  315},
+      {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
 
-      {"inmiscellaneoussymbolsandarrows",    329},
-      {""}, {""}, {""},
+      {pool_offset(185),    329},
+      {-1}, {-1}, {-1},
 
-      {"inlineara",                          417},
+      {pool_offset(189),                          417},
 
-      {"inmiscellaneoussymbolsandpictographs", 483},
-      {""}, {""},
+      {pool_offset(190), 483},
+      {-1}, {-1},
 
-      {"sinhala",                            200},
-      {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""},
+      {pool_offset(193),                            200},
+      {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
 
-      {"taiviet",                            213},
-      {""}, {""},
+      {pool_offset(202),                            213},
+      {-1}, {-1},
 
-      {"ext",                                 69},
-      {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""},
+      {pool_offset(205),                                 69},
+      {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
 
-      {"latn",                               110},
+      {pool_offset(215),                               110},
 
-      {"latin",                              110},
+      {pool_offset(216),                              110},
 
-      {"ital",                               155},
+      {pool_offset(217),                               155},
 
-      {"intamil",                            263},
-      {""},
+      {pool_offset(218),                            263},
+      {-1},
 
-      {"inmultani",                          446},
-      {""},
+      {pool_offset(220),                          446},
+      {-1},
 
-      {"taml",                               215},
-      {""}, {""}, {""}, {""}, {""}, {""},
+      {pool_offset(222),                               215},
+      {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
 
-      {"inrunic",                            279},
+      {pool_offset(229),                            279},
 
-      {"incarian",                           405},
-      {""},
+      {pool_offset(230),                           405},
+      {-1},
 
-      {"armn",                                21},
-      {""},
+      {pool_offset(232),                                21},
+      {-1},
 
-      {"armi",                                93},
+      {pool_offset(234),                                93},
 
-      {"cari",                                37},
+      {pool_offset(235),                                37},
 
-      {"inlatinextendedc",                   331},
-      {""},
+      {pool_offset(236),                   331},
+      {-1},
 
-      {"armenian",                            21},
+      {pool_offset(238),                            21},
 
-      {"inmyanmar",                          271},
+      {pool_offset(239),                          271},
 
-      {"incyrillic",                         246},
-      {""},
+      {pool_offset(240),                         246},
+      {-1},
 
-      {"inlatinextendeda",                   240},
-      {""}, {""}, {""},
+      {pool_offset(242),                   240},
+      {-1}, {-1}, {-1},
 
-      {"carian",                              37},
-      {""}, {""},
+      {pool_offset(246),                              37},
+      {-1}, {-1},
 
-      {"intaile",                            288},
-      {""}, {""}, {""},
+      {pool_offset(249),                            288},
+      {-1}, {-1}, {-1},
 
-      {"tale",                               211},
-      {""}, {""},
+      {pool_offset(253),                               211},
+      {-1}, {-1},
 
-      {"arabic",                              20},
-      {""}, {""},
+      {pool_offset(256),                              20},
+      {-1}, {-1},
 
-      {"l",                                  107},
+      {pool_offset(259),                                  107},
 
-      {"nl",                                 149},
+      {pool_offset(260),                                 149},
 
-      {"zl",                                 235},
-      {""},
+      {pool_offset(261),                                 235},
+      {-1},
 
-      {"insyriac",                           251},
-      {""},
+      {pool_offset(263),                           251},
+      {-1},
 
-      {"samr",                               193},
-      {""},
+      {pool_offset(265),                               193},
+      {-1},
 
-      {"merc",                               135},
-      {""},
+      {pool_offset(267),                               135},
+      {-1},
 
-      {"inlinearbideograms",                 399},
-      {""}, {""},
+      {pool_offset(269),                 399},
+      {-1}, {-1},
 
-      {"samaritan",                          193},
+      {pool_offset(272),                          193},
 
-      {"lt",                                 121},
-      {""}, {""},
+      {pool_offset(273),                                 121},
+      {-1}, {-1},
 
-      {"insharada",                          443},
-      {""}, {""}, {""}, {""}, {""}, {""},
+      {pool_offset(276),                          443},
+      {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
 
-      {"inmeeteimayekextensions",            376},
-      {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""},
+      {pool_offset(283),            376},
+      {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
 
-      {"inruminumeralsymbols",               437},
-      {""}, {""},
+      {pool_offset(292),               437},
+      {-1}, {-1},
 
-      {"miao",                               137},
+      {pool_offset(295),                               137},
 
-      {"inlatinextendede",                   378},
-      {""}, {""}, {""},
+      {pool_offset(296),                   378},
+      {-1}, {-1}, {-1},
 
-      {"zinh",                                94},
-      {""}, {""}, {""},
+      {pool_offset(300),                                94},
+      {-1}, {-1}, {-1},
 
-      {"inahom",                             453},
-      {""},
+      {pool_offset(304),                             453},
+      {-1},
 
-      {"incherokee",                         276},
+      {pool_offset(306),                         276},
 
-      {"han",                                 80},
-      {""}, {""},
+      {pool_offset(307),                                 80},
+      {-1}, {-1},
 
-      {"hani",                                80},
+      {pool_offset(310),                                80},
 
-      {"inosmanya",                          414},
+      {pool_offset(311),                          414},
 
-      {"inmiscellaneoustechnical",           314},
-      {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""},
-      {""},
+      {pool_offset(312),           314},
+      {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
+      {-1},
 
-      {"cham",                                44},
-      {""},
+      {pool_offset(323),                                44},
+      {-1},
 
-      {"inmahajani",                         442},
+      {pool_offset(325),                         442},
 
-      {"osma",                               162},
-      {""}, {""},
+      {pool_offset(326),                               162},
+      {-1}, {-1},
 
-      {"manichaean",                         129},
+      {pool_offset(329),                         129},
 
-      {"term",                               217},
-      {""},
+      {pool_offset(330),                               217},
+      {-1},
 
-      {"sinh",                               200},
-      {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""},
+      {pool_offset(332),                               200},
+      {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
 
-      {"cntrl",                                3},
-      {""}, {""}, {""}, {""},
+      {pool_offset(342),                                3},
+      {-1}, {-1}, {-1}, {-1},
 
-      {"chakma",                              43},
+      {pool_offset(347),                              43},
 
-      {"insinhala",                          267},
-      {""}, {""}, {""},
+      {pool_offset(348),                          267},
+      {-1}, {-1}, {-1},
 
-      {"tamil",                              215},
+      {pool_offset(352),                              215},
 
-      {"inethiopic",                         274},
-      {""}, {""},
+      {pool_offset(353),                         274},
+      {-1}, {-1},
 
-      {"connectorpunctuation",               177},
+      {pool_offset(356),               177},
 
-      {"shavian",                            197},
-      {""}, {""}, {""},
+      {pool_offset(357),                            197},
+      {-1}, {-1}, {-1},
 
-      {"joinc",                               98},
+      {pool_offset(361),                               98},
 
-      {"inenclosedalphanumerics",            317},
-      {""}, {""}, {""}, {""}, {""},
+      {pool_offset(362),            317},
+      {-1}, {-1}, {-1}, {-1}, {-1},
 
-      {"ahex",                                15},
+      {pool_offset(368),                                15},
 
-      {"inlatinextendedadditional",          304},
+      {pool_offset(369),          304},
 
-      {"lineara",                            113},
-      {""}, {""}, {""}, {""}, {""}, {""},
+      {pool_offset(370),                            113},
+      {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
 
-      {"inenclosedcjklettersandmonths",      350},
+      {pool_offset(377),      350},
 
-      {"hex",                                 85},
-      {""}, {""},
+      {pool_offset(378),                                 85},
+      {-1}, {-1},
 
-      {"thai",                               219},
+      {pool_offset(381),                               219},
 
-      {"mahj",                               126},
-      {""}, {""}, {""},
+      {pool_offset(382),                               126},
+      {-1}, {-1}, {-1},
 
-      {"math",                               130},
-      {""}, {""},
+      {pool_offset(386),                               130},
+      {-1}, {-1},
 
-      {"ll",                                 116},
+      {pool_offset(389),                                 116},
 
-      {"thaa",                               218},
-      {""},
+      {pool_offset(390),                               218},
+      {-1},
 
-      {"hatran",                              83},
-      {""}, {""}, {""}, {""}, {""}, {""},
+      {pool_offset(392),                              83},
+      {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
 
-      {"mahajani",                           126},
+      {pool_offset(399),                           126},
 
-      {"insinhalaarchaicnumbers",            444},
-      {""},
+      {pool_offset(400),            444},
+      {-1},
 
-      {"taitham",                            212},
+      {pool_offset(402),                            212},
 
-      {"thaana",                             218},
-      {""}, {""}, {""}, {""},
+      {pool_offset(403),                             218},
+      {-1}, {-1}, {-1}, {-1},
 
-      {"ethi",                                68},
+      {pool_offset(408),                                68},
 
-      {"inenclosedalphanumericsupplement",   481},
-      {""}, {""}, {""}, {""},
+      {pool_offset(409),   481},
+      {-1}, {-1}, {-1}, {-1},
 
-      {"meroiticcursive",                    135},
+      {pool_offset(414),                    135},
 
-      {"inideographicdescriptioncharacters", 340},
-      {""}, {""}, {""},
+      {pool_offset(415), 340},
+      {-1}, {-1}, {-1},
 
-      {"terminalpunctuation",                217},
-      {""}, {""}, {""}, {""}, {""}, {""},
+      {pool_offset(419),                217},
+      {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
 
-      {"inemoticons",                        484},
-      {""}, {""}, {""}, {""},
+      {pool_offset(426),                        484},
+      {-1}, {-1}, {-1}, {-1},
 
-      {"intifinagh",                         334},
-      {""},
+      {pool_offset(431),                         334},
+      {-1},
 
-      {"asciihexdigit",                       15},
-      {""}, {""}, {""}, {""},
+      {pool_offset(433),                       15},
+      {-1}, {-1}, {-1}, {-1},
 
-      {"tifinagh",                           221},
-      {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""},
-      {""}, {""}, {""},
+      {pool_offset(438),                           221},
+      {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
+      {-1}, {-1}, {-1},
 
-      {"inearlydynasticcuneiform",           458},
-      {""}, {""}, {""}, {""}, {""},
+      {pool_offset(451),           458},
+      {-1}, {-1}, {-1}, {-1}, {-1},
 
-      {"inopticalcharacterrecognition",      316},
-      {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""},
-      {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""},
-      {""}, {""}, {""},
+      {pool_offset(457),      316},
+      {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
+      {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
+      {-1}, {-1}, {-1},
 
-      {"loe",                                119},
-      {""}, {""}, {""}, {""}, {""}, {""},
+      {pool_offset(479),                                119},
+      {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
 
-      {"titlecaseletter",                    121},
-      {""}, {""},
+      {pool_offset(486),                    121},
+      {-1}, {-1},
 
-      {"inscriptionalparthian",               96},
-      {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""},
-      {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""},
-      {""}, {""},
+      {pool_offset(489),               96},
+      {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
+      {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
+      {-1}, {-1},
 
-      {"oriya",                              161},
-      {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""},
+      {pool_offset(510),                              161},
+      {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
 
-      {"hira",                                86},
-      {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""},
+      {pool_offset(520),                                86},
+      {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
 
-      {"sora",                               205},
+      {pool_offset(529),                               205},
 
-      {"mero",                               136},
-      {""}, {""}, {""}, {""},
+      {pool_offset(530),                               136},
+      {-1}, {-1}, {-1}, {-1},
 
-      {"inarrows",                           312},
-      {""},
+      {pool_offset(535),                           312},
+      {-1},
 
-      {"inhiragana",                         342},
-      {""}, {""}, {""}, {""}, {""}, {""},
+      {pool_offset(537),                         342},
+      {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
 
-      {"no",                                 150},
+      {pool_offset(544),                                 150},
 
-      {"inmahjongtiles",                     478},
-      {""}, {""}, {""},
+      {pool_offset(545),                     478},
+      {-1}, {-1}, {-1},
 
-      {"innko",                              254},
-      {""}, {""},
+      {pool_offset(549),                              254},
+      {-1}, {-1},
 
-      {"co",                                  52},
+      {pool_offset(552),                                  52},
 
-      {"cher",                                50},
-      {""}, {""},
+      {pool_offset(553),                                50},
+      {-1}, {-1},
 
-      {"inmro",                              462},
-      {""}, {""}, {""}, {""}, {""}, {""},
+      {pool_offset(556),                              462},
+      {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
 
-      {"common",                              53},
+      {pool_offset(563),                              53},
 
-      {"cwcm",                                46},
-      {""}, {""}, {""},
+      {pool_offset(564),                                46},
+      {-1}, {-1}, {-1},
 
-      {"inmiao",                             465},
-      {""}, {""}, {""}, {""},
+      {pool_offset(568),                             465},
+      {-1}, {-1}, {-1}, {-1},
 
-      {"inscriptionalpahlavi",                95},
-      {""}, {""},
+      {pool_offset(573),                95},
+      {-1}, {-1},
 
-      {"inmathematicalalphanumericsymbols",  474},
+      {pool_offset(576),  474},
 
-      {"so",                                 203},
-      {""},
+      {pool_offset(577),                                 203},
+      {-1},
 
-      {"hano",                                82},
+      {pool_offset(579),                                82},
 
-      {"tirh",                               222},
-      {""}, {""}, {""},
+      {pool_offset(580),                               222},
+      {-1}, {-1}, {-1},
 
-      {"inhatran",                           422},
+      {pool_offset(584),                           422},
 
-      {"inolchiki",                          298},
+      {pool_offset(585),                          298},
 
-      {"ahom",                                16},
-      {""},
+      {pool_offset(586),                                16},
+      {-1},
 
-      {"di",                                  60},
+      {pool_offset(588),                                  60},
 
-      {"hatr",                                83},
-      {""},
+      {pool_offset(589),                                83},
+      {-1},
 
-      {"inogham",                            278},
-      {""}, {""}, {""}, {""},
+      {pool_offset(591),                            278},
+      {-1}, {-1}, {-1}, {-1},
 
-      {"intirhuta",                          449},
-      {""}, {""}, {""}, {""},
+      {pool_offset(596),                          449},
+      {-1}, {-1}, {-1}, {-1},
 
-      {"inmodi",                             451},
-      {""},
+      {pool_offset(601),                             451},
+      {-1},
 
-      {"idc",                                 90},
+      {pool_offset(603),                                 90},
 
-      {"mand",                               128},
-      {""}, {""}, {""},
+      {pool_offset(604),                               128},
+      {-1}, {-1}, {-1},
 
-      {"inmandaic",                          256},
+      {pool_offset(608),                          256},
 
-      {"dia",                                 64},
+      {pool_offset(609),                                 64},
 
-      {"cwcf",                                45},
-      {""}, {""}, {""}, {""}, {""}, {""}, {""},
+      {pool_offset(610),                                45},
+      {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
 
-      {"xidc",                               231},
-      {""}, {""},
+      {pool_offset(618),                               231},
+      {-1}, {-1},
 
-      {"sind",                               106},
+      {pool_offset(621),                               106},
 
-      {"newline",                              0},
-      {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""},
+      {pool_offset(622),                              0},
+      {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
 
-      {"mend",                               134},
-      {""}, {""}, {""},
+      {pool_offset(631),                               134},
+      {-1}, {-1}, {-1},
 
-      {"newtailue",                          147},
-      {""}, {""},
+      {pool_offset(635),                          147},
+      {-1}, {-1},
 
-      {"inshorthandformatcontrols",          468},
-      {""}, {""}, {""},
+      {pool_offset(638),          468},
+      {-1}, {-1}, {-1},
 
-      {"anatolianhieroglyphs",                18},
+      {pool_offset(642),                18},
 
-      {"xids",                               232},
-      {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""},
+      {pool_offset(643),                               232},
+      {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
 
-      {"ids",                                 91},
-      {""}, {""}, {""}, {""}, {""},
+      {pool_offset(653),                                 91},
+      {-1}, {-1}, {-1}, {-1}, {-1},
 
-      {"innewtailue",                        289},
+      {pool_offset(659),                        289},
 
-      {"insylotinagri",                      363},
-      {""}, {""}, {""}, {""}, {""},
+      {pool_offset(660),                      363},
+      {-1}, {-1}, {-1}, {-1}, {-1},
 
-      {"insundanese",                        295},
-      {""}, {""}, {""}, {""}, {""}, {""},
+      {pool_offset(666),                        295},
+      {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
 
-      {"lo",                                 118},
-      {""}, {""}, {""},
+      {pool_offset(673),                                 118},
+      {-1}, {-1}, {-1},
 
-      {"indominotiles",                      479},
+      {pool_offset(677),                      479},
 
-      {"inlao",                              269},
-      {""}, {""}, {""}, {""}, {""}, {""},
+      {pool_offset(678),                              269},
+      {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
 
-      {"lao",                                109},
+      {pool_offset(685),                                109},
 
-      {"laoo",                               109},
+      {pool_offset(686),                               109},
 
-      {"mongolian",                          140},
-      {""}, {""},
+      {pool_offset(687),                          140},
+      {-1}, {-1},
 
-      {"cwt",                                 48},
-      {""},
+      {pool_offset(690),                                 48},
+      {-1},
 
-      {"idst",                                89},
+      {pool_offset(692),                                89},
 
-      {"format",                              42},
-      {""}, {""},
+      {pool_offset(693),                              42},
+      {-1}, {-1},
 
-      {"lineseparator",                      235},
-      {""}, {""}, {""}, {""}, {""},
+      {pool_offset(696),                      235},
+      {-1}, {-1}, {-1}, {-1}, {-1},
 
-      {"letter",                             107},
-      {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""},
+      {pool_offset(702),                             107},
+      {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
 
-      {"idcontinue",                          90},
-      {""}, {""},
+      {pool_offset(711),                          90},
+      {-1}, {-1},
 
-      {"inanatolianhieroglyphs",             460},
-      {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""},
+      {pool_offset(714),             460},
+      {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
 
-      {"inlydian",                           424},
-      {""},
+      {pool_offset(723),                           424},
+      {-1},
 
-      {"pi",                                 183},
+      {pool_offset(725),                                 183},
 
-      {"nchar",                              151},
-      {""}, {""}, {""}, {""},
+      {pool_offset(726),                              151},
+      {-1}, {-1}, {-1}, {-1},
 
-      {"inspacingmodifierletters",           243},
+      {pool_offset(731),           243},
 
-      {"oalpha",                             163},
-      {""}, {""},
+      {pool_offset(732),                             163},
+      {-1}, {-1},
 
-      {"indeseret",                          412},
-      {""},
+      {pool_offset(735),                          412},
+      {-1},
 
-      {"pc",                                 177},
-      {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""},
-      {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""},
+      {pool_offset(737),                                 177},
+      {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
+      {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
 
-      {"xdigit",                              11},
-      {""},
+      {pool_offset(756),                              11},
+      {-1},
 
-      {"inphaistosdisc",                     403},
+      {pool_offset(758),                     403},
 
-      {"joincontrol",                         98},
+      {pool_offset(759),                         98},
 
-      {"inlowsurrogates",                    385},
-      {""},
+      {pool_offset(760),                    385},
+      {-1},
 
-      {"mro",                                141},
+      {pool_offset(762),                                141},
 
-      {"mroo",                               141},
-      {""}, {""}, {""},
+      {pool_offset(763),                               141},
+      {-1}, {-1}, {-1},
 
-      {"xidstart",                           232},
-      {""}, {""}, {""}, {""}, {""},
+      {pool_offset(767),                           232},
+      {-1}, {-1}, {-1}, {-1}, {-1},
 
-      {"wara",                               229},
-      {""}, {""},
+      {pool_offset(773),                               229},
+      {-1}, {-1},
 
-      {"inwarangciti",                       454},
-      {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""},
-      {""},
+      {pool_offset(776),                       454},
+      {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
+      {-1},
 
-      {"ps",                                 185},
-      {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""},
+      {pool_offset(787),                                 185},
+      {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
 
-      {"pe",                                 179},
-      {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""},
+      {pool_offset(797),                                 179},
+      {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
 
-      {"cwl",                                 47},
-      {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""},
+      {pool_offset(806),                                 47},
+      {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
 
-      {"incoptic",                           332},
-      {""}, {""}, {""}, {""}, {""}, {""}, {""},
+      {pool_offset(816),                           332},
+      {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
 
-      {"diacritic",                           64},
-      {""}, {""},
+      {pool_offset(824),                           64},
+      {-1}, {-1},
 
-      {"pf",                                 180},
-      {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""},
-      {""}, {""}, {""}, {""}, {""}, {""}, {""},
+      {pool_offset(827),                                 180},
+      {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
+      {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
 
-      {"space",                                9},
-      {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""},
+      {pool_offset(844),                                9},
+      {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
 
-      {"hanunoo",                             82},
-      {""}, {""},
+      {pool_offset(853),                             82},
+      {-1}, {-1},
 
-      {"incyrillicextendeda",                336},
-      {""}, {""}, {""},
+      {pool_offset(856),                336},
+      {-1}, {-1}, {-1},
 
-      {"odi",                                164},
-      {""}, {""}, {""}, {""}, {""},
+      {pool_offset(860),                                164},
+      {-1}, {-1}, {-1}, {-1}, {-1},
 
-      {"modi",                               139},
+      {pool_offset(866),                               139},
 
-      {"oidc",                               166},
+      {pool_offset(867),                               166},
 
-      {"incopticepactnumbers",               406},
-      {""},
+      {pool_offset(868),               406},
+      {-1},
 
-      {"palm",                               173},
+      {pool_offset(870),                               173},
 
-      {"insundanesesupplement",              299},
+      {pool_offset(871),              299},
 
-      {"patws",                              175},
-      {""}, {""}, {""},
+      {pool_offset(872),                              175},
+      {-1}, {-1}, {-1},
 
-      {"inolditalic",                        407},
+      {pool_offset(876),                        407},
 
-      {"inlepcha",                           297},
+      {pool_offset(877),                           297},
 
-      {"shaw",                               197},
-      {""},
+      {pool_offset(878),                               197},
+      {-1},
 
-      {"omath",                              169},
-      {""}, {""}, {""}, {""}, {""},
+      {pool_offset(880),                              169},
+      {-1}, {-1}, {-1}, {-1}, {-1},
 
-      {"alpha",                                1},
-      {""}, {""}, {""}, {""}, {""},
+      {pool_offset(886),                                1},
+      {-1}, {-1}, {-1}, {-1}, {-1},
 
-      {"oids",                               167},
-      {""}, {""}, {""},
+      {pool_offset(892),                               167},
+      {-1}, {-1}, {-1},
 
-      {"control",                             41},
+      {pool_offset(896),                             41},
 
-      {"ideo",                                92},
+      {pool_offset(897),                                92},
 
-      {"lepc",                               111},
+      {pool_offset(898),                               111},
 
-      {"psalterpahlavi",                     186},
+      {pool_offset(899),                     186},
 
-      {"dsrt",                                62},
-      {""},
+      {pool_offset(900),                                62},
+      {-1},
 
-      {"otheridcontinue",                    166},
-      {""}, {""}, {""},
+      {pool_offset(902),                    166},
+      {-1}, {-1}, {-1},
 
-      {"inpalmyrene",                        420},
+      {pool_offset(906),                        420},
 
-      {"decimalnumber",                      146},
-      {""}, {""}, {""}, {""}, {""}, {""}, {""},
+      {pool_offset(907),                      146},
+      {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
 
-      {"noncharactercodepoint",              151},
+      {pool_offset(915),              151},
 
-      {"idstart",                             91},
+      {pool_offset(916),                             91},
 
-      {"otheralphabetic",                    163},
+      {pool_offset(917),                    163},
 
-      {"letternumber",                       149},
-      {""}, {""}, {""}, {""},
+      {pool_offset(918),                       149},
+      {-1}, {-1}, {-1}, {-1},
 
-      {"dash",                                59},
-      {""}, {""},
+      {pool_offset(923),                                59},
+      {-1}, {-1},
 
-      {"xidcontinue",                        231},
-      {""}, {""}, {""},
+      {pool_offset(926),                        231},
+      {-1}, {-1}, {-1},
 
-      {"finalpunctuation",                   180},
+      {pool_offset(930),                   180},
 
-      {"extender",                            69},
-      {""}, {""}, {""},
+      {pool_offset(931),                            69},
+      {-1}, {-1}, {-1},
 
-      {"siddham",                            198},
-      {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""},
+      {pool_offset(935),                            198},
+      {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
 
-      {"inoldturkic",                        435},
-      {""}, {""},
+      {pool_offset(945),                        435},
+      {-1}, {-1},
 
-      {"sharada",                            196},
-      {""}, {""},
+      {pool_offset(948),                            196},
+      {-1}, {-1},
 
-      {"whitespace",                         230},
-      {""}, {""}, {""}, {""},
+      {pool_offset(951),                         230},
+      {-1}, {-1}, {-1}, {-1},
 
-      {"inmodifiertoneletters",              361},
-      {""},
+      {pool_offset(956),              361},
+      {-1},
 
-      {"radical",                            188},
-      {""},
+      {pool_offset(958),                            188},
+      {-1},
 
-      {"canadianaboriginal",                  36},
-      {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""},
+      {pool_offset(960),                  36},
+      {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
 
-      {"inethiopicextendeda",                377},
+      {pool_offset(969),                377},
 
-      {"imperialaramaic",                     93},
-      {""}, {""}, {""}, {""}, {""}, {""}, {""},
+      {pool_offset(970),                     93},
+      {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
 
-      {"perm",                               157},
+      {pool_offset(978),                               157},
 
-      {"deseret",                             62},
-      {""}, {""}, {""}, {""},
+      {pool_offset(979),                             62},
+      {-1}, {-1}, {-1}, {-1},
 
-      {"casedletter",                        108},
-      {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""},
-      {""}, {""}, {""}, {""},
+      {pool_offset(984),                        108},
+      {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
+      {-1}, {-1}, {-1}, {-1},
 
-      {"inimperialaramaic",                  419},
-      {""}, {""},
+      {pool_offset(998),                  419},
+      {-1}, {-1},
 
-      {"otheridstart",                       167},
-      {""}, {""}, {""}, {""},
+      {pool_offset(1001),                       167},
+      {-1}, {-1}, {-1}, {-1},
 
-      {"prti",                                96},
-      {""}, {""}, {""}, {""}, {""},
+      {pool_offset(1006),                                96},
+      {-1}, {-1}, {-1}, {-1}, {-1},
 
-      {"cprt",                                57},
-      {""}, {""}, {""}, {""}, {""},
+      {pool_offset(1012),                                57},
+      {-1}, {-1}, {-1}, {-1}, {-1},
 
-      {"othersymbol",                        203},
-      {""}, {""}, {""},
+      {pool_offset(1018),                        203},
+      {-1}, {-1}, {-1},
 
-      {"coptic",                              54},
-      {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""},
-      {""}, {""}, {""}, {""}, {""},
+      {pool_offset(1022),                              54},
+      {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
+      {-1}, {-1}, {-1}, {-1}, {-1},
 
-      {"otherlowercase",                     168},
+      {pool_offset(1037),                     168},
 
-      {"phnx",                               182},
-      {""}, {""}, {""},
+      {pool_offset(1038),                               182},
+      {-1}, {-1}, {-1},
 
-      {"inphoenician",                       423},
-      {""}, {""}, {""}, {""}, {""}, {""},
+      {pool_offset(1042),                       423},
+      {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
 
-      {"incaucasianalbanian",                416},
+      {pool_offset(1049),                416},
 
-      {"inlatin1supplement",                 239},
-      {""}, {""}, {""},
+      {pool_offset(1050),                 239},
+      {-1}, {-1}, {-1},
 
-      {"xpeo",                               158},
-      {""}, {""}, {""},
+      {pool_offset(1054),                               158},
+      {-1}, {-1}, {-1},
 
-      {"ininscriptionalparthian",            432},
+      {pool_offset(1058),            432},
 
-      {"ininscriptionalpahlavi",             433},
+      {pool_offset(1059),             433},
 
-      {"other",                               35},
+      {pool_offset(1060),                               35},
 
-      {"privateuse",                          52},
-      {""}, {""}, {""}, {""},
+      {pool_offset(1061),                          52},
+      {-1}, {-1}, {-1}, {-1},
 
-      {"othernumber",                        150},
-      {""}, {""}, {""}, {""},
+      {pool_offset(1066),                        150},
+      {-1}, {-1}, {-1}, {-1},
 
-      {"inenclosedideographicsupplement",    482},
-      {""},
+      {pool_offset(1071),    482},
+      {-1},
 
-      {"copt",                                54},
-      {""}, {""}, {""}, {""},
+      {pool_offset(1073),                                54},
+      {-1}, {-1}, {-1}, {-1},
 
-      {"print",                                7},
-      {""},
+      {pool_offset(1078),                                7},
+      {-1},
 
-      {"cuneiform",                           56},
+      {pool_offset(1080),                           56},
 
-      {"olditalic",                          155},
+      {pool_offset(1081),                          155},
 
-      {"xsux",                                56},
-      {""}, {""}, {""},
+      {pool_offset(1082),                                56},
+      {-1}, {-1}, {-1},
 
-      {"inmongolian",                        285},
-      {""}, {""}, {""}, {""},
+      {pool_offset(1086),                        285},
+      {-1}, {-1}, {-1}, {-1},
 
-      {"inancientgreekmusicalnotation",      471},
+      {pool_offset(1091),      471},
 
-      {"sundanese",                          206},
+      {pool_offset(1092),                          206},
 
-      {"inoldnortharabian",                  429},
-      {""},
+      {pool_offset(1093),                  429},
+      {-1},
 
-      {"patternsyntax",                      174},
-      {""}, {""},
+      {pool_offset(1095),                      174},
+      {-1}, {-1},
 
-      {"inherited",                           94},
+      {pool_offset(1098),                           94},
 
-      {"ingrantha",                          448},
+      {pool_offset(1099),                          448},
 
-      {"inphoneticextensions",               301},
-      {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""},
+      {pool_offset(1100),               301},
+      {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
 
-      {"saurashtra",                         194},
-      {""}, {""}, {""}, {""}, {""},
+      {pool_offset(1110),                         194},
+      {-1}, {-1}, {-1}, {-1}, {-1},
 
-      {"inancientgreeknumbers",              401},
-      {""}, {""}, {""}, {""}, {""},
+      {pool_offset(1116),              401},
+      {-1}, {-1}, {-1}, {-1}, {-1},
 
-      {"shrd",                               196},
-      {""}, {""}, {""},
+      {pool_offset(1122),                               196},
+      {-1}, {-1}, {-1},
 
-      {"inoldsoutharabian",                  428},
+      {pool_offset(1126),                  428},
 
-      {"innabataean",                        421},
+      {pool_offset(1127),                        421},
 
-      {"inalphabeticpresentationforms",      388},
+      {pool_offset(1128),      388},
 
-      {"spaceseparator",                     237},
-      {""}, {""}, {""}, {""}, {""},
+      {pool_offset(1129),                     237},
+      {-1}, {-1}, {-1}, {-1}, {-1},
 
-      {"olower",                             168},
-      {""},
+      {pool_offset(1135),                             168},
+      {-1},
 
-      {"ingeneralpunctuation",               306},
+      {pool_offset(1137),               306},
 
-      {"inunifiedcanadianaboriginalsyllabics", 277},
-      {""},
+      {pool_offset(1138), 277},
+      {-1},
 
-      {"bamum",                               25},
-      {""}, {""},
+      {pool_offset(1140),                               25},
+      {-1}, {-1},
 
-      {"inarabic",                           250},
-      {""}, {""}, {""},
+      {pool_offset(1143),                           250},
+      {-1}, {-1}, {-1},
 
-      {"phli",                                95},
+      {pool_offset(1147),                                95},
 
-      {"inphoneticextensionssupplement",     302},
-      {""},
+      {pool_offset(1148),     302},
+      {-1},
 
-      {"patternwhitespace",                  175},
-      {""},
+      {pool_offset(1150),                  175},
+      {-1},
 
-      {"inbasiclatin",                       238},
-      {""},
+      {pool_offset(1152),                       238},
+      {-1},
 
-      {"othermath",                          169},
+      {pool_offset(1154),                          169},
 
-      {"idsbinaryoperator",                   88},
+      {pool_offset(1155),                   88},
 
-      {"inmathematicaloperators",            313},
+      {pool_offset(1156),            313},
 
-      {"multani",                            142},
+      {pool_offset(1157),                            142},
 
-      {"ingujarati",                         261},
-      {""}, {""}, {""}, {""},
+      {pool_offset(1158),                         261},
+      {-1}, {-1}, {-1}, {-1},
 
-      {"inelbasan",                          415},
+      {pool_offset(1163),                          415},
 
-      {"inoldhungarian",                     436},
+      {pool_offset(1164),                     436},
 
-      {"innumberforms",                      311},
+      {pool_offset(1165),                      311},
 
-      {"nd",                                 146},
-      {""},
+      {pool_offset(1166),                                 146},
+      {-1},
 
-      {"yi",                                 233},
+      {pool_offset(1168),                                 233},
 
-      {"lisu",                               115},
-      {""}, {""},
+      {pool_offset(1169),                               115},
+      {-1}, {-1},
 
-      {"yiii",                               233},
-      {""},
+      {pool_offset(1172),                               233},
+      {-1},
 
-      {"inpsalterpahlavi",                   434},
-      {""}, {""}, {""},
+      {pool_offset(1174),                   434},
+      {-1}, {-1}, {-1},
 
-      {"tagbanwa",                           210},
-      {""}, {""}, {""}, {""}, {""},
+      {pool_offset(1178),                           210},
+      {-1}, {-1}, {-1}, {-1}, {-1},
 
-      {"bass",                                26},
-      {""}, {""}, {""}, {""},
+      {pool_offset(1184),                                26},
+      {-1}, {-1}, {-1}, {-1},
 
-      {"nbat",                               145},
+      {pool_offset(1189),                               145},
 
-      {"inbyzantinemusicalsymbols",          469},
-      {""},
+      {pool_offset(1190),          469},
+      {-1},
 
-      {"closepunctuation",                   179},
-      {""},
+      {pool_offset(1192),                   179},
+      {-1},
 
-      {"tfng",                               221},
+      {pool_offset(1194),                               221},
 
-      {"otherletter",                        118},
-      {""}, {""}, {""},
+      {pool_offset(1195),                        118},
+      {-1}, {-1}, {-1},
 
-      {"sd",                                 204},
-      {""}, {""},
+      {pool_offset(1199),                                 204},
+      {-1}, {-1},
 
-      {"lowercase",                          120},
+      {pool_offset(1202),                          120},
 
-      {"sidd",                               198},
-      {""},
+      {pool_offset(1203),                               198},
+      {-1},
 
-      {"nabataean",                          145},
-      {""},
+      {pool_offset(1205),                          145},
+      {-1},
 
-      {"lepcha",                             111},
+      {pool_offset(1207),                             111},
 
-      {"inarabicpresentationformsa",         389},
-      {""},
+      {pool_offset(1208),         389},
+      {-1},
 
-      {"modifierletter",                     117},
+      {pool_offset(1210),                     117},
 
-      {"intags",                             496},
+      {pool_offset(1211),                             496},
 
-      {"mult",                               142},
-      {""}, {""},
+      {pool_offset(1212),                               142},
+      {-1}, {-1},
 
-      {"insiddham",                          450},
+      {pool_offset(1215),                          450},
 
-      {"talu",                               147},
-      {""}, {""}, {""}, {""},
+      {pool_offset(1216),                               147},
+      {-1}, {-1}, {-1}, {-1},
 
-      {"cased",                               39},
-      {""},
+      {pool_offset(1221),                               39},
+      {-1},
 
-      {"intibetan",                          270},
-      {""}, {""}, {""}, {""}, {""}, {""},
+      {pool_offset(1223),                          270},
+      {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
 
-      {"separator",                          234},
-      {""},
+      {pool_offset(1230),                          234},
+      {-1},
 
-      {"runic",                              190},
+      {pool_offset(1232),                              190},
 
-      {"inmiscellaneousmathematicalsymbolsb", 327},
-      {""}, {""}, {""}, {""},
+      {pool_offset(1233), 327},
+      {-1}, {-1}, {-1}, {-1},
 
-      {"linb",                               114},
+      {pool_offset(1238),                               114},
 
-      {"inbraillepatterns",                  325},
+      {pool_offset(1239),                  325},
 
-      {"oldpersian",                         158},
-      {""},
+      {pool_offset(1240),                         158},
+      {-1},
 
-      {"inugaritic",                         410},
+      {pool_offset(1242),                         410},
 
-      {"telu",                               216},
-      {""},
+      {pool_offset(1243),                               216},
+      {-1},
 
-      {"limb",                               112},
-      {""},
+      {pool_offset(1245),                               112},
+      {-1},
 
-      {"oldpermic",                          157},
-      {""},
+      {pool_offset(1247),                          157},
+      {-1},
 
-      {"bali",                                24},
+      {pool_offset(1249),                                24},
 
-      {"inmyanmarextendedb",                 372},
+      {pool_offset(1250),                 372},
 
-      {"tibt",                               220},
-      {""}, {""}, {""}, {""}, {""}, {""}, {""},
+      {pool_offset(1251),                               220},
+      {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
 
-      {"saur",                               194},
-      {""}, {""}, {""},
+      {pool_offset(1259),                               194},
+      {-1}, {-1}, {-1},
 
-      {"po",                                 184},
-      {""},
+      {pool_offset(1263),                                 184},
+      {-1},
 
-      {"tibetan",                            220},
-      {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""},
-      {""}, {""}, {""}, {""}, {""},
+      {pool_offset(1265),                            220},
+      {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
+      {-1}, {-1}, {-1}, {-1}, {-1},
 
-      {"insaurashtra",                       366},
-      {""}, {""}, {""},
+      {pool_offset(1280),                       366},
+      {-1}, {-1}, {-1},
 
-      {"inbalinese",                         294},
+      {pool_offset(1284),                         294},
 
-      {"elba",                                67},
-      {""}, {""}, {""}, {""},
+      {pool_offset(1285),                                67},
+      {-1}, {-1}, {-1}, {-1},
 
-      {"bengali",                             28},
+      {pool_offset(1290),                             28},
 
-      {"gran",                                73},
-      {""}, {""}, {""},
+      {pool_offset(1291),                                73},
+      {-1}, {-1}, {-1},
 
-      {"phoenician",                         182},
-      {""},
+      {pool_offset(1295),                         182},
+      {-1},
 
-      {"ingurmukhi",                         260},
-      {""}, {""},
+      {pool_offset(1297),                         260},
+      {-1}, {-1},
 
-      {"caseignorable",                       38},
-      {""}, {""}, {""}, {""},
+      {pool_offset(1300),                       38},
+      {-1}, {-1}, {-1}, {-1},
 
-      {"lyci",                               123},
-      {""},
+      {pool_offset(1305),                               123},
+      {-1},
 
-      {"inyijinghexagramsymbols",            353},
-      {""},
+      {pool_offset(1307),            353},
+      {-1},
 
-      {"mlym",                               127},
-      {""}, {""}, {""}, {""}, {""}, {""},
+      {pool_offset(1309),                               127},
+      {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
 
-      {"lycian",                             123},
-      {""}, {""}, {""}, {""},
+      {pool_offset(1316),                             123},
+      {-1}, {-1}, {-1}, {-1},
 
-      {"elbasan",                             67},
-      {""}, {""}, {""}, {""}, {""},
+      {pool_offset(1321),                             67},
+      {-1}, {-1}, {-1}, {-1}, {-1},
 
-      {"balinese",                            24},
+      {pool_offset(1327),                            24},
 
-      {"narb",                               156},
-      {""},
+      {pool_offset(1328),                               156},
+      {-1},
 
-      {"brai",                                32},
-      {""}, {""},
+      {pool_offset(1330),                                32},
+      {-1}, {-1},
 
-      {"insuttonsignwriting",                475},
-      {""},
+      {pool_offset(1333),                475},
+      {-1},
 
-      {"insorasompeng",                      440},
+      {pool_offset(1335),                      440},
 
-      {"malayalam",                          127},
-      {""}, {""},
+      {pool_offset(1336),                          127},
+      {-1}, {-1},
 
-      {"arab",                                20},
-      {""},
+      {pool_offset(1339),                                20},
+      {-1},
 
-      {"brahmi",                              31},
-      {""},
+      {pool_offset(1341),                              31},
+      {-1},
 
-      {"incountingrodnumerals",              473},
-      {""}, {""}, {""},
+      {pool_offset(1343),              473},
+      {-1}, {-1}, {-1},
 
-      {"rjng",                               189},
+      {pool_offset(1347),                               189},
 
-      {"mong",                               140},
-      {""}, {""}, {""},
+      {pool_offset(1348),                               140},
+      {-1}, {-1}, {-1},
 
-      {"incyrillicsupplement",               247},
-      {""}, {""}, {""}, {""}, {""}, {""},
+      {pool_offset(1352),               247},
+      {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
 
-      {"ogam",                               152},
-      {""},
+      {pool_offset(1359),                               152},
+      {-1},
 
-      {"sarb",                               159},
+      {pool_offset(1361),                               159},
 
-      {"lower",                                6},
-      {""},
+      {pool_offset(1362),                                6},
+      {-1},
 
-      {"inrejang",                           369},
-      {""}, {""}, {""}, {""}, {""},
+      {pool_offset(1364),                           369},
+      {-1}, {-1}, {-1}, {-1}, {-1},
 
-      {"hmng",                               172},
-      {""}, {""},
+      {pool_offset(1370),                               172},
+      {-1}, {-1},
 
-      {"tirhuta",                            222},
+      {pool_offset(1373),                            222},
 
-      {"hang",                                81},
-      {""}, {""}, {""}, {""},
+      {pool_offset(1374),                                81},
+      {-1}, {-1}, {-1}, {-1},
 
-      {"wspace",                             230},
-      {""}, {""}, {""}, {""},
+      {pool_offset(1379),                             230},
+      {-1}, {-1}, {-1}, {-1},
 
-      {"inlatinextendedd",                   362},
-      {""}, {""},
+      {pool_offset(1384),                   362},
+      {-1}, {-1},
 
-      {"invai",                              358},
+      {pool_offset(1387),                              358},
 
-      {"incherokeesupplement",               379},
-      {""},
+      {pool_offset(1388),               379},
+      {-1},
 
-      {"mymr",                               143},
-      {""}, {""}, {""},
+      {pool_offset(1390),                               143},
+      {-1}, {-1}, {-1},
 
-      {"vai",                                227},
+      {pool_offset(1394),                                227},
 
-      {"vaii",                               227},
-      {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""},
-      {""}, {""}, {""},
+      {pool_offset(1395),                               227},
+      {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
+      {-1}, {-1}, {-1},
 
-      {"ethiopic",                            68},
-      {""},
+      {pool_offset(1408),                            68},
+      {-1},
 
-      {"sylotinagri",                        207},
-      {""}, {""}, {""}, {""},
+      {pool_offset(1410),                        207},
+      {-1}, {-1}, {-1}, {-1},
 
-      {"myanmar",                            143},
-      {""},
+      {pool_offset(1415),                            143},
+      {-1},
 
-      {"syrc",                               208},
-      {""},
+      {pool_offset(1417),                               208},
+      {-1},
 
-      {"inbrahmi",                           438},
-      {""}, {""}, {""},
+      {pool_offset(1419),                           438},
+      {-1}, {-1}, {-1},
 
-      {"mathsymbol",                         202},
-      {""},
+      {pool_offset(1423),                         202},
+      {-1},
 
-      {"runr",                               190},
-      {""}, {""}, {""}, {""}, {""},
+      {pool_offset(1425),                               190},
+      {-1}, {-1}, {-1}, {-1}, {-1},
 
-      {"inshavian",                          413},
+      {pool_offset(1431),                          413},
 
-      {"gothic",                              72},
-      {""}, {""}, {""}, {""}, {""},
+      {pool_offset(1432),                              72},
+      {-1}, {-1}, {-1}, {-1}, {-1},
 
-      {"syriac",                             208},
+      {pool_offset(1438),                             208},
 
-      {"p",                                  171},
-      {""},
+      {pool_offset(1439),                                  171},
+      {-1},
 
-      {"zp",                                 236},
+      {pool_offset(1441),                                 236},
 
-      {"induployan",                         467},
-      {""},
+      {pool_offset(1442),                         467},
+      {-1},
 
-      {"vs",                                 228},
-      {""}, {""},
+      {pool_offset(1444),                                 228},
+      {-1}, {-1},
 
-      {"ingreekandcoptic",                   245},
+      {pool_offset(1447),                   245},
 
-      {"ingothic",                           408},
-      {""}, {""},
+      {pool_offset(1448),                           408},
+      {-1}, {-1},
 
-      {"lowercaseletter",                    116},
-      {""}, {""}, {""},
+      {pool_offset(1451),                    116},
+      {-1}, {-1}, {-1},
 
-      {"inoriya",                            262},
-      {""}, {""}, {""}, {""}, {""},
+      {pool_offset(1455),                            262},
+      {-1}, {-1}, {-1}, {-1}, {-1},
 
-      {"grext",                               75},
+      {pool_offset(1461),                               75},
 
-      {"linearb",                            114},
+      {pool_offset(1462),                            114},
 
-      {"inyiradicals",                       356},
-      {""},
+      {pool_offset(1463),                       356},
+      {-1},
 
-      {"inethiopicsupplement",               275},
+      {pool_offset(1465),               275},
 
-      {"inletterlikesymbols",                310},
+      {pool_offset(1466),                310},
 
-      {"ingeometricshapes",                  320},
-      {""},
+      {pool_offset(1467),                  320},
+      {-1},
 
-      {"java",                                97},
+      {pool_offset(1469),                                97},
 
-      {"inblockelements",                    319},
-      {""},
+      {pool_offset(1470),                    319},
+      {-1},
 
-      {"number",                             144},
+      {pool_offset(1472),                             144},
 
-      {"incombininghalfmarks",               392},
+      {pool_offset(1473),               392},
 
-      {"inbassavah",                         463},
-      {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""},
-      {""}, {""}, {""}, {""}, {""},
+      {pool_offset(1474),                         463},
+      {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
+      {-1}, {-1}, {-1}, {-1}, {-1},
 
-      {"inlinearbsyllabary",                 398},
-      {""},
+      {pool_offset(1489),                 398},
+      {-1},
 
-      {"osmanya",                            162},
-      {""}, {""}, {""},
+      {pool_offset(1491),                            162},
+      {-1}, {-1}, {-1},
 
-      {"avst",                                23},
-      {""}, {""}, {""}, {""},
+      {pool_offset(1495),                                23},
+      {-1}, {-1}, {-1}, {-1},
 
-      {"hexdigit",                            85},
-      {""}, {""}, {""},
+      {pool_offset(1500),                            85},
+      {-1}, {-1}, {-1},
 
-      {"injavanese",                         371},
-      {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""},
+      {pool_offset(1504),                         371},
+      {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
 
-      {"cyrl",                                58},
+      {pool_offset(1513),                                58},
 
-      {"avestan",                             23},
-      {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""},
-      {""}, {""}, {""}, {""}, {""}, {""}, {""},
+      {pool_offset(1514),                             23},
+      {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
+      {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
 
-      {"intaiviet",                          375},
+      {pool_offset(1531),                          375},
 
-      {"inornamentaldingbats",               485},
+      {pool_offset(1532),               485},
 
-      {"tavt",                               213},
-      {""}, {""}, {""}, {""},
+      {pool_offset(1533),                               213},
+      {-1}, {-1}, {-1}, {-1},
 
-      {"javanese",                            97},
+      {pool_offset(1538),                            97},
 
-      {"inethiopicextended",                 335},
-      {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""},
-      {""},
+      {pool_offset(1539),                 335},
+      {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
+      {-1},
 
-      {"inhalfwidthandfullwidthforms",       396},
-      {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""},
+      {pool_offset(1550),       396},
+      {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
 
-      {"ingeorgian",                         272},
-      {""},
+      {pool_offset(1559),                         272},
+      {-1},
 
-      {"inarabicmathematicalalphabeticsymbols", 477},
-      {""}, {""}, {""}, {""}, {""}, {""}, {""},
+      {pool_offset(1561), 477},
+      {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
 
-      {"hangul",                              81},
-      {""},
+      {pool_offset(1569),                              81},
+      {-1},
 
-      {"insuperscriptsandsubscripts",        307},
-      {""}, {""}, {""}, {""},
+      {pool_offset(1571),        307},
+      {-1}, {-1}, {-1}, {-1},
 
-      {"inhanunoo",                          281},
-      {""},
+      {pool_offset(1576),                          281},
+      {-1},
 
-      {"inhangulsyllables",                  381},
-      {""}, {""}, {""}, {""}, {""}, {""}, {""},
+      {pool_offset(1578),                  381},
+      {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
 
-      {"inoldpersian",                       411},
-      {""}, {""},
+      {pool_offset(1586),                       411},
+      {-1}, {-1},
 
-      {"geor",                                70},
-      {""},
+      {pool_offset(1589),                                70},
+      {-1},
 
-      {"otherpunctuation",                   184},
-      {""},
+      {pool_offset(1591),                   184},
+      {-1},
 
-      {"inoldpermic",                        409},
-      {""}, {""}, {""}, {""},
+      {pool_offset(1593),                        409},
+      {-1}, {-1}, {-1}, {-1},
 
-      {"inalchemicalsymbols",                487},
+      {pool_offset(1598),                487},
 
-      {"sylo",                               207},
-      {""},
+      {pool_offset(1599),                               207},
+      {-1},
 
-      {"hiragana",                            86},
-      {""}, {""},
+      {pool_offset(1601),                            86},
+      {-1}, {-1},
 
-      {"word",                                12},
-      {""}, {""}, {""}, {""}, {""}, {""}, {""},
+      {pool_offset(1604),                                12},
+      {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
 
-      {"inmeroitichieroglyphs",              425},
-      {""},
+      {pool_offset(1612),              425},
+      {-1},
 
-      {"insmallformvariants",                394},
-      {""}, {""}, {""}, {""}, {""},
+      {pool_offset(1614),                394},
+      {-1}, {-1}, {-1}, {-1}, {-1},
 
-      {"sund",                               206},
+      {pool_offset(1620),                               206},
 
-      {"brah",                                31},
-      {""},
+      {pool_offset(1621),                                31},
+      {-1},
 
-      {"insupplementalmathematicaloperators", 328},
+      {pool_offset(1623), 328},
 
-      {"glagolitic",                          71},
-      {""}, {""},
+      {pool_offset(1624),                          71},
+      {-1}, {-1},
 
-      {"braille",                             32},
-      {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""},
-      {""}, {""},
+      {pool_offset(1627),                             32},
+      {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
+      {-1}, {-1},
 
-      {"unassigned",                          51},
+      {pool_offset(1639),                          51},
 
-      {"sgnw",                               199},
-      {""}, {""}, {""},
+      {pool_offset(1640),                               199},
+      {-1}, {-1}, {-1},
 
-      {"plrd",                               137},
-      {""}, {""}, {""},
+      {pool_offset(1644),                               137},
+      {-1}, {-1}, {-1},
 
-      {"hebr",                                84},
+      {pool_offset(1648),                                84},
 
-      {"ogham",                              152},
-      {""}, {""}, {""}, {""},
+      {pool_offset(1649),                              152},
+      {-1}, {-1}, {-1}, {-1},
 
-      {"cyrillic",                            58},
-      {""}, {""}, {""},
+      {pool_offset(1654),                            58},
+      {-1}, {-1}, {-1},
 
-      {"orya",                               161},
-      {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""},
-      {""},
+      {pool_offset(1658),                               161},
+      {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
+      {-1},
 
-      {"grantha",                             73},
-      {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""},
-      {""}, {""}, {""}, {""}, {""},
+      {pool_offset(1669),                             73},
+      {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
+      {-1}, {-1}, {-1}, {-1}, {-1},
 
-      {"invariationselectors",               390},
-      {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""},
+      {pool_offset(1684),               390},
+      {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
 
-      {"indingbats",                         322},
-      {""},
+      {pool_offset(1693),                         322},
+      {-1},
 
-      {"inunifiedcanadianaboriginalsyllabicsextended", 286},
-      {""}, {""}, {""}, {""}, {""}, {""},
+      {pool_offset(1695), 286},
+      {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
 
-      {"inhanguljamoextendeda",              370},
-      {""}, {""},
+      {pool_offset(1702),              370},
+      {-1}, {-1},
 
-      {"goth",                                72},
+      {pool_offset(1705),                                72},
 
-      {"graphemebase",                        74},
-      {""},
+      {pool_offset(1706),                        74},
+      {-1},
 
-      {"bidic",                               29},
-      {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""},
+      {pool_offset(1708),                               29},
+      {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
 
-      {"ogrext",                             165},
-      {""}, {""}, {""}, {""}, {""}, {""},
+      {pool_offset(1717),                             165},
+      {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
 
-      {"idsb",                                88},
-      {""}, {""}, {""}, {""}, {""}, {""}, {""},
+      {pool_offset(1724),                                88},
+      {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
 
-      {"invariationselectorssupplement",     497},
+      {pool_offset(1732),     497},
 
-      {"assigned",                            22},
-      {""}, {""}, {""},
+      {pool_offset(1733),                            22},
+      {-1}, {-1}, {-1},
 
-      {"symbol",                             191},
-      {""}, {""}, {""},
+      {pool_offset(1737),                             191},
+      {-1}, {-1}, {-1},
 
-      {"ingreekextended",                    305},
-      {""},
+      {pool_offset(1741),                    305},
+      {-1},
 
-      {"pauc",                               176},
-      {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""},
+      {pool_offset(1743),                               176},
+      {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
 
-      {"meroitichieroglyphs",                136},
-      {""},
+      {pool_offset(1752),                136},
+      {-1},
 
-      {"logicalorderexception",              119},
-      {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""},
-      {""}, {""}, {""}, {""}, {""}, {""}, {""},
+      {pool_offset(1754),              119},
+      {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
+      {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
 
-      {"incurrencysymbols",                  308},
-      {""}, {""}, {""},
+      {pool_offset(1771),                  308},
+      {-1}, {-1}, {-1},
 
-      {"inarabicextendeda",                  257},
-      {""}, {""}, {""}, {""}, {""}, {""}, {""},
+      {pool_offset(1775),                  257},
+      {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
 
-      {"insupplementalarrowsc",              489},
-      {""}, {""},
+      {pool_offset(1783),              489},
+      {-1}, {-1},
 
-      {"insupplementalarrowsa",              324},
-      {""},
+      {pool_offset(1786),              324},
+      {-1},
 
-      {"inkannada",                          265},
-      {""}, {""}, {""},
+      {pool_offset(1788),                          265},
+      {-1}, {-1}, {-1},
 
-      {"kana",                               101},
+      {pool_offset(1792),                               101},
 
-      {"phagspa",                            181},
-      {""}, {""},
+      {pool_offset(1793),                            181},
+      {-1}, {-1},
 
-      {"cakm",                                43},
+      {pool_offset(1796),                                43},
 
-      {"digit",                                4},
-      {""}, {""}, {""}, {""},
+      {pool_offset(1797),                                4},
+      {-1}, {-1}, {-1}, {-1},
 
-      {"softdotted",                         204},
-      {""}, {""}, {""},
+      {pool_offset(1802),                         204},
+      {-1}, {-1}, {-1},
 
-      {"inchakma",                           441},
-      {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""},
-      {""}, {""},
+      {pool_offset(1806),                           441},
+      {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
+      {-1}, {-1},
 
-      {"inphagspa",                          365},
-      {""}, {""}, {""},
+      {pool_offset(1818),                          365},
+      {-1}, {-1}, {-1},
 
-      {"inhighprivateusesurrogates",         384},
-      {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""},
-      {""}, {""}, {""}, {""},
+      {pool_offset(1822),         384},
+      {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
+      {-1}, {-1}, {-1}, {-1},
 
-      {"warangciti",                         229},
-      {""}, {""}, {""}, {""}, {""}, {""}, {""},
+      {pool_offset(1836),                         229},
+      {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
 
-      {"incjkcompatibilityforms",            393},
-      {""}, {""},
+      {pool_offset(1844),            393},
+      {-1}, {-1},
 
-      {"idstrinaryoperator",                  89},
-      {""},
+      {pool_offset(1847),                  89},
+      {-1},
 
-      {"incjkcompatibilityideographs",       387},
-      {""},
+      {pool_offset(1849),       387},
+      {-1},
 
-      {"inkaithi",                           439},
-      {""}, {""}, {""}, {""}, {""},
+      {pool_offset(1851),                           439},
+      {-1}, {-1}, {-1}, {-1}, {-1},
 
-      {"takri",                              214},
-      {""}, {""}, {""}, {""}, {""}, {""},
+      {pool_offset(1857),                              214},
+      {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
 
-      {"phlp",                               186},
+      {pool_offset(1864),                               186},
 
-      {"mendekikakui",                       134},
-      {""},
+      {pool_offset(1865),                       134},
+      {-1},
 
-      {"punct",                                8},
-      {""}, {""},
+      {pool_offset(1867),                                8},
+      {-1}, {-1},
 
-      {"otherdefaultignorablecodepoint",     164},
+      {pool_offset(1870),     164},
 
-      {"inkatakana",                         343},
-      {""}, {""}, {""}, {""}, {""}, {""},
+      {pool_offset(1871),                         343},
+      {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
 
-      {"graph",                                5},
+      {pool_offset(1878),                                5},
 
-      {"lydi",                               124},
-      {""}, {""}, {""}, {""}, {""},
+      {pool_offset(1879),                               124},
+      {-1}, {-1}, {-1}, {-1}, {-1},
 
-      {"pd",                                 178},
-      {""},
+      {pool_offset(1885),                                 178},
+      {-1},
 
-      {"incjkstrokes",                       348},
-      {""}, {""},
+      {pool_offset(1887),                       348},
+      {-1}, {-1},
 
-      {"lydian",                             124},
-      {""}, {""}, {""}, {""},
+      {pool_offset(1890),                             124},
+      {-1}, {-1}, {-1}, {-1},
 
-      {"sorasompeng",                        205},
-      {""},
+      {pool_offset(1895),                        205},
+      {-1},
 
-      {"incjkcompatibilityideographssupplement", 495},
-      {""}, {""},
+      {pool_offset(1897), 495},
+      {-1}, {-1},
 
-      {"meeteimayek",                        133},
-      {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""},
+      {pool_offset(1900),                        133},
+      {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
 
-      {"otheruppercase",                     170},
-      {""}, {""},
+      {pool_offset(1909),                     170},
+      {-1}, {-1},
 
-      {"kali",                               102},
-      {""}, {""},
+      {pool_offset(1912),                               102},
+      {-1}, {-1},
 
-      {"inhanguljamo",                       273},
-      {""},
+      {pool_offset(1915),                       273},
+      {-1},
 
-      {"ideographic",                         92},
-      {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""},
-      {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""},
+      {pool_offset(1917),                         92},
+      {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
+      {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
 
-      {"inmeeteimayek",                      380},
-      {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""},
-      {""}, {""}, {""},
+      {pool_offset(1935),                      380},
+      {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
+      {-1}, {-1}, {-1},
 
-      {"incyrillicextendedb",                359},
-      {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""},
-      {""}, {""}, {""}, {""}, {""}, {""},
+      {pool_offset(1948),                359},
+      {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
+      {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
 
-      {"hluw",                                18},
-      {""}, {""}, {""}, {""},
+      {pool_offset(1964),                                18},
+      {-1}, {-1}, {-1}, {-1},
 
-      {"patsyn",                             174},
-      {""}, {""},
+      {pool_offset(1969),                             174},
+      {-1}, {-1},
 
-      {"incombiningdiacriticalmarks",        244},
+      {pool_offset(1972),        244},
 
-      {"inarabicsupplement",                 252},
-      {""},
+      {pool_offset(1973),                 252},
+      {-1},
 
-      {"inkanasupplement",                   466},
-      {""},
+      {pool_offset(1975),                   466},
+      {-1},
 
-      {"deprecated",                          61},
+      {pool_offset(1977),                          61},
 
-      {"inverticalforms",                    391},
-      {""}, {""}, {""},
+      {pool_offset(1978),                    391},
+      {-1}, {-1}, {-1},
 
-      {"incombiningdiacriticalmarksforsymbols", 309},
-      {""}, {""}, {""}, {""},
+      {pool_offset(1982), 309},
+      {-1}, {-1}, {-1}, {-1},
 
-      {"indevanagari",                       258},
-      {""},
+      {pool_offset(1987),                       258},
+      {-1},
 
-      {"inbuhid",                            282},
-      {""},
+      {pool_offset(1989),                            282},
+      {-1},
 
-      {"alphabetic",                          17},
-      {""}, {""}, {""},
+      {pool_offset(1991),                          17},
+      {-1}, {-1}, {-1},
 
-      {"oldhungarian",                       154},
-      {""}, {""},
+      {pool_offset(1995),                       154},
+      {-1}, {-1},
 
-      {"mark",                               125},
-      {""}, {""}, {""}, {""}, {""}, {""},
+      {pool_offset(1998),                               125},
+      {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
 
-      {"inkharoshthi",                       427},
-      {""}, {""}, {""}, {""}, {""},
+      {pool_offset(2005),                       427},
+      {-1}, {-1}, {-1}, {-1}, {-1},
 
-      {"deva",                                63},
+      {pool_offset(2011),                                63},
 
-      {"invedicextensions",                  300},
-      {""}, {""}, {""}, {""}, {""}, {""},
+      {pool_offset(2012),                  300},
+      {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
 
-      {"devanagari",                          63},
+      {pool_offset(2019),                          63},
 
-      {"incombiningdiacriticalmarkssupplement", 303},
-      {""}, {""}, {""},
+      {pool_offset(2020), 303},
+      {-1}, {-1}, {-1},
 
-      {"ingeometricshapesextended",          488},
-      {""}, {""}, {""}, {""}, {""},
+      {pool_offset(2024),          488},
+      {-1}, {-1}, {-1}, {-1}, {-1},
 
-      {"inkhmer",                            284},
-      {""}, {""}, {""},
+      {pool_offset(2030),                            284},
+      {-1}, {-1}, {-1},
 
-      {"changeswhencasemapped",               46},
-      {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""},
-      {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""},
-      {""}, {""}, {""}, {""}, {""},
+      {pool_offset(2034),               46},
+      {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
+      {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
+      {-1}, {-1}, {-1}, {-1}, {-1},
 
-      {"intakri",                            452},
-      {""}, {""},
+      {pool_offset(2058),                            452},
+      {-1}, {-1},
 
-      {"dep",                                 61},
+      {pool_offset(2061),                                 61},
 
-      {"takr",                               214},
-      {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""},
-      {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""},
+      {pool_offset(2062),                               214},
+      {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
+      {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
 
-      {"changeswhencasefolded",               45},
-      {""},
+      {pool_offset(2080),               45},
+      {-1},
 
-      {"kaithi",                              99},
-      {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""},
-      {""},
+      {pool_offset(2082),                              99},
+      {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
+      {-1},
 
-      {"phag",                               181},
-      {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""},
-      {""},
+      {pool_offset(2093),                               181},
+      {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
+      {-1},
 
-      {"inpahawhhmong",                      464},
-      {""},
+      {pool_offset(2104),                      464},
+      {-1},
 
-      {"bidicontrol",                         29},
-      {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""},
+      {pool_offset(2106),                         29},
+      {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
 
-      {"inkhojki",                           445},
-      {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""},
+      {pool_offset(2116),                           445},
+      {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
 
-      {"bamu",                                25},
+      {pool_offset(2126),                                25},
 
-      {"inbamum",                            360},
+      {pool_offset(2127),                            360},
 
-      {"changeswhentitlecased",               48},
-      {""}, {""},
+      {pool_offset(2128),               48},
+      {-1}, {-1},
 
-      {"inkhmersymbols",                     290},
+      {pool_offset(2131),                     290},
 
-      {"uideo",                              224},
+      {pool_offset(2132),                              224},
 
-      {"lu",                                 122},
-      {""}, {""},
+      {pool_offset(2133),                                 122},
+      {-1}, {-1},
 
-      {"kthi",                                99},
-      {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""},
+      {pool_offset(2136),                                99},
+      {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
 
-      {"limbu",                              112},
-      {""},
+      {pool_offset(2145),                              112},
+      {-1},
 
-      {"defaultignorablecodepoint",           60},
-      {""}, {""}, {""},
+      {pool_offset(2147),           60},
+      {-1}, {-1}, {-1},
 
-      {"inplayingcards",                     480},
-      {""},
+      {pool_offset(2151),                     480},
+      {-1},
 
-      {"inhebrew",                           249},
-      {""}, {""}, {""}, {""}, {""}, {""}, {""},
+      {pool_offset(2153),                           249},
+      {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
 
-      {"modifiersymbol",                     201},
-      {""}, {""}, {""}, {""}, {""},
+      {pool_offset(2161),                     201},
+      {-1}, {-1}, {-1}, {-1}, {-1},
 
-      {"ugaritic",                           223},
-      {""}, {""}, {""}, {""},
+      {pool_offset(2167),                           223},
+      {-1}, {-1}, {-1}, {-1},
 
-      {"inlisu",                             357},
+      {pool_offset(2172),                             357},
 
-      {"inglagolitic",                       330},
-      {""},
+      {pool_offset(2173),                       330},
+      {-1},
 
-      {"inprivateusearea",                   386},
-      {""}, {""},
+      {pool_offset(2175),                   386},
+      {-1}, {-1},
 
-      {"olck",                               153},
-      {""}, {""}, {""},
+      {pool_offset(2178),                               153},
+      {-1}, {-1}, {-1},
 
-      {"inbengali",                          259},
-      {""}, {""},
+      {pool_offset(2182),                          259},
+      {-1}, {-1},
 
-      {"olchiki",                            153},
-      {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""},
+      {pool_offset(2185),                            153},
+      {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
 
-      {"caucasianalbanian",                   40},
-      {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""},
-      {""}, {""}, {""}, {""}, {""},
+      {pool_offset(2195),                   40},
+      {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
+      {-1}, {-1}, {-1}, {-1}, {-1},
 
-      {"oldturkic",                          160},
+      {pool_offset(2210),                          160},
 
-      {"beng",                                28},
+      {pool_offset(2211),                                28},
 
-      {"intelugu",                           264},
-      {""}, {""}, {""}, {""}, {""},
+      {pool_offset(2212),                           264},
+      {-1}, {-1}, {-1}, {-1}, {-1},
 
-      {"hyphen",                              87},
-      {""}, {""},
+      {pool_offset(2218),                              87},
+      {-1}, {-1},
 
-      {"inbuginese",                         291},
-      {""}, {""}, {""},
+      {pool_offset(2221),                         291},
+      {-1}, {-1}, {-1},
 
-      {"intagalog",                          280},
-      {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""},
-      {""}, {""}, {""}, {""}, {""},
+      {pool_offset(2225),                          280},
+      {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
+      {-1}, {-1}, {-1}, {-1}, {-1},
 
-      {"cypriot",                             57},
-      {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""},
+      {pool_offset(2240),                             57},
+      {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
 
-      {"inlimbu",                            287},
-      {""}, {""},
+      {pool_offset(2249),                            287},
+      {-1}, {-1},
 
-      {"graphemeextend",                      75},
-      {""}, {""},
+      {pool_offset(2252),                      75},
+      {-1}, {-1},
 
-      {"tagb",                               210},
-      {""}, {""}, {""},
+      {pool_offset(2255),                               210},
+      {-1}, {-1}, {-1},
 
-      {"incypriotsyllabary",                 418},
-      {""}, {""}, {""},
+      {pool_offset(2259),                 418},
+      {-1}, {-1}, {-1},
 
-      {"intagbanwa",                         283},
-      {""}, {""}, {""}, {""},
+      {pool_offset(2263),                         283},
+      {-1}, {-1}, {-1}, {-1},
 
-      {"inaegeannumbers",                    400},
-      {""}, {""}, {""}, {""}, {""}, {""},
+      {pool_offset(2268),                    400},
+      {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
 
-      {"inkatakanaphoneticextensions",       349},
+      {pool_offset(2275),       349},
 
-      {"glag",                                71},
+      {pool_offset(2276),                                71},
 
-      {"combiningmark",                      125},
+      {pool_offset(2277),                      125},
 
-      {"palmyrene",                          173},
-      {""},
+      {pool_offset(2278),                          173},
+      {-1},
 
-      {"khmr",                               104},
-      {""}, {""}, {""},
+      {pool_offset(2280),                               104},
+      {-1}, {-1}, {-1},
 
-      {"khar",                               103},
-      {""}, {""}, {""}, {""}, {""}, {""}, {""},
+      {pool_offset(2284),                               103},
+      {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
 
-      {"ugar",                               223},
-      {""}, {""}, {""}, {""}, {""}, {""}, {""},
+      {pool_offset(2292),                               223},
+      {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
 
-      {"inarabicpresentationformsb",         395},
-      {""}, {""}, {""},
+      {pool_offset(2300),         395},
+      {-1}, {-1}, {-1},
 
-      {"insupplementaryprivateuseareaa",     498},
-      {""},
+      {pool_offset(2304),     498},
+      {-1},
 
-      {"variationselector",                  228},
-      {""}, {""}, {""}, {""},
+      {pool_offset(2306),                  228},
+      {-1}, {-1}, {-1}, {-1},
 
-      {"nko",                                148},
+      {pool_offset(2311),                                148},
 
-      {"nkoo",                               148},
-      {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""},
-      {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""},
+      {pool_offset(2312),                               148},
+      {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
+      {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
 
-      {"inbamumsupplement",                  461},
-      {""}, {""}, {""}, {""}, {""},
+      {pool_offset(2330),                  461},
+      {-1}, {-1}, {-1}, {-1}, {-1},
 
-      {"tglg",                               209},
-      {""},
+      {pool_offset(2336),                               209},
+      {-1},
 
-      {"any",                                 19},
+      {pool_offset(2338),                                 19},
 
-      {"enclosingmark",                      132},
-      {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""},
+      {pool_offset(2339),                      132},
+      {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
 
-      {"gujr",                                78},
-      {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""},
+      {pool_offset(2348),                                78},
+      {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
 
-      {"changeswhenlowercased",               47},
-      {""}, {""}, {""}, {""},
+      {pool_offset(2358),               47},
+      {-1}, {-1}, {-1}, {-1},
 
-      {"knda",                               100},
+      {pool_offset(2363),                               100},
 
-      {"hung",                               154},
+      {pool_offset(2364),                               154},
 
-      {"gujarati",                            78},
-      {""}, {""},
+      {pool_offset(2365),                            78},
+      {-1}, {-1},
 
-      {"bopo",                                30},
-      {""}, {""}, {""}, {""},
+      {pool_offset(2368),                                30},
+      {-1}, {-1}, {-1}, {-1},
 
-      {"inmendekikakui",                     476},
-      {""}, {""},
+      {pool_offset(2373),                     476},
+      {-1}, {-1},
 
-      {"inbopomofo",                         344},
-      {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""},
+      {pool_offset(2376),                         344},
+      {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
 
-      {"kharoshthi",                         103},
-      {""},
+      {pool_offset(2386),                         103},
+      {-1},
 
-      {"kannada",                            100},
-      {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""},
-      {""}, {""}, {""},
+      {pool_offset(2388),                            100},
+      {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
+      {-1}, {-1}, {-1},
 
-      {"khoj",                               105},
-      {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""},
-      {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""},
-      {""}, {""},
+      {pool_offset(2401),                               105},
+      {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
+      {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
+      {-1}, {-1},
 
-      {"cherokee",                            50},
-      {""}, {""}, {""},
+      {pool_offset(2422),                            50},
+      {-1}, {-1}, {-1},
 
-      {"inlatinextendedb",                   241},
-      {""}, {""}, {""}, {""}, {""},
+      {pool_offset(2426),                   241},
+      {-1}, {-1}, {-1}, {-1}, {-1},
 
-      {"dashpunctuation",                    178},
-      {""}, {""},
+      {pool_offset(2432),                    178},
+      {-1}, {-1},
 
-      {"dupl",                                65},
-      {""}, {""}, {""}, {""}, {""}, {""}, {""},
+      {pool_offset(2435),                                65},
+      {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
 
-      {"inyisyllables",                      355},
-      {""}, {""}, {""}, {""}, {""}, {""}, {""},
+      {pool_offset(2443),                      355},
+      {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
 
-      {"georgian",                            70},
-      {""},
+      {pool_offset(2451),                            70},
+      {-1},
 
-      {"rejang",                             189},
-      {""},
+      {pool_offset(2453),                             189},
+      {-1},
 
-      {"oupper",                             170},
-      {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""},
-      {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""},
-      {""}, {""}, {""},
+      {pool_offset(2455),                             170},
+      {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
+      {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
+      {-1}, {-1}, {-1},
 
-      {"aghb",                                40},
-      {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""},
-      {""}, {""}, {""}, {""},
+      {pool_offset(2477),                                40},
+      {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
+      {-1}, {-1}, {-1}, {-1},
 
-      {"khmer",                              104},
-      {""}, {""},
+      {pool_offset(2491),                              104},
+      {-1}, {-1},
 
-      {"grbase",                              74},
-      {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""},
+      {pool_offset(2494),                              74},
+      {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
 
-      {"currencysymbol",                     195},
-      {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""},
-      {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""},
-      {""}, {""}, {""}, {""}, {""}, {""}, {""},
+      {pool_offset(2503),                     195},
+      {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
+      {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
+      {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
 
-      {"incombiningdiacriticalmarksextended", 293},
-      {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""},
-      {""}, {""}, {""},
+      {pool_offset(2529), 293},
+      {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
+      {-1}, {-1}, {-1},
 
-      {"spacingmark",                        131},
-      {""},
+      {pool_offset(2542),                        131},
+      {-1},
 
-      {"orkh",                               160},
-      {""}, {""}, {""}, {""}, {""},
+      {pool_offset(2544),                               160},
+      {-1}, {-1}, {-1}, {-1}, {-1},
 
-      {"cwu",                                 49},
-      {""},
+      {pool_offset(2550),                                 49},
+      {-1},
 
-      {"hebrew",                              84},
-      {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""},
-      {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""},
+      {pool_offset(2552),                              84},
+      {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
+      {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
 
-      {"insupplementalpunctuation",          337},
-      {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""},
-      {""},
+      {pool_offset(2570),          337},
+      {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
+      {-1},
 
-      {"oldnortharabian",                    156},
-      {""}, {""}, {""}, {""}, {""},
+      {pool_offset(2581),                    156},
+      {-1}, {-1}, {-1}, {-1}, {-1},
 
-      {"incjksymbolsandpunctuation",         341},
-      {""}, {""},
+      {pool_offset(2587),         341},
+      {-1}, {-1},
 
-      {"othergraphemeextend",                165},
-      {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""},
-      {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""},
-      {""}, {""}, {""}, {""},
+      {pool_offset(2590),                165},
+      {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
+      {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
+      {-1}, {-1}, {-1}, {-1},
 
-      {"indevanagariextended",               367},
-      {""}, {""}, {""}, {""}, {""}, {""}, {""},
+      {pool_offset(2613),               367},
+      {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
 
-      {"tagalog",                            209},
-      {""}, {""}, {""}, {""}, {""}, {""},
+      {pool_offset(2621),                            209},
+      {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
 
-      {"surrogate",                           55},
-      {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""},
-      {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""},
-      {""}, {""}, {""},
+      {pool_offset(2628),                           55},
+      {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
+      {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
+      {-1}, {-1}, {-1},
 
-      {"bopomofo",                            30},
-      {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""},
-      {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""},
-      {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""},
-      {""},
+      {pool_offset(2650),                            30},
+      {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
+      {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
+      {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
+      {-1},
 
-      {"ingeorgiansupplement",               333},
-      {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""},
-      {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""},
-      {""}, {""}, {""}, {""}, {""}, {""},
+      {pool_offset(2679),               333},
+      {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
+      {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
+      {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
 
-      {"uppercase",                          226},
-      {""}, {""}, {""}, {""}, {""}, {""},
+      {pool_offset(2704),                          226},
+      {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
 
-      {"unifiedideograph",                   224},
-      {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""},
-      {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""},
-      {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""},
-      {""}, {""}, {""},
+      {pool_offset(2711),                   224},
+      {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
+      {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
+      {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
+      {-1}, {-1}, {-1},
 
-      {"inpaucinhau",                        455},
+      {pool_offset(2742),                        455},
 
-      {"paucinhau",                          176},
-      {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""},
-      {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""},
-      {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""},
-      {""}, {""}, {""},
+      {pool_offset(2743),                          176},
+      {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
+      {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
+      {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
+      {-1}, {-1}, {-1},
 
-      {"insupplementalsymbolsandpictographs", 490},
-      {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""},
-      {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""},
+      {pool_offset(2774), 490},
+      {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
+      {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
 
-      {"nonspacingmark",                     138},
-      {""},
+      {pool_offset(2792),                     138},
+      {-1},
 
-      {"inhanguljamoextendedb",              382},
-      {""}, {""}, {""}, {""}, {""}, {""}, {""},
+      {pool_offset(2794),              382},
+      {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
 
-      {"inhighsurrogates",                   383},
+      {pool_offset(2802),                   383},
 
-      {"punctuation",                        171},
-      {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""},
-      {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""},
-      {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""},
-      {""}, {""}, {""},
+      {pool_offset(2803),                        171},
+      {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
+      {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
+      {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
+      {-1}, {-1}, {-1},
 
-      {"openpunctuation",                    185},
+      {pool_offset(2834),                    185},
 
-      {"bassavah",                            26},
-      {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""},
-      {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""},
-      {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""},
-      {""},
+      {pool_offset(2835),                            26},
+      {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
+      {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
+      {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
+      {-1},
 
-      {"upper",                               10},
-      {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""},
-      {""}, {""}, {""}, {""},
+      {pool_offset(2864),                               10},
+      {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
+      {-1}, {-1}, {-1}, {-1},
 
-      {"insupplementalarrowsb",              326},
+      {pool_offset(2878),              326},
 
-      {"inkanbun",                           346},
-      {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""},
-      {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""},
-      {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""},
-      {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""},
-      {""}, {""},
+      {pool_offset(2879),                           346},
+      {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
+      {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
+      {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
+      {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
+      {-1}, {-1},
 
-      {"inkangxiradicals",                   339},
-      {""}, {""}, {""},
+      {pool_offset(2918),                   339},
+      {-1}, {-1}, {-1},
 
-      {"inmeroiticcursive",                  426},
-      {""}, {""},
+      {pool_offset(2922),                  426},
+      {-1}, {-1},
 
-      {"signwriting",                        199},
-      {""}, {""},
+      {pool_offset(2925),                        199},
+      {-1}, {-1},
 
-      {"incjkradicalssupplement",            338},
-      {""},
+      {pool_offset(2928),            338},
+      {-1},
 
-      {"pahawhhmong",                        172},
-      {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""},
-      {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""},
-      {""}, {""}, {""},
+      {pool_offset(2930),                        172},
+      {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
+      {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
+      {-1}, {-1}, {-1},
 
-      {"inkayahli",                          368},
+      {pool_offset(2952),                          368},
 
-      {"uppercaseletter",                    122},
-      {""},
+      {pool_offset(2953),                    122},
+      {-1},
 
-      {"batk",                                27},
-      {""}, {""}, {""}, {""},
+      {pool_offset(2955),                                27},
+      {-1}, {-1}, {-1}, {-1},
 
-      {"inbatak",                            296},
-      {""}, {""}, {""}, {""}, {""}, {""}, {""},
+      {pool_offset(2960),                            296},
+      {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
 
-      {"incjkcompatibility",                 351},
-      {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""},
-      {""}, {""}, {""}, {""}, {""},
+      {pool_offset(2968),                 351},
+      {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
+      {-1}, {-1}, {-1}, {-1}, {-1},
 
-      {"buhd",                                34},
-      {""}, {""}, {""}, {""}, {""},
+      {pool_offset(2983),                                34},
+      {-1}, {-1}, {-1}, {-1}, {-1},
 
-      {"egyp",                                66},
-      {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""},
-      {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""},
-      {""},
+      {pool_offset(2989),                                66},
+      {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
+      {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
+      {-1},
 
-      {"innoblock",                          500},
-      {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""},
-      {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""},
-      {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""},
-      {""}, {""}, {""}, {""}, {""}, {""},
+      {pool_offset(3009),                          500},
+      {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
+      {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
+      {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
+      {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
 
-      {"inegyptianhieroglyphs",              459},
-      {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""},
-      {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""},
-      {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""},
-      {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""},
-      {""}, {""}, {""}, {""},
+      {pool_offset(3043),              459},
+      {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
+      {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
+      {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
+      {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
+      {-1}, {-1}, {-1}, {-1},
 
-      {"grek",                                77},
-      {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""},
-      {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""},
-      {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""},
-      {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""},
-      {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""},
-      {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""},
-      {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""},
-      {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""},
-      {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""},
-      {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""},
-      {""},
+      {pool_offset(3084),                                77},
+      {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
+      {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
+      {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
+      {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
+      {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
+      {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
+      {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
+      {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
+      {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
+      {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
+      {-1},
 
-      {"bugi",                                33},
-      {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""},
-      {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""},
-      {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""},
-      {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""},
-      {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""},
-      {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""},
+      {pool_offset(3176),                                33},
+      {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
+      {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
+      {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
+      {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
+      {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
+      {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
 
-      {"changeswhenuppercased",               49},
-      {""}, {""}, {""},
+      {pool_offset(3230),               49},
+      {-1}, {-1}, {-1},
 
-      {"paragraphseparator",                 236},
-      {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""},
-      {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""},
-      {""},
+      {pool_offset(3234),                 236},
+      {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
+      {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
+      {-1},
 
-      {"buginese",                            33},
-      {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""},
-      {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""},
-      {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""},
+      {pool_offset(3254),                            33},
+      {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
+      {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
+      {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
 
-      {"guru",                                79},
-      {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""},
-      {""}, {""}, {""}, {""}, {""}, {""}, {""},
+      {pool_offset(3282),                                79},
+      {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
+      {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
 
-      {"inbopomofoextended",                 347},
-      {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""},
-      {""}, {""}, {""},
+      {pool_offset(3299),                 347},
+      {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
+      {-1}, {-1}, {-1},
 
-      {"telugu",                             216},
-      {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""},
-      {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""},
-      {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""},
-      {""}, {""}, {""},
+      {pool_offset(3312),                             216},
+      {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
+      {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
+      {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
+      {-1}, {-1}, {-1},
 
-      {"quotationmark",                      187},
-      {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""},
-      {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""},
-      {""}, {""},
+      {pool_offset(3343),                      187},
+      {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
+      {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
+      {-1}, {-1},
 
-      {"inkhudawadi",                        447},
-      {""}, {""}, {""}, {""}, {""},
+      {pool_offset(3364),                        447},
+      {-1}, {-1}, {-1}, {-1}, {-1},
 
-      {"kayahli",                            102},
-      {""},
+      {pool_offset(3370),                            102},
+      {-1},
 
-      {"oldsoutharabian",                    159},
-      {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""},
-      {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""},
-      {""}, {""}, {""}, {""}, {""},
+      {pool_offset(3372),                    159},
+      {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
+      {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
+      {-1}, {-1}, {-1}, {-1}, {-1},
 
-      {"insupplementaryprivateuseareab",     499},
-      {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""},
-      {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""},
-      {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""},
-      {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""},
-      {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""},
-      {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""},
-      {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""},
-      {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""},
-      {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""},
-      {""},
+      {pool_offset(3396),     499},
+      {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
+      {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
+      {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
+      {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
+      {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
+      {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
+      {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
+      {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
+      {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
+      {-1},
 
-      {"inhangulcompatibilityjamo",          345},
-      {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""},
-      {""}, {""},
+      {pool_offset(3479),          345},
+      {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
+      {-1}, {-1},
 
-      {"zyyy",                                53},
-      {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""},
-      {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""},
-      {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""},
-      {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""},
-      {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""},
-      {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""},
-      {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""},
+      {pool_offset(3491),                                53},
+      {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
+      {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
+      {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
+      {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
+      {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
+      {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
+      {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
 
-      {"qmark",                              187},
-      {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""},
-      {""},
+      {pool_offset(3555),                              187},
+      {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
+      {-1},
 
-      {"buhid",                               34},
+      {pool_offset(3566),                               34},
 
-      {"sk",                                 201},
-      {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""},
-      {""}, {""}, {""}, {""}, {""},
+      {pool_offset(3567),                                 201},
+      {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
+      {-1}, {-1}, {-1}, {-1}, {-1},
 
-      {"unknown",                            225},
-      {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""},
-      {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""},
-      {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""},
-      {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""},
+      {pool_offset(3582),                            225},
+      {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
+      {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
+      {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
+      {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
 
-      {"khudawadi",                          106},
-      {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""},
-      {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""},
-      {""}, {""}, {""}, {""}, {""}, {""},
+      {pool_offset(3619),                          106},
+      {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
+      {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
+      {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
 
-      {"katakana",                           101},
-      {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""},
-      {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""},
-      {""}, {""}, {""}, {""}, {""}, {""}, {""},
+      {pool_offset(3644),                           101},
+      {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
+      {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
+      {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
 
-      {"incjkunifiedideographsextensionc",   492},
-      {""}, {""},
+      {pool_offset(3670),   492},
+      {-1}, {-1},
 
-      {"incjkunifiedideographsextensiona",   352},
-      {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""},
-      {""}, {""},
+      {pool_offset(3673),   352},
+      {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
+      {-1}, {-1},
 
-      {"incjkunifiedideographs",             354},
-      {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""},
-      {""}, {""}, {""}, {""}, {""},
+      {pool_offset(3685),             354},
+      {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
+      {-1}, {-1}, {-1}, {-1}, {-1},
 
-      {"incjkunifiedideographsextensione",   494},
-      {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""},
-      {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""},
-      {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""},
-      {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""},
-      {""}, {""}, {""}, {""}, {""}, {""},
+      {pool_offset(3700),   494},
+      {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
+      {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
+      {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
+      {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
+      {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
 
-      {"duployan",                            65},
-      {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""},
-      {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""},
-      {""},
+      {pool_offset(3743),                            65},
+      {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
+      {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
+      {-1},
 
-      {"egyptianhieroglyphs",                 66},
-      {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""},
-      {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""},
-      {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""},
-      {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""},
-      {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""},
-      {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""},
-      {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""},
-      {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""},
-      {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""},
-      {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""},
+      {pool_offset(3763),                 66},
+      {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
+      {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
+      {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
+      {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
+      {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
+      {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
+      {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
+      {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
+      {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
+      {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
 
-      {"inboxdrawing",                       318},
-      {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""},
-      {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""},
-      {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""},
-      {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""},
-      {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""},
-      {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""},
-      {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""},
-      {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""},
-      {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""},
-      {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""},
-      {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""},
-      {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""},
-      {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""},
-      {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""},
-      {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""},
-      {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""},
-      {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""},
-      {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""},
-      {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""},
-      {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""},
-      {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""},
-      {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""},
-      {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""},
-      {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""},
-      {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""},
-      {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""},
-      {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""},
-      {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""},
+      {pool_offset(3853),                       318},
+      {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
+      {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
+      {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
+      {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
+      {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
+      {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
+      {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
+      {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
+      {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
+      {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
+      {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
+      {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
+      {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
+      {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
+      {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
+      {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
+      {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
+      {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
+      {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
+      {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
+      {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
+      {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
+      {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
+      {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
+      {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
+      {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
+      {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
+      {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
 
-      {"khojki",                             105},
-      {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""},
-      {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""},
-      {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""},
-      {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""},
-      {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""},
-      {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""},
-      {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""},
-      {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""},
-      {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""},
-      {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""},
-      {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""},
-      {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""},
-      {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""},
-      {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""},
-      {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""},
-      {""}, {""},
+      {pool_offset(4106),                             105},
+      {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
+      {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
+      {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
+      {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
+      {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
+      {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
+      {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
+      {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
+      {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
+      {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
+      {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
+      {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
+      {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
+      {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
+      {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
+      {-1}, {-1},
 
-      {"incjkunifiedideographsextensiond",   493},
-      {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""},
-      {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""},
-      {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""},
-      {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""},
-      {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""},
-      {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""},
-      {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""},
-      {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""},
-      {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""},
-      {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""},
-      {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""},
-      {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""},
-      {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""},
-      {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""},
-      {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""},
-      {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""},
-      {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""},
-      {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""},
-      {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""},
-      {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""},
-      {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""},
-      {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""},
-      {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""},
-      {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""},
-      {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""},
-      {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""},
-      {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""},
-      {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""},
-      {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""},
-      {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""},
-      {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""},
-      {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""},
-      {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""},
-      {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""},
-      {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""},
-      {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""},
-      {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""},
-      {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""},
-      {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""},
-      {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""},
-      {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""},
-      {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""},
-      {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""},
-      {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""},
-      {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""},
-      {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""},
-      {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""},
-      {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""},
-      {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""},
-      {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""},
-      {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""},
-      {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""},
-      {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""},
+      {pool_offset(4244),   493},
+      {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
+      {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
+      {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
+      {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
+      {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
+      {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
+      {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
+      {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
+      {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
+      {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
+      {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
+      {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
+      {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
+      {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
+      {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
+      {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
+      {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
+      {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
+      {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
+      {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
+      {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
+      {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
+      {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
+      {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
+      {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
+      {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
+      {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
+      {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
+      {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
+      {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
+      {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
+      {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
+      {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
+      {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
+      {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
+      {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
+      {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
+      {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
+      {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
+      {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
+      {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
+      {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
+      {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
+      {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
+      {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
+      {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
+      {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
+      {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
+      {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
+      {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
+      {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
+      {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
+      {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
 
-      {"batak",                               27},
-      {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""},
-      {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""},
-      {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""},
-      {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""},
-      {""}, {""}, {""}, {""}, {""}, {""},
+      {pool_offset(4722),                               27},
+      {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
+      {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
+      {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
+      {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
+      {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
 
-      {"incjkunifiedideographsextensionb",   491},
-      {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""},
-      {""}, {""}, {""}, {""}, {""},
+      {pool_offset(4765),   491},
+      {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
+      {-1}, {-1}, {-1}, {-1}, {-1},
 
-      {"blank",                                2},
-      {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""},
-      {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""},
-      {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""},
-      {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""},
-      {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""},
-      {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""},
-      {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""},
-      {""}, {""}, {""}, {""}, {""}, {""}, {""},
+      {pool_offset(4780),                                2},
+      {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
+      {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
+      {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
+      {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
+      {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
+      {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
+      {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
+      {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
 
-      {"greek",                               77},
-      {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""},
-      {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""},
-      {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""},
-      {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""},
-      {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""},
-      {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""},
-      {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""},
-      {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""},
-      {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""},
-      {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""},
-      {""},
+      {pool_offset(4851),                               77},
+      {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
+      {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
+      {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
+      {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
+      {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
+      {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
+      {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
+      {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
+      {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
+      {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
+      {-1},
 
-      {"grlink",                              76},
-      {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""},
-      {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""},
-      {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""},
-      {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""},
-      {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""},
-      {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""},
-      {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""},
-      {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""},
-      {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""},
-      {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""},
-      {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""},
-      {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""},
-      {""}, {""},
+      {pool_offset(4943),                              76},
+      {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
+      {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
+      {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
+      {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
+      {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
+      {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
+      {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
+      {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
+      {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
+      {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
+      {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
+      {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
+      {-1}, {-1},
 
-      {"gurmukhi",                            79},
-      {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""},
-      {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""},
-      {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""},
-      {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""},
-      {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""},
-      {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""},
-      {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""},
-      {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""},
-      {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""},
-      {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""},
-      {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""},
-      {""}, {""}, {""}, {""}, {""}, {""}, {""}, {""},
+      {pool_offset(5054),                            79},
+      {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
+      {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
+      {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
+      {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
+      {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
+      {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
+      {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
+      {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
+      {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
+      {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
+      {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
+      {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
 
-      {"graphemelink",                        76}
+      {pool_offset(5162),                        76}
     };
 
   if (len <= MAX_WORD_LENGTH && len >= MIN_WORD_LENGTH)
@@ -25295,10 +26727,14 @@ unicode_lookup_property_name (register const char *str, register unsigned int le
 
       if (key <= MAX_HASH_VALUE && key >= 0)
         {
-          register const char *s = wordlist[key].name;
+          register int o = wordlist[key].name;
+          if (o >= 0)
+            {
+              register const char *s = o + unicode_prop_name_pool;
 
-          if ((((unsigned char)*str ^ (unsigned char)*s) & ~32) == 0 && !gperf_case_strncmp (str, s, len) && s[len] == '\0')
-            return &wordlist[key];
+              if ((((unsigned char)*str ^ (unsigned char)*s) & ~32) == 0 && !gperf_case_strncmp (str, s, len) && s[len] == '\0')
+                return &wordlist[key];
+            }
         }
     }
   return 0;

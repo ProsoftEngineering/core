@@ -215,7 +215,8 @@ OnigSyntaxType OnigSyntaxPerl_NG = {
       ONIG_SYN_OP2_ESC_G_SUBEXP_CALL |
       ONIG_SYN_OP2_ESC_CAPITAL_K_KEEP |
       ONIG_SYN_OP2_ESC_CAPITAL_R_GENERAL_NEWLINE |
-      ONIG_SYN_OP2_ESC_CAPITAL_N_O_SUPER_DOT )
+      ONIG_SYN_OP2_ESC_CAPITAL_N_O_SUPER_DOT |
+      ONIG_SYN_OP2_QMARK_PERL_SUBEXP_CALL )
   , ( SYN_GNU_REGEX_BV |
       ONIG_SYN_CAPTURE_ONLY_NAMED_GROUP |
       ONIG_SYN_ALLOW_MULTIPLEX_DEFINITION_NAME )
@@ -237,7 +238,7 @@ extern int
 onig_set_default_syntax(OnigSyntaxType* syntax)
 {
   if (IS_NULL(syntax))
-    syntax = ONIG_SYNTAX_RUBY;
+    syntax = ONIG_SYNTAX_ONIGURUMA;
 
   OnigDefaultSyntax = syntax;
   return 0;
