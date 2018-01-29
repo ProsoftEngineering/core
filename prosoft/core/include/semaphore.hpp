@@ -1,4 +1,4 @@
-// Copyright © 2014-2015, Prosoft Engineering, Inc. (A.K.A "Prosoft")
+// Copyright © 2014-2018, Prosoft Engineering, Inc. (A.K.A "Prosoft")
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without
@@ -184,6 +184,11 @@ public:
     void reset(integral_type count, typename std::enable_if<std::is_same<Value, isemaphore::event_semaphore_value>::value, Reset>::type* = 0) {
         std::lock_guard<std::mutex> l(m_lck);
         m_val.reset(count);
+    }
+    
+    typename value_type::value_type count() { // for testing
+        std::lock_guard<std::mutex> l(m_lck);
+        return m_val.operator typename value_type::value_type();
     }
 
 private:
