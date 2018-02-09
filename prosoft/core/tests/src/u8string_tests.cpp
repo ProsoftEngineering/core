@@ -1,4 +1,4 @@
-// Copyright © 2014-2017, Prosoft Engineering, Inc. (A.K.A "Prosoft")
+// Copyright © 2014-2018, Prosoft Engineering, Inc. (A.K.A "Prosoft")
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without
@@ -25,8 +25,9 @@
 
 #include <prosoft/core/config/config_platform.h>
 
-#include <stdexcept>
 #include <cstring>
+#include <set>
+#include <stdexcept>
 
 #include <byteorder.h>
 #include <u8string/u8string.hpp>
