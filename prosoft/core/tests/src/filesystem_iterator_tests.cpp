@@ -1,4 +1,4 @@
-// Copyright © 2016-2017, Prosoft Engineering, Inc. (A.K.A "Prosoft")
+// Copyright © 2016-2018, Prosoft Engineering, Inc. (A.K.A "Prosoft")
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without
@@ -26,6 +26,7 @@
 #include <filesystem/filesystem.hpp>
 
 #include "catch.hpp"
+#include "fsdirent_catch_fix.hpp"
 
 using namespace prosoft;
 using namespace prosoft::filesystem;
