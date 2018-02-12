@@ -1,4 +1,4 @@
-# Copyright © 2015-2017, Prosoft Engineering, Inc. (A.K.A "Prosoft")
+# Copyright © 2015-2018, Prosoft Engineering, Inc. (A.K.A "Prosoft")
 # All rights reserved.
 # 
 # Redistribution and use in source and binary forms, with or without
@@ -61,27 +61,32 @@ DEBUG_CONFIG = 'Debug'
 RELEASE_CONFIG = 'RelWithDebInfo'
 
 # As of Cmake 3.1 the VS generator architecture does not need to be specified.
-# We continue doing so to allow distinct builds to be controlled by rake. 
+# We continue doing so to allow distinct builds to be controlled by rake.
+if HAVE_VS2017
+  VS2017_CMAKE_GENERATORS = ['Visual Studio 15 Win64', 'Visual Studio 15']
+end
+
+if HAVE_VS2015
+  VS2015_CMAKE_GENERATORS = ['Visual Studio 14 Win64', 'Visual Studio 14']
+end
+ 
 if which('xcrun')
   CMAKE_DEFAULT_GENERATOR = 'Xcode'
 elsif which('ninja')
   CMAKE_DEFAULT_GENERATOR = 'Ninja'
 elsif HAVE_VS2017
-  CMAKE_DEFAULT_GENERATOR = 'Visual Studio 15 Win64'
+  CMAKE_DEFAULT_GENERATOR = VS2017_CMAKE_GENERATORS[0]
 elsif HAVE_VS2015
-  CMAKE_DEFAULT_GENERATOR = 'Visual Studio 14 Win64'
+  CMAKE_DEFAULT_GENERATOR = VS2015_CMAKE_GENERATORS[0]
 else
   CMAKE_DEFAULT_GENERATOR = 'Unix Makefiles'
 end
 
 CMAKE_GENERATORS = [CMAKE_DEFAULT_GENERATOR]
 if HAVE_VS2017
-  CMAKE_GENERATORS << 'Visual Studio 15 Win64'
-  CMAKE_GENERATORS << 'Visual Studio 15'
-end
-if HAVE_VS2015
-  CMAKE_GENERATORS << 'Visual Studio 14 Win64'
-  CMAKE_GENERATORS << 'Visual Studio 14'
+  CMAKE_GENERATORS.concat(VS2017_CMAKE_GENERATORS)
+elsif HAVE_VS2015
+  CMAKE_GENERATORS.concat(VS2015_CMAKE_GENERATORS)
 end
 CMAKE_GENERATORS.uniq!
 
