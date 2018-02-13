@@ -1,4 +1,4 @@
-// Copyright © 2016, Prosoft Engineering, Inc. (A.K.A "Prosoft")
+// Copyright © 2016-2018, Prosoft Engineering, Inc. (A.K.A "Prosoft")
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without
@@ -31,9 +31,39 @@
 // https://github.com/llvm-mirror/compiler-rt/blob/master/include/sanitizer/lsan_interface.h
 #if PS_HAVE_LSAN_INTERFACE_H
 #include <sanitizer/lsan_interface.h>
+#define PS_INTENTIONAL_MEMORY_LEAK_BEGIN __lsan_disable();
+#define PS_INTENTIONAL_MEMORY_LEAK_END __lsan_enable();
 #define PS_INTENTIONAL_MEMORY_LEAK(Ptr) __lsan_ignore_object((Ptr))
 #else
+#define PS_INTENTIONAL_MEMORY_LEAK_BEGIN
+#define PS_INTENTIONAL_MEMORY_LEAK_END
 #define PS_INTENTIONAL_MEMORY_LEAK(Ptr)
+#endif
+
+#ifdef __cplusplus
+namespace prosoft {
+
+class intentional_leak_guard {
+public:
+    intentional_leak_guard() {
+        PS_INTENTIONAL_MEMORY_LEAK_BEGIN
+    }
+    ~intentional_leak_guard() {
+        PS_INTENTIONAL_MEMORY_LEAK_END
+    }
+    
+    intentional_leak_guard(const intentional_leak_guard&) = delete;
+    intentional_leak_guard(intentional_leak_guard&&) = delete;
+    intentional_leak_guard& operator=(const intentional_leak_guard&) = delete;
+    intentional_leak_guard& operator=(intentional_leak_guard&&) = delete;
+    
+    void* operator new(size_t) = delete;
+    void* operator new(size_t, void*) = delete;
+    void* operator new[](size_t) = delete;
+    void* operator new[](size_t, void*) = delete;
+};
+
+} // prosoft
 #endif
 
 #endif // PS_CONFIG_ANALYZER_H
