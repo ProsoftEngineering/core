@@ -1,4 +1,4 @@
-// Copyright © 2017, Prosoft Engineering, Inc. (A.K.A "Prosoft")
+// Copyright © 2017-2018, Prosoft Engineering, Inc. (A.K.A "Prosoft")
 // All rights reserved. 
 //
 // Redistribution and use in source and binary forms, with or without
@@ -696,8 +696,8 @@ std::error_category& snapshot_category() {
     return cat;
 }
 
-enum snapshot_flags : uint8_t {
-    snapshot_attached = 0x1,
+enum snapshot_flags : unsigned {
+    snapshot_attached = 0x1U,
 };
 
 inline bool attached(const fs::snapshot& snap) noexcept {
@@ -790,13 +790,6 @@ snapshot::~snapshot() {
     }
 }
 
-snapshot create_snapshot(const path& p, const snapshot_create_options& opts) {
-    error_code ec;
-    auto snap = create_snapshot(p, opts, ec);
-    PS_THROW_IF(ec.value(), filesystem_error("Could not create snapshot", p, ec));
-    return snap;
-}
-
 snapshot create_snapshot(const path& p, const snapshot_create_options&, error_code& ec) {
     try {
         com_init com{ec};
@@ -819,12 +812,6 @@ snapshot create_snapshot(const path& p, const snapshot_create_options&, error_co
     }
 
     return snapshot{snapshot_id{}};
-}
-
-void attach_snapshot(snapshot& s, const path& p) {
-    error_code ec;
-    attach_snapshot(s, p, ec);
-    PS_THROW_IF(ec.value(), filesystem_error("Could not attach snapshot", p, ec));
 }
 
 void attach_snapshot(snapshot& snap, const path& p, std::error_code& ec) {

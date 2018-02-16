@@ -1,4 +1,4 @@
-// Copyright © 2017, Prosoft Engineering, Inc. (A.K.A "Prosoft")
+// Copyright © 2017-2018, Prosoft Engineering, Inc. (A.K.A "Prosoft")
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without
@@ -28,9 +28,7 @@
 
 // XXX: Windows snapshots require a 32bit OS for 32bit apps. WOW64 is not supported.
 // Mingw spits out warnings that the VSS COM API "has not been verified". In addition, ATL is not available.
-#define PS_HAVE_FILESYSTEM_SNAPSHOT _WIN32 && !__MINGW32__
-
-#if PS_HAVE_FILESYSTEM_SNAPSHOT
+#define PS_HAVE_FILESYSTEM_SNAPSHOT (MAC_OS_X_VERSION_MIN_REQUIRED > 0 || (_WIN32 && !__MINGW32__))
 
 #include <memory>
 #include <system_error>
@@ -65,6 +63,8 @@ struct snapshot_id {
     }
 #else
     native_string_type m_id;
+    path m_from;
+    path m_to;
 
     snapshot_id(native_string_type&& s) noexcept(std::is_nothrow_move_constructible<native_string_type>::value)
         : m_id(std::move(s)) {
@@ -93,7 +93,7 @@ class snapshot_manager;
 class snapshot {
     friend snapshot_manager;
     snapshot_id m_id;
-    using flags_type = uint8_t;
+    using flags_type = unsigned;
     flags_type m_flags;
 
     void clear() {
@@ -102,14 +102,14 @@ class snapshot {
     }
 
 public:
-    explicit snapshot(snapshot_id&& sid)
+    explicit snapshot(snapshot_id&& sid, flags_type f = 0)
         : m_id(std::move(sid))
-        , m_flags() {
+        , m_flags(f) {
     }
     
-    explicit snapshot(const snapshot_id& sid)
+    explicit snapshot(const snapshot_id& sid, flags_type f = 0)
         : m_id(sid)
-        , m_flags() {
+        , m_flags(f) {
     }
 
     snapshot(snapshot&& other) noexcept(std::is_nothrow_move_constructible<snapshot_id>::value)
@@ -140,11 +140,12 @@ inline bool operator!=(const snapshot& lhs, const snapshot& rhs) noexcept(noexce
     return !operator==(lhs, rhs);
 }
 
-#define PS_FILESYSTEM_SNAPSHOT_CAN_CREATE_ID !_WIN32
+#define PS_FILESYSTEM_SNAPSHOT_CAN_CREATE_ID 0
 
 struct snapshot_create_options {
     enum : unsigned {
         none = 0,
+        nobrowse = 0x1, // do not show in GUI -- not supported for Windows
         defaults = none,
     } m_flags = defaults;
 #if PS_FILESYSTEM_SNAPSHOT_CAN_CREATE_ID
@@ -171,7 +172,5 @@ void delete_snapshot(snapshot&, std::error_code&);
 } // v1
 } // filesystem
 } // prosoft
-
-#endif // PS_HAVE_FILESYSTEM_SNAPSHOT
 
 #endif // PS_CORE_FILESYSTEM_SNAPSHOT_HPP

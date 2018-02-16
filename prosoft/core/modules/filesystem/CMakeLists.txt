@@ -1,4 +1,4 @@
-# Copyright © 2016-2017, Prosoft Engineering, Inc. (A.K.A "Prosoft")
+# Copyright © 2016-2018, Prosoft Engineering, Inc. (A.K.A "Prosoft")
 # All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
@@ -40,7 +40,7 @@ add_library(${fs_lib}
     ${PSFS}/src/pathops.cpp
     ${PSFS}/src/filesystem.cpp
     ${PSFS}/src/filesystem_acl.cpp
-    ${PSFS}/src/snapshot.cpp
+    ${PSFS}/src/snapshot_all.cpp
     ${PSFS}/src/standard_directory_path.cpp
 )
 
@@ -54,13 +54,28 @@ target_include_directories(${fs_lib}
 if(APPLE)
     target_sources(${fs_lib} PRIVATE
         ${PSFS}/src/fsevents_monitor.cpp
+        ${PSFS}/src/snapshot_mac.cpp
+        ${PSFS}/src/spawn_mac.mm
     )
-    target_link_libraries(${fs_lib} PUBLIC "-framework CoreFoundation -framework CoreServices")
+    set_source_files_properties(
+        ${PSFS}/src/spawn_mac.mm
+        PROPERTIES COMPILE_FLAGS -fobjc-arc
+    )
+    target_link_libraries(${fs_lib} PUBLIC "-framework Foundation -framework CoreServices")
 endif()
 
 if(WIN32)
+    target_sources(${fs_lib} PRIVATE
+        ${PSFS}/src/snapshot_win32.cpp
+    )
     target_link_libraries(${fs_lib} PUBLIC "shell32" "vssapi")
 	ps_core_module_use_external_module(${fs_lib} winutils)
+endif()
+
+if (UNIX AND NOT APPLE)
+    target_sources(${fs_lib} PRIVATE
+        ${PSFS}/src/snapshot_nop.cpp
+    )
 endif()
 
 ps_core_module_use_u8string_module(${fs_lib})

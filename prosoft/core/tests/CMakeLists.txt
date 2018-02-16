@@ -1,4 +1,4 @@
-# Copyright © 2015-2017, Prosoft Engineering, Inc. (A.K.A "Prosoft")
+# Copyright © 2015-2018, Prosoft Engineering, Inc. (A.K.A "Prosoft")
 # All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
@@ -71,6 +71,7 @@ add_executable(${PROJECT_NAME}
 if(APPLE)
     target_sources(${PROJECT_NAME} PRIVATE
         ${CORETESTS}/src/apple_convert_tests.mm
+        ${CORETESTS}/src/spawn_tests.cpp
     )
     set_source_files_properties(
         ${CORETESTS}/src/apple_convert_tests.mm

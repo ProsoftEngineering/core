@@ -1,4 +1,4 @@
-// Copyright © 2017, Prosoft Engineering, Inc. (A.K.A "Prosoft")
+// Copyright © 2017-2018, Prosoft Engineering, Inc. (A.K.A "Prosoft")
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without
@@ -28,6 +28,10 @@
 
 #if PS_HAVE_FILESYSTEM_SNAPSHOT
 
+#if __APPLE__
+#include <sys/mount.h>
+#endif
+
 #include "identity.hpp"
 
 #include "catch.hpp"
@@ -53,15 +57,18 @@ TEST_CASE("filesystem_snapshot") {
     }
 
     WHEN("attaching an invalid snapshot") {
-        CHECK_THROWS(attach_snapshot(snapshot(snapshot_id()), path{}));
+        auto snap = snapshot(snapshot_id());
+        CHECK_THROWS(attach_snapshot(snap, path{}));
     }
 
     WHEN("detaching an invalid snapshot") {
-        CHECK_THROWS(detach_snapshot(snapshot(snapshot_id())));
+        auto snap = snapshot(snapshot_id());
+        CHECK_THROWS(detach_snapshot(snap));
     }
 
     WHEN("deleting an invalid snapshot") {
-        CHECK_THROWS(delete_snapshot(snapshot(snapshot_id())));
+        auto snap = snapshot(snapshot_id());
+        CHECK_THROWS(delete_snapshot(snap));
     }
 
     static bool flag{};
@@ -69,6 +76,7 @@ TEST_CASE("filesystem_snapshot") {
     if (!flag) {
         flag = true;
 
+#if _WIN32
         using namespace prosoft::system;
         std::error_code ec;
         auto admin = is_member(identity::admin_group(), ec);
@@ -77,11 +85,15 @@ TEST_CASE("filesystem_snapshot") {
             return;
         }
 
-#if _WIN32
         BOOL wow{};
         IsWow64Process(GetCurrentProcess(), &wow);
         if (wow) {
             std::cout << "32bit snapshot tests require 32bit Windows" << "\n";
+            return;
+        }
+#elif __APPLE__
+        struct statfs sb;
+        if (0 != statfs("/", &sb) || std::string{"apfs"} != sb.f_fstypename) {
             return;
         }
 #endif
@@ -97,18 +109,27 @@ TEST_CASE("filesystem_snapshot") {
     }
 
     WHEN("creating a snapshot") {
+#if _WIN32
+        static const auto root = PS_TEXT("C:\\");
+        static const auto mount_path = PS_TEXT("S:\\");
+        static const auto system_root = PS_TEXT("Windows");
+#else
+        static const auto root = "/";
+        const auto mount_path = temp_directory_path() / path{std::string{"snap"}.append(std::to_string(getpid()))};
+        static const auto system_root = "System";
+#endif
         error_code ec;
-        auto snap = create_snapshot(PS_TEXT("C:\\"), ec);
+        auto snap = create_snapshot(root, ec); // This can fail normally for a variety of reasons.
         if (!ec) {
             CHECK_THROWS(detach_snapshot(snap));
             CHECK_THROWS(attach_snapshot(snap, PS_TEXT("")));
-            const path mount{PS_TEXT("S:\\")};
+            const path mount{mount_path};
             REQUIRE_FALSE(exists(mount, ec));
             attach_snapshot(snap, mount, ec);
             CHECK(!ec);
             CHECK_THROWS(delete_snapshot(snap));
 
-            CHECK(exists(mount / PS_TEXT("Windows"), ec));
+            CHECK(exists(mount / system_root, ec));
 
             const auto snapid{snap.id()};
             {
