@@ -215,12 +215,13 @@ void unmount_snapshot(const prosoft::filesystem::snapshot& snap, std::error_code
     spawn_cout cout;
     spawn_cerr cerr;
     std::system_error err{0, std::system_category()};
-    spawn_args args;
+    // umount will sometimes fail with 'resource busy' and recommend diskutil, so just use it instead
+    spawn_args args{"unmount"};
     if (f.value) {
-        args.push_back("-f");
+        args.push_back("force");
     }
     args.push_back(snap.id().m_to.string());
-    spawn("umount", args, cout, cerr, err);
+    spawn("diskutil", args, cout, cerr, err);
     ec = err.code();
 }
 
