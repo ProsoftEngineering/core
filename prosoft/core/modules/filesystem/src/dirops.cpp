@@ -302,11 +302,13 @@ path temp_directory_path(error_code& ec) {
     path p;
 #if !_WIN32
     const char* t = ::getenv(ifilesystem::TMPDIR);
-    if (!t || *t == 0) {
+#if __APPLE__
+    std::unique_ptr<char[]> buf;
+#endif
+    if (!t || *t == 0) { // null can occur when run via sudo or anything else that sanitizes the environment
         constexpr const char* default_tmpdir = "/tmp";
         t = default_tmpdir;
 #if __APPLE__
-        std::unique_ptr<char[]> buf;
         const auto len = ::confstr(_CS_DARWIN_USER_TEMP_DIR, nullptr, 0);
         if (len > 0) {
             buf.reset(new char[len]);
