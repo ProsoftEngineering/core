@@ -1670,7 +1670,20 @@ TEST_CASE("filesystem_path") {
             CHECK(p.lexically_relative(p3).empty());
             CHECK(p.lexically_proximate(p3) == p);
             CHECK(p.lexically_detached(p3).empty());
-            
+        }
+
+        if (win32Paths) {
+            WHEN("path is win32 absolute") {
+                const auto wp = path{PS_TEXT("C:\\a")};
+                auto base = path{PS_TEXT("C:")};
+                CHECK(wp.lexically_relative(base) == path(PS_TEXT("\\a")));
+                CHECK(wp.lexically_detached(base) == path(PS_TEXT("\\a")));
+                base = path{PS_TEXT("C:\\")};
+                CHECK(wp.lexically_relative(base) == path(PS_TEXT("a")));
+                CHECK(wp.lexically_detached(base) == path(PS_TEXT("a")));
+                CHECK(base.lexically_relative(base) == path(path::dot));
+                CHECK(base.lexically_detached(base) == path(path::dot));
+            }
         }
         
         WHEN("path is relative") {
