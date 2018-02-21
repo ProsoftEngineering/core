@@ -1,4 +1,4 @@
-// Copyright © 2015-2017, Prosoft Engineering, Inc. (A.K.A "Prosoft")
+// Copyright © 2015-2018, Prosoft Engineering, Inc. (A.K.A "Prosoft")
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without
@@ -714,6 +714,9 @@ inline path home_directory_path(error_code& ec) {
 // The filesystem mount point for the given path. This may differ from path.root_path().
 path mount_path(const path&);
 path mount_path(const path&, error_code&);
+
+path unused_drive();
+path unused_drive(error_code&); // Windows: first unused drive letter, useful for attaching a snapshot
 
 enum class domain {
     user, // XXX: UNIX daemon users may not have a home dir for relative sub-paths.

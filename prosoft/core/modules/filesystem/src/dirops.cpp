@@ -1,4 +1,4 @@
-// Copyright © 2016-2017, Prosoft Engineering, Inc. (A.K.A "Prosoft")
+// Copyright © 2016-2018, Prosoft Engineering, Inc. (A.K.A "Prosoft")
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without
@@ -395,6 +395,22 @@ path ifilesystem::home_directory_path(const access_control_identity& cid, error_
     
     assert_directory_exists(p, ec);
     return p;
+}
+
+path unused_drive() {
+    error_code ec;
+    auto p = unused_drive(ec);
+    PS_THROW_IF(ec.value(), filesystem_error("Could not get unused drive", ec));
+    return p;
+}
+
+path unused_drive(error_code& ec) {
+#if _WIN32
+    return ifilesystem::first_unused_drive_letter(ec);
+#else
+    ec.clear(); // ENOTSUP?
+    return path{};
+#endif
 }
 
 } // v1

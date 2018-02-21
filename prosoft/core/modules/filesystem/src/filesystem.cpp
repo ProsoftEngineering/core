@@ -34,6 +34,7 @@
 #include <unistd.h>
 #else
 #include <windows.h>
+#include <array>
 #endif
 
 #include <cstring>
@@ -605,6 +606,53 @@ bool finfo(const path& p, ::BY_HANDLE_FILE_INFORMATION* info, error_code& ec) {
 
 file_time_type to_filetime(const ::FILETIME& ft) {
     return to_times{}.from(ft);
+}
+
+std::wstring first_unused_drive_letter(DWORD bits) {
+    constexpr std::array<wchar_t*, 26> letters {
+        L"A:\\",
+        L"B:\\",
+        L"C:\\",
+        L"D:\\",
+        L"E:\\",
+        L"F:\\",
+        L"G:\\",
+        L"H:\\",
+        L"I:\\",
+        L"J:\\",
+        L"K:\\",
+        L"L:\\",
+        L"M:\\",
+        L"N:\\",
+        L"O:\\",
+        L"P:\\",
+        L"Q:\\",
+        L"R:\\",
+        L"S:\\",
+        L"T:\\",
+        L"U:\\",
+        L"V:\\",
+        L"W:\\",
+        L"X:\\",
+        L"Y:\\",
+        L"Z:\\",
+    };
+    for (auto i = 3; i < letters.size(); ++i) { // Start at D:
+        if (0 == (bits & (1<<i))) { 
+            return std::wstring{letters[i]};
+        }
+    }
+    return L"";
+}
+
+std::wstring first_unused_drive_letter(error_code& ec) {
+    if (const auto bits = GetLogicalDrives()) {
+        ec.clear();
+        return first_unused_drive_letter(bits);
+    } else {
+        system::system_error(ec);
+        return L"";
+    }
 }
 
 } // ifilesystem

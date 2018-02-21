@@ -454,6 +454,46 @@ TEST_CASE("filesystem") {
     }
 #endif
 
+    WHEN("getting an unused drive") {
+        error_code ec;
+#if _WIN32
+        CHECK_FALSE(unused_drive(ec).empty());
+
+        // A:, B: and C: can never be returned
+        CHECK(ifilesystem::first_unused_drive_letter(0) == L"D:\\");
+        CHECK(ifilesystem::first_unused_drive_letter(0x1) == L"D:\\");
+        CHECK(ifilesystem::first_unused_drive_letter(0x2) == L"D:\\");
+        CHECK(ifilesystem::first_unused_drive_letter(0x4) == L"D:\\");
+        CHECK(ifilesystem::first_unused_drive_letter(0x7) == L"D:\\");
+        CHECK(ifilesystem::first_unused_drive_letter(0x8) == L"E:\\");
+        CHECK(ifilesystem::first_unused_drive_letter(0x1A) == L"F:\\");
+        CHECK(ifilesystem::first_unused_drive_letter(0x3A) == L"G:\\");
+        CHECK(ifilesystem::first_unused_drive_letter(0x7A) == L"H:\\");
+        CHECK(ifilesystem::first_unused_drive_letter(0xFA) == L"I:\\");
+        CHECK(ifilesystem::first_unused_drive_letter(0x1FA) == L"J:\\");
+        CHECK(ifilesystem::first_unused_drive_letter(0x3FA) == L"K:\\");
+        CHECK(ifilesystem::first_unused_drive_letter(0x7FA) == L"L:\\");
+        CHECK(ifilesystem::first_unused_drive_letter(0xFFA) == L"M:\\");
+        CHECK(ifilesystem::first_unused_drive_letter(0x1FFA) == L"N:\\");
+        CHECK(ifilesystem::first_unused_drive_letter(0x3FFA) == L"O:\\");
+        CHECK(ifilesystem::first_unused_drive_letter(0x7FFA) == L"P:\\");
+        CHECK(ifilesystem::first_unused_drive_letter(0xFFFA) == L"Q:\\");
+        CHECK(ifilesystem::first_unused_drive_letter(0x1FFFA) == L"R:\\");
+        CHECK(ifilesystem::first_unused_drive_letter(0x3FFFA) == L"S:\\");
+        CHECK(ifilesystem::first_unused_drive_letter(0x7FFFA) == L"T:\\");
+        CHECK(ifilesystem::first_unused_drive_letter(0xFFFFA) == L"U:\\");
+        CHECK(ifilesystem::first_unused_drive_letter(0x1FFFFA) == L"V:\\");
+        CHECK(ifilesystem::first_unused_drive_letter(0x3FFFFA) == L"W:\\");
+        CHECK(ifilesystem::first_unused_drive_letter(0x7FFFFA) == L"X:\\");
+        CHECK(ifilesystem::first_unused_drive_letter(0xFFFFFA) == L"Y:\\");
+        CHECK(ifilesystem::first_unused_drive_letter(0x1FFFFFA) == L"Z:\\");
+        CHECK(ifilesystem::first_unused_drive_letter(0x3FFFFFF).empty());
+        CHECK(ifilesystem::first_unused_drive_letter(0xFFFFFFFF).empty());
+#else
+        CHECK(unused_drive(ec).empty());
+#endif
+    }
+
     SECTION("attribute extensions") {
         #include "filesystem_attr_tests_i.cpp"
     }
