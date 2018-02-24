@@ -28,6 +28,15 @@
 
 #if __APPLE__
 #include <prosoft/core/config/config_apple.h>
+#elif _WIN32
+#include <prosoft/core/config/config_windows.h>
+#endif
+
+// Same purpose as Win32 TEXT() macro for ASCII/Unicode string literals. Just don't have to bring in Windows.h.
+#if _WIN32 && defined(UNICODE)
+#define PS_TEXT(S) L##S
+#else
+#define PS_TEXT(S) S
 #endif
 
 #endif // PS_CORE_CONFIG_PLATFORM_H

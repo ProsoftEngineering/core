@@ -1,4 +1,4 @@
-// Copyright © 2014-2015, Prosoft Engineering, Inc. (A.K.A "Prosoft")
+// Copyright © 2014-2017, Prosoft Engineering, Inc. (A.K.A "Prosoft")
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without
@@ -30,6 +30,7 @@
 #define PS_CORE_UNIFORM_ACCESS__HPP
 
 #include <iterator>
+#include <type_traits>
 #include <utility>
 
 #include <prosoft/core/config/config.h>
@@ -40,43 +41,82 @@ struct access_traits_base {
     typedef const char* const_byte_pointer;
 };
 
-template <class T>
+template <class T, class E = void>
 struct access_traits : public access_traits_base {
-    PS_CONSTEXPR size_t data_size(const T& t) const {
+    using const_value_pointer = const typename T::value_type*;
+    
+    PS_CONSTEXPR_IF_CPP14 size_t data_size(const T& t) const {
         return t.size();
     }
     
-    const typename T::value_type* data(const T& t) const {
+    PS_CONSTEXPR_IF_CPP14 const_value_pointer data(const T& t) const {
         return t.data();
     }
     
-    PS_CONSTEXPR size_t byte_size(const T& t) const {
+    PS_CONSTEXPR_IF_CPP14 size_t byte_size(const T& t) const {
         return t.size() * sizeof(typename T::value_type);
     }
     
-    const_byte_pointer bytes(const T& t) const {
+    PS_CONSTEXPR_IF_CPP14 const_byte_pointer bytes(const T& t) const {
         return reinterpret_cast<const_byte_pointer>(t.data());
     }
 };
 
 template <class T>
-inline const typename T::value_type* data(const T& t) {
-    return access_traits<T>{}.data(t);
+struct access_traits<T*, typename std::enable_if<std::is_integral<T>::value>::type> : public access_traits_base {
+    using const_value_pointer = const T*;
+    
+    constexpr size_t data_size(const_value_pointer t) const {
+#if PS_COMPLETE_CPP14
+// Bug in VS 2017.0: https://developercommunity.visualstudio.com/content/problem/10720/constexpr-function-accessing-character-array-leads.html
+// Requires C++14 expanded constexpr.
+        int i = 0;
+        while (t[i]) {
+            i++;
+        }
+        return i;
+#else
+        return *t ? 1 + data_size(t + 1) : 0;
+#endif
+    }
+    
+    constexpr const_value_pointer data(const_value_pointer t) const {
+        return t;
+    }
+    
+    constexpr size_t byte_size(const_value_pointer t) const {
+        return data_size(t) * sizeof(typename std::remove_pointer<T>::type);
+    }
+    
+    constexpr const_byte_pointer bytes(const_value_pointer t) const {
+        return reinterpret_cast<typename access_traits_base::const_byte_pointer>(t);
+    }
+};
+
+template <class T>
+using access_traits_base_type = typename std::remove_reference<typename std::remove_const<typename std::decay<T>::type>::type>::type;
+
+template <class T>
+using access_traits_type = access_traits<access_traits_base_type<T>>;
+
+template <class T>
+constexpr typename access_traits_type<T>::const_value_pointer data(T&& t) {
+    return access_traits_type<T>{}.data(std::forward<T>(t));
 }
 
 template <class T>
-inline size_t data_size(const T& t) {
-    return access_traits<T>{}.data_size(t);
+constexpr inline size_t data_size(T&& t) {
+    return access_traits_type<T>{}.data_size(std::forward<T>(t));
 }
 
 template <class T>
-inline typename access_traits<T>::const_byte_pointer bytes(const T& t) {
-    return access_traits<T>{}.bytes(t);
+constexpr inline typename access_traits_type<T>::const_byte_pointer bytes(T&& t) {
+    return access_traits_type<T>{}.bytes(std::forward<T>(t));
 }
 
 template <class T>
-inline size_t byte_size(const T& t) {
-    return access_traits<T>{}.byte_size(t);
+constexpr inline size_t byte_size(T&& t) {
+    return access_traits_type<T>{}.byte_size(std::forward<T>(t));
 }
 
 template <class Iterator>

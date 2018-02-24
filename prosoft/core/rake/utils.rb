@@ -1,4 +1,4 @@
-# Copyright © 2015, Prosoft Engineering, Inc. (A.K.A "Prosoft")
+# Copyright © 2015-2018, Prosoft Engineering, Inc. (A.K.A "Prosoft")
 # All rights reserved.
 # 
 # Redistribution and use in source and binary forms, with or without
@@ -37,9 +37,10 @@ def which(cmd)
   return nil
 end
 
+# VS2017 breaks with previous install orginization leading to distinct install paths for each edition (Enterprise, Pro, etc).
+HAVE_VS2017 = File.exist? 'C:/Program Files (x86)/Microsoft Visual Studio/2017' # /Professional/VC/Auxiliary/Build/vcvarsall.bat
 HAVE_VS2015 = File.exist? 'C:/Program Files (x86)/Microsoft Visual Studio 14.0/VC/vcvarsall.bat'
-HAVE_VS2013 = File.exist? 'C:/Program Files (x86)/Microsoft Visual Studio 12.0/VC/vcvarsall.bat'
-if HAVE_VS2015 || HAVE_VS2013
+if HAVE_VS2017 or HAVE_VS2015
   UNAME = 'MSVC'
 elsif which('uname')
   UNAME = `uname -s`.strip
@@ -59,26 +60,33 @@ ROOT_DIR = Dir.getwd
 DEBUG_CONFIG = 'Debug'
 RELEASE_CONFIG = 'RelWithDebInfo'
 
+# As of Cmake 3.1 the VS generator architecture does not need to be specified.
+# We continue doing so to allow distinct builds to be controlled by rake.
+if HAVE_VS2017
+  VS2017_CMAKE_GENERATORS = ['Visual Studio 15 Win64', 'Visual Studio 15']
+end
+
+if HAVE_VS2015
+  VS2015_CMAKE_GENERATORS = ['Visual Studio 14 Win64', 'Visual Studio 14']
+end
+ 
 if which('xcrun')
   CMAKE_DEFAULT_GENERATOR = 'Xcode'
 elsif which('ninja')
   CMAKE_DEFAULT_GENERATOR = 'Ninja'
+elsif HAVE_VS2017
+  CMAKE_DEFAULT_GENERATOR = VS2017_CMAKE_GENERATORS[0]
 elsif HAVE_VS2015
-  CMAKE_DEFAULT_GENERATOR = 'Visual Studio 14 Win64'
-elsif HAVE_VS2013
-  CMAKE_DEFAULT_GENERATOR = 'Visual Studio 12 Win64'
+  CMAKE_DEFAULT_GENERATOR = VS2015_CMAKE_GENERATORS[0]
 else
   CMAKE_DEFAULT_GENERATOR = 'Unix Makefiles'
 end
 
 CMAKE_GENERATORS = [CMAKE_DEFAULT_GENERATOR]
-if HAVE_VS2015
-  CMAKE_GENERATORS << 'Visual Studio 14 Win64'
-  CMAKE_GENERATORS << 'Visual Studio 14'
-end
-if HAVE_VS2013  
-  CMAKE_GENERATORS << 'Visual Studio 12 Win64'
-  CMAKE_GENERATORS << 'Visual Studio 12'
+if HAVE_VS2017
+  CMAKE_GENERATORS.concat(VS2017_CMAKE_GENERATORS)
+elsif HAVE_VS2015
+  CMAKE_GENERATORS.concat(VS2015_CMAKE_GENERATORS)
 end
 CMAKE_GENERATORS.uniq!
 

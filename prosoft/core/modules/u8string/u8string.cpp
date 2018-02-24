@@ -1,4 +1,4 @@
-// Copyright © 2013-2015, Prosoft Engineering, Inc. (A.K.A "Prosoft")
+// Copyright © 2013-2017, Prosoft Engineering, Inc. (A.K.A "Prosoft")
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without
@@ -23,6 +23,8 @@
 // (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
+#include <prosoft/core/config/config_platform.h>
+
 #include <algorithm>
 #include <stdexcept>
 #include <cstring>
@@ -32,9 +34,15 @@
 
 #include "u8string.hpp"
 
-namespace prosoft {
+enum class validate_flags {
+    none,
+    ascii,
+    normalized,
+};
+PS_ENUM_BITMASK_OPS(validate_flags);
 
 namespace {
+using namespace prosoft;
 
 PS_CONSTEXPR const u8string::unicode_type nbounds = 0xffffffff; // value returned for invalid indexes -- u32 valid range is {0,0x7fffffff}
 PS_CONSTEXPR const size_t seq_size = 8; // unicode codepoint sequence size -- 8 for alignment and NULL term
@@ -209,26 +217,84 @@ struct is_equal_icase : public std::unary_function<u8string::unicode_type, bool>
     }
 };
 
+template <class Iterator>
+validate_flags validate_or_throw(Iterator first, Iterator last) {
+    bool normalized = false;
+    bool ascii = false;
+    auto i = find_invalid(first, last, ascii, &normalized);
+    validate_flags flags{};
+    if (i == last) {
+        if (ascii) {
+            flags |= validate_flags::ascii;
+        }
+        if (normalized) {
+            flags |= validate_flags::normalized;
+        }
+    } else {
+        throw u8string::invalid_utf8(*i);
+    }
+    return flags;
+}
+
+template <class U8Store, class String>
+void initialize(U8Store& u8, String&& string) {
+    const auto flags = validate_or_throw(string.begin(), string.end());
+    if (is_set(flags & (validate_flags::ascii|validate_flags::normalized))) {
+        u8._s =  std::forward<String>(string); // avoid conversion for ascii (which should be the most common case)
+    } else {
+        u8._s = normalize(string);
+    }
+    u8._ascii = is_set(flags & validate_flags::ascii);
+};
+
+template <class U8Store, class StringIterator>
+void initialize(U8Store& u8, StringIterator first, StringIterator last) {
+    const auto flags = validate_or_throw(first, last);
+    auto str = std::string{first, last};
+    if (is_set(flags & (validate_flags::ascii|validate_flags::normalized))) {
+        u8._s =  std::move(str); // avoid conversion
+    } else {
+        u8._s = normalize(str); // double copy -- not sure sure how to avoid it though
+    }
+    u8._ascii = is_set(flags & validate_flags::ascii);
+}
+
 } // anon
 
+namespace prosoft {
+
 void u8string::_init(const std::string& other) {
-    bool normalized = false;
-    auto i = find_invalid(other.begin(), other.end(), _u8._ascii, &normalized);
-    if (i == other.end()) {
-        _u8._s = ascii() || normalized ? other : normalize(other); // avoid conversion for ascii (which should be the most common case)
+    initialize(_u8, other);
+}
+
+void u8string::_init(std::string&& other) {
+    initialize(_u8, std::move(other));
+}
+
+void u8string::_init(const char* first, const char* last) {
+    const auto flags = validate_or_throw(first, last);
+    if (is_set(flags & (validate_flags::ascii|validate_flags::normalized))) {
+        _u8._s =  container_type{first, last}; // avoid conversion
     } else {
-        throw invalid_utf8(*i);
+        _u8._s = normalize(first, std::distance(first, last));
     }
+    _u8._ascii = is_set(flags & validate_flags::ascii);
 }
 
-u8string::u8string(const_iterator& start, const_iterator& fin)
-    // XXX: The iters are external; thus we cannot assume that movement() is correct for either. Therefore we don't cache the length here.
-    : u8string(std::string(start.base(), fin.base()), npos, false) {
+void u8string::_init(container_type::iterator first, container_type::iterator last) {
+    initialize(_u8, first, last);
 }
 
-// Unlike std::, utf8 does not provide conversion from non-const to const iters.
-u8string::u8string(iterator& start, iterator& fin)
-    : u8string(std::string(start.base(), fin.base()), npos, false) {
+void u8string::_init(container_type::const_iterator first, container_type::const_iterator last) {
+    initialize(_u8, first, last);
+}
+
+void u8string::_init(container_type::reverse_iterator first, container_type::reverse_iterator last) {
+    initialize(_u8, first, last);
+}
+
+void u8string::_init(container_type::const_reverse_iterator first, container_type::const_reverse_iterator last) {
+    initialize(_u8, first, last);
 }
 
 u8string::u8string(std::string&& other, size_type count, bool ASCII) {
@@ -388,13 +454,13 @@ u8string::iterator u8string::insert(iterator i, const_iterator start, const_iter
 
     const bool emptySequence = start == fin;
 // Neither GCC 4.x nor MSVC 2013 return an iterator as required by C++11.
-#if !__ps_complete_cpp11_stdlib
+#if !PS_COMPLETE_CPP11_STDLIB
     const auto bytePos = i.base() - _u8._s.begin();
 #else
     auto where =
 #endif
     _u8._s.insert(i.base(), start.base(), fin.base());
-#if !__ps_complete_cpp11_stdlib
+#if !PS_COMPLETE_CPP11_STDLIB
     auto where = _u8._s.begin() + bytePos;
     PSASSERT(emptySequence || *where == *(start.base()), "Broken assumption");
 #endif
@@ -476,16 +542,17 @@ u8string& u8string::replace(size_type pos, size_type len, const u8string& other)
     return *this;
 }
 
-int u8string::compare(const u8string& other, bool icase) const {
-    return compare(0, npos, other, 0, npos, icase);
+int u8string::compare(const u8string& other, compare_flags flags) const {
+    return compare(0, npos, other, 0, npos, flags);
 }
 
-int u8string::compare(size_type pos, size_type count, const u8string& other, bool icase) const {
-    return compare(pos, count, other, 0, npos, icase);
+int u8string::compare(size_type pos, size_type count, const u8string& other, compare_flags flags) const {
+    return compare(pos, count, other, 0, npos, flags);
 }
 
-int u8string::compare(size_type pos, size_type count, const u8string& other, size_type pos2, size_type count2, bool icase) const {
+int u8string::compare(size_type pos, size_type count, const u8string& other, size_type pos2, size_type count2, compare_flags flags) const {
     int retval;
+    const bool icase = (flags & case_insensitive_compare);
     if (!icase && ascii() && other.ascii()) {
         retval = str().compare(pos, count, other.str(), pos2, count2);
     } else {
@@ -522,7 +589,8 @@ int u8string::compare(size_type pos, size_type count, const u8string& other, siz
     return retval;
 }
 
-int u8string::compare(unicode_type c1, unicode_type c2, bool icase) {
+int u8string::compare(unicode_type c1, unicode_type c2, compare_flags flags) {
+    const bool icase = (flags & case_insensitive_compare);
     if (!icase && _is_ascii(c1) && _is_ascii(c2)) { // ASCII case-compare shortcut
         return (c1 == c2 ? 0 : (c1 > c2 ? 1 : -1));
     }
@@ -592,10 +660,6 @@ u8string u8string::substr(size_type pos, size_type len) const {
 
 bool u8string::is_ascii() const {
     return _u8._ascii;
-}
-
-bool u8string::is_valid() const {
-    return is_valid(_u8._s);
 }
 
 bool u8string::has_bom() const {

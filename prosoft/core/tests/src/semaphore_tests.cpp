@@ -1,4 +1,4 @@
-// Copyright © 2014-2015, Prosoft Engineering, Inc. (A.K.A "Prosoft")
+// Copyright © 2014-2018, Prosoft Engineering, Inc. (A.K.A "Prosoft")
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without
@@ -22,6 +22,8 @@
 // ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 // (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+#include <prosoft/core/config/config_platform.h>
 
 #include <thread>
 
@@ -176,10 +178,14 @@ TEST_CASE("semaphore") {
 
 TEST_CASE("binary_semaphore") {
     binary_semaphore s;
+    CHECK(s.count() == 0);
     REQUIRE(semaphore::status_type::timeout == s.wait_for(std::chrono::milliseconds(1)));
+    CHECK(s.count() == 0);
     
     s.signal();
+    CHECK(s.count() == 1);
     REQUIRE(semaphore::status_type::no_timeout == s.wait_for(std::chrono::milliseconds(1)));
+    CHECK(s.count() == 0);
     
     std::atomic_int i{0};
     
@@ -190,16 +196,20 @@ TEST_CASE("binary_semaphore") {
     t.detach();
     
     using namespace std::chrono;
-    std::this_thread::sleep_for(duration_cast<nanoseconds>(milliseconds{10}));
+    std::this_thread::sleep_for(duration_cast<nanoseconds>(milliseconds{20})); // wait for thread to spawn and block on wait()
     REQUIRE(i == 0);
-    s.signal();
-    std::this_thread::sleep_for(duration_cast<nanoseconds>(milliseconds{30}));
+    s.signal(); // should occur after thread wait()
+    std::this_thread::sleep_for(duration_cast<nanoseconds>(milliseconds{30})); // wait for thread to wakeup and increment value
     CHECK(i == 1);
     
-    // channel is drained, so more waits are basically nops
-    REQUIRE(semaphore::status_type::no_timeout == s.wait_for(std::chrono::milliseconds(1)));
+    // Channel should be in signaled state, so a wait should be a nop.
+    // However if the thread wait() happened AFTER the signal the channel will be in a wait state.
+    const auto expected = s.count() == 1 ? semaphore::status_type::no_timeout : semaphore::status_type::timeout;
+    REQUIRE(expected == s.wait_for(std::chrono::milliseconds(1)));
+    CHECK(s.count() == 0);
     
     s.reset();
+    CHECK(s.count() == 0);
     REQUIRE(semaphore::status_type::timeout == s.wait_for(std::chrono::milliseconds(1)));
 }
 

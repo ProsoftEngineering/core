@@ -1,4 +1,4 @@
-// Copyright © 2006-2015, Prosoft Engineering, Inc. (A.K.A "Prosoft")
+// Copyright © 2006-2017, Prosoft Engineering, Inc. (A.K.A "Prosoft")
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without
@@ -51,12 +51,19 @@
 
 //// Compiler versions ////
 
-#define PS_CLANG_REQ(_M, _m, _p) (defined(__clang__) && ((__clang_major__ > _M) || (__clang_major__ >= _M && __clang_minor__ > _m) || (__clang_major__ >= _M && __clang_minor__ >= _m) && __clang_patchlevel__ >= _p))
+#ifdef __clang__
+#define PS_CLANG_REQ(_M, _m, _p) ((__clang_major__ > _M) || (__clang_major__ >= _M && __clang_minor__ > _m) || (__clang_major__ >= _M && __clang_minor__ >= _m) && __clang_patchlevel__ >= _p)
+#else
+#define PS_CLANG_REQ(_M, _m, _p) 0
+#endif
 
-#define PS_GCC_REQ(_M, _m, _p) (defined(__GNUC__) && ((__GNUC__ > _M) || (__GNUC__ >= _M && __GNUC_MINOR__ > _m) || (__GNUC__ >= _M && __GNUC_MINOR__ >= _m) && __GNUC_PATCHLEVEL__ >= _p))
+#ifdef __GNUC__
+#define PS_GCC_REQ(_M, _m, _p) ((__GNUC__ > _M) || (__GNUC__ >= _M && __GNUC_MINOR__ > _m) || (__GNUC__ >= _M && __GNUC_MINOR__ >= _m) && __GNUC_PATCHLEVEL__ >= _p)
+#else
+#define PS_GCC_REQ(_M, _m, _p) 0
+#endif
 
 // No patch level.
-// XXX: MSVC's (<= 2013, 2015?) non-c99 preprocessor does not support nested "defined()" clauses in a #define properly.
 #ifdef _MSC_VER
 #define PS_MSVC_REQ(_M, _m) (_MSC_VER >= (_M * 100 + _m * 10))
 #else
@@ -117,9 +124,11 @@
 
 // C++11/14 support -- Clang and GCC are basically 100% 11 compliant as of 3.3 and 4.8.1 respectively.
 // VS 2013 is decent, and 2015 much better (basically complete excepting SFINAE)
-// Clang: http://clang.llvm.org/cxx_status.html
+// Clang: https://clang.llvm.org/cxx_status.html
 // GCC: https://gcc.gnu.org/projects/cxx0x.html, https://gcc.gnu.org/projects/cxx1y.html
+// MSVC (2017): https://docs.microsoft.com/en-us/cpp/visual-cpp-language-conformance
 // MSVC: http://msdn.microsoft.com/en-us/library/vstudio/hh567368.aspx
+// All: http://en.cppreference.com/w/cpp/compiler_support
 //
 
 #if defined(__cplusplus)
@@ -132,7 +141,8 @@
 // Superset of PS_CPP11. "Preferred" compiler versions that implement the majority of C++11 features.
 #define PS_PREFERRED_CPP11 (PS_CLANG_REQ(3, 2, 0) || PS_GCC_REQ(4, 7, 0) || PS_MSVC_REQ(18, 0))
 // Superset of PS_PREFERRED_CPP11. 100% compliant C++11 compilers (XXX: this does not imply a 100% compliant std lib -- e.g. std::regex is not implemented in GCC until 4.9)
-#define PS_COMPLETE_CPP11 (PS_CLANG_REQ(3, 3, 0) || PS_GCC_REQ(4, 8, 1))
+// VS2017 is technically not complete, as the C99 preprocessor and SFINAE still have minor missing features. But for our purposes it is.
+#define PS_COMPLETE_CPP11 (PS_CLANG_REQ(3, 3, 0) || PS_GCC_REQ(4, 8, 1) || PS_MSVC_REQ(19, 1))
 #else // PS_CPP11
 #define PS_PREFERRED_CPP11 0
 #define PS_COMPLETE_CPP11 0
@@ -143,7 +153,7 @@
 // Superset of PS_CPP14. "Preferred" compiler versions that implement the majority of C++14 features.
 #define PS_PREFERRED_CPP14 (PS_CLANG_REQ(3, 4, 0) || PS_GCC_REQ(4, 9, 0) || PS_MSVC_REQ(19, 0))
 // Superset of PS_PREFERRED_CPP14. 100% compliant C++14 compilers.
-#define PS_COMPLETE_CPP14 (PS_CLANG_REQ(3, 4, 0) || PS_GCC_REQ(5, 0, 0))
+#define PS_COMPLETE_CPP14 (PS_CLANG_REQ(3, 4, 0) || PS_GCC_REQ(5, 0, 0) || PS_MSVC_REQ(19, 1))
 #else // PS_CPP14
 #define PS_PREFERRED_CPP14 0
 #define PS_COMPLETE_CPP14 0
@@ -156,6 +166,8 @@
 #define PS_PREFERRED_CPP14 0
 #define PS_COMPLETE_CPP14 0
 #endif // __cplusplus
+
+#define PS_CPP17 (__cplusplus > 201402L)
 
 //// Compiler name ////
 
@@ -248,6 +260,12 @@
 #define PS_ALWAYS_INLINE __forceinline
 #endif
 
+#if __clang__ || __GNUC__
+#define PS_NOINLINE __attribute__((noinline))
+#elif _MSC_VER
+#define PS_NOINLINE __declspec(noinline)
+#endif
+
 #if __cplusplus
 #define PS_INLINE inline
 #elif __clang__ || __GNUC__
@@ -286,14 +304,9 @@
 
 #if __has_attribute(warn_unused_result) || defined(__GNUC__)
 #define PS_WARN_UNUSED_RESULT __attribute__((warn_unused_result))
+#elif _MSC_VER
+#define PS_WARN_UNUSED_RESULT _Check_return_
 #else
-// XXX: MSVC has _Check_return_ since VS2012, however it appears that attributes must appear at the beginning of a function instead of the end.
-#if defined(_MSC_VER)
-#define PS_WARN_UNUSED_RESULT_MSVC _Check_return_
-#else
-#define PS_WARN_UNUSED_RESULT_MSVC
-#endif
-//
 #define PS_WARN_UNUSED_RESULT
 #endif
 

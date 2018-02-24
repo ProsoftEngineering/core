@@ -29,6 +29,7 @@
 #if __APPLE__
 #include <CoreFoundation/CoreFoundation.h>
 #elif _WIN32
+#include <prosoft/core/config/config_windows.h>
 #include <windows.h>
 #endif
 
@@ -110,8 +111,8 @@ struct cf_delete {
 };
 } // iunique
 
-template <typename CFRefType>
-using unique_cftype = std::unique_ptr<typename std::remove_pointer<CFRefType>::type, iunique::cf_delete>;
+template <typename CFRefType, class Deleter = iunique::cf_delete>
+using unique_cftype = std::unique_ptr<typename std::remove_pointer<CFRefType>::type, Deleter>;
 
 namespace CF {
 // Common CF type aliases
@@ -139,6 +140,11 @@ struct local_delete {
         ::LocalFree(p);
     }
 };
+struct taskmem_delete {
+    void operator() (void* p) noexcept {
+        ::CoTaskMemFree(p);
+    }
+};
 } // iunique
 
 namespace windows {
@@ -147,6 +153,9 @@ using unique_global = std::unique_ptr<T, iunique::global_delete>;
 
 template <typename T>
 using unique_local = std::unique_ptr<T, iunique::local_delete>;
+
+template <typename T>
+using unique_taskmem = std::unique_ptr<T, iunique::taskmem_delete>;
 
 struct handle_traits {
     typedef HANDLE pointer;

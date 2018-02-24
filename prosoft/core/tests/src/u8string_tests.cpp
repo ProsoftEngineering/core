@@ -1,4 +1,4 @@
-// Copyright © 2014-2015, Prosoft Engineering, Inc. (A.K.A "Prosoft")
+// Copyright © 2014-2018, Prosoft Engineering, Inc. (A.K.A "Prosoft")
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without
@@ -23,8 +23,11 @@
 // (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#include <stdexcept>
+#include <prosoft/core/config/config_platform.h>
+
 #include <cstring>
+#include <set>
+#include <stdexcept>
 
 #include <byteorder.h>
 #include <u8string/u8string.hpp>
@@ -38,6 +41,8 @@ const char* u8test = "\xE2\x84\xAB\xE1\xBA\xA1\xC4\x81\xE2\x80\xA6"; // 4 u16 co
 const u16string::value_type u16test[] = {0x212b, 0x1ea1, 0x0101, 0x2026, 0}; // ditto, but a u16 literal
 const u16string::value_type u32test[] = {0xD840, 0xDC0B, 0}; // 1 u32 codepoint (0x0002000B), u16 literal
 
+// See https://github.com/philsquared/Catch/issues/565 for why this is needed.
+CATCH_INTERNAL_SUPPRESS_PARENTHESES_WARNINGS
 template <typename T>
 void test_ascii_compare() {
     CHECK(T("a") < T("b"));
@@ -65,6 +70,7 @@ void test_ascii_compare() {
     CHECK(T("hello") == T("hello"));
     CHECK(T("hello") != T("world"));
 }
+CATCH_INTERNAL_UNSUPPRESS_PARENTHESES_WARNINGS
 } // anon
 
 TEST_CASE("u8string") {
@@ -152,7 +158,7 @@ TEST_CASE("u8string") {
 
         // bad utf8
         ss = "\x0C5"; // ISO 8859-1 capital Angstrom
-        CHECK_THROWS_AS(u8string sbad(ss), u8string::invalid_utf8);
+        CHECK_THROWS_AS(u8string(ss), u8string::invalid_utf8);
 
         uint8_t data[] = {'a', 'b', 'c', 0, 0, 'd', 'e', 'f'};
         u8string n1(data, sizeof(data));
@@ -175,6 +181,75 @@ TEST_CASE("u8string") {
         CHECK(s.length() == 1);
         CHECK_FALSE(s.is_ascii());
 #endif
+    }
+    
+    WHEN("construction from a temporary std::string") {
+        std::string s{"abcd"};
+        u8string u8(std::move(s));
+        CHECK(u8.is_ascii());
+        CHECK(u8 == "abcd");
+        CHECK(s.empty());
+    }
+    
+    WHEN("constructing from char* iterators") {
+        auto first = "abcd";
+        auto last = first + strlen(first);
+        u8string u8{first, last};
+        CHECK(u8 == first);
+        CHECK(u8.is_ascii());
+        
+        first = "\xC3\xA1\xC3\xA1";
+        last = first + strlen(first);
+        u8 = u8string{first, last};
+        CHECK(u8 == first);
+        CHECK_FALSE(u8.is_ascii());
+    }
+    
+    WHEN("constructing from std::string iterators") {
+        std::string s{"abcd"};
+        u8string u8{s.begin(), s.end()};
+        CHECK(u8 == s);
+        CHECK(u8.is_ascii());
+        
+        u8 = u8string{s.cbegin(), s.cend()};
+        CHECK(u8 == s);
+        CHECK(u8.is_ascii());
+        
+        u8 = u8string{s.rbegin(), s.rend()};
+        CHECK(u8 == "dcba");
+        CHECK(u8.is_ascii());
+        
+        u8 = u8string{s.crbegin(), s.crend()};
+        CHECK(u8 == "dcba");
+        CHECK(u8.is_ascii());
+        
+        // UTF
+        
+        s = std::string{"\xC3\xA1\xC3\xA1"};
+        u8 = u8string{s.begin(), s.end()};
+        CHECK(u8 == s);
+        CHECK_FALSE(u8.is_ascii());
+        
+        u8 = u8string{s.cbegin(), s.cend()};
+        CHECK(u8 == s);
+        CHECK_FALSE(u8.is_ascii());
+        
+        CHECK_THROWS_AS(u8string(s.rbegin(), s.rend()), u8string::invalid_utf8); // reverse is invalid UTF8
+        
+        CHECK_THROWS_AS(u8string(s.crbegin(), s.crend()), u8string::invalid_utf8);
+    }
+    
+    WHEN("constructing from wide string iterators") {
+        const u8string source{"\xC3\xA1\xC3\xA1"};
+        
+        const u16string u16{unicode::u16(source)};
+        u8string u8{u16.begin(), u16.end()};
+        CHECK(u8 == source);
+        
+        u8.clear();
+        const u32string u32{unicode::u32(source)};
+        u8 = u8string{u32.begin(), u32.end()};
+        CHECK(u8 == source);
     }
 
     SECTION("assignment") {
@@ -240,17 +315,17 @@ TEST_CASE("u8string") {
         CHECK(0 == path.compare(1, path.length() - 1, prefix, 3, u8string::npos));
 
         s = u8string("ICASE COMPARE");
-        CHECK(0 == s.compare(u8string("icase compare"), true));
+        CHECK(0 == s.compare(u8string("icase compare"), u8string::case_insensitive_compare));
 
         s = u8string("\xE1\xBA\xA0");
-        CHECK(0 == s.compare(u8string("\xE1\xBA\xA1"), true));
+        CHECK(0 == s.compare(u8string("\xE1\xBA\xA1"), u8string::case_insensitive_compare));
 
         // Capital Sharp S added in 5.1, should be the uppercase form of the small "sharp s". (Prior to 2010 it was common, though not standard, to use "SS".)
         s = u8string("\xE1\xBA\x9E");
-        CHECK(0 == s.compare(u8string("\xC3\x9F"), true));
+        CHECK(0 == s.compare(u8string("\xC3\x9F"), true)); // check legacy bool API
 
         s = u8string("aaa");
-        CHECK(-1 == s.compare(u8string("aaaa"), false));
+        CHECK(-1 == s.compare(u8string("aaaa"), false)); // check legacy bool API
         CHECK(-1 == s.compare(u8string("AAAA"), true));
 
         CHECK(s == "aaa");
@@ -306,6 +381,8 @@ TEST_CASE("u8string") {
         // test with std::string to ensure same behavior
         test_ascii_compare<std::string>();
         test_ascii_compare<u8string>();
+
+        CHECK(-1 == u8string::compare(0xffffffffU, 0xffffffffU)); // invalid codepoint compare
     }
 
     SECTION("iteration") {
@@ -600,6 +677,12 @@ TEST_CASE("u8string") {
         i = s.insert(i, s2.cbegin(), s2.cend());
         CHECK(s.length() == len + s2.length());
         CHECK((char32_t)'z' == *i);
+
+        len = s.length();
+        s.insert(len, u8string{"d"});
+        CHECK(s.length() == len+1);
+
+        CHECK_THROWS(s.insert(s.length()+1, u8string{"d"}));
 
         s = as_utf8("Amel");
         CHECK(s.is_ascii());

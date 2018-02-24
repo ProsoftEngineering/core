@@ -1,4 +1,4 @@
-// Copyright © 2014-2015, Prosoft Engineering, Inc. (A.K.A "Prosoft")
+// Copyright © 2014-2017, Prosoft Engineering, Inc. (A.K.A "Prosoft")
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without
@@ -25,6 +25,8 @@
 
 #ifndef PS_CORE_REGEX_HPP
 #define PS_CORE_REGEX_HPP
+
+#include <prosoft/core/config/config_platform.h>
 
 #include <exception>
 #include <functional>

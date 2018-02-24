@@ -29,7 +29,7 @@
 
 using namespace prosoft;
 
-SCENARIO("Apple string conversion") {
+TEST_CASE("apple_string_convert") {
 
     WHEN("converting from null") {
         const auto us = from_CFString<u8string>{}(nullptr);
@@ -72,5 +72,17 @@ SCENARIO("Apple string conversion") {
         THEN("the string contains the expected value") {
             CHECK(s == "Libert\x8E");
         }
+    }
+    
+    WHEN("converting to CFString/NSString") {
+        auto cfs = to_CFString<u8string>{}(u8string{"test"}); // check temp string
+        CHECK(cfs);
+        
+        const u8string us{"test"};
+        cfs = to_CFString<u8string>{}(us, to_CFString<u8string>::nocopy);
+        CHECK(cfs);
+        
+        id nss = to_NSString<u8string>{}(us); // Catch fails to link if type is NSString* __strong (ARC)
+        CHECK(nil != nss);
     }
 }

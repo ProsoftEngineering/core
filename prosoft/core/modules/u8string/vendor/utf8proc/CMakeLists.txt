@@ -6,9 +6,11 @@ disallow_intree_builds()
 
 project (utf8proc C)
 
-# Be sure to also update these in Makefile!
-set(SO_MAJOR 1)
-set(SO_MINOR 3)
+# This is the ABI version number, which may differ from the
+# API version number (defined in utf8proc.h).
+# Be sure to also update these in Makefile and MANIFEST!
+set(SO_MAJOR 2)
+set(SO_MINOR 1)
 set(SO_PATCH 0)
 
 add_definitions (

@@ -1,4 +1,4 @@
-// Copyright © 2013-2015, Prosoft Engineering, Inc. (A.K.A "Prosoft")
+// Copyright © 2013-2017, Prosoft Engineering, Inc. (A.K.A "Prosoft")
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without
@@ -81,18 +81,31 @@ public:
         _u8 = std::move(other._u8);
     }
 
-    PS_EXPORT u8string(const_iterator&, const_iterator&); // substring extraction only
-    PS_EXPORT u8string(iterator&, iterator&);
+    u8string(const_iterator&, const_iterator&);
+    u8string(iterator&, iterator&);
+    
+    // These are dangerous. We don't currently support grapheme clusters so reversing a u32 codepoint sequence could result in invalid UTF.
+    // There are ways to do it, if you really want.
+    u8string(const_reverse_iterator&, const_reverse_iterator&) = delete;
+    u8string(reverse_iterator&, reverse_iterator&) = delete;
 
     // XXX: conversions from other types are explicit as they may throw exceptions
     // XXX: DO NOT RELY on the resulting u8string raw bytes (str(), c_str()) comparing to the raw input bytes!
-    //      (Which are likely be transformed during normalization.)
+    //      (Which are likely to be transformed during normalization.)
     //      Only use the provided comparison methods to compare bytes in any form.
     //      Codepoint -- not char -- count (length) may also be different as well as byte count.
     explicit u8string(const std::string& other) {
         _init(other);
     }
+    explicit u8string(std::string&& other) {
+        _init(std::move(other));
+    }
     PS_EXPORT explicit u8string(const char*, size_type nbytes = 0);
+    
+    template <class Iterator>
+    explicit u8string(Iterator first, Iterator last) {
+        _init(first, last);
+    }
 
     // not explicit to allow for automatic conversion during assignment
     u8string(const uint8_t* other, size_type nbytes = 0)
@@ -174,12 +187,31 @@ public:
     PS_EXPORT u8string& replace(size_type pos, size_type len, const u8string& str);
 
     // ==
+    
+    enum compare_flags {
+        default_compare = 0x0,
+        case_insensitive_compare = 0x1
+    };
 
-    PS_EXPORT int compare(const u8string&, bool icase = false) const;
-    PS_EXPORT int compare(size_type pos, size_type count, const u8string&, bool icase = false) const;
-    PS_EXPORT int compare(size_type pos, size_type count, const u8string& other, size_type pos2, size_type count2, bool icase = false) const;
+    PS_EXPORT int compare(const u8string&, compare_flags flags = default_compare) const;
+    PS_EXPORT int compare(size_type pos, size_type count, const u8string&, compare_flags flags = default_compare) const;
+    PS_EXPORT int compare(size_type pos, size_type count, const u8string& other, size_type pos2, size_type count2, compare_flags flags = default_compare) const;
 
-    PS_EXPORT static int compare(unicode_type, unicode_type, bool icase = false); // normalized codepoint compare
+    PS_EXPORT static int compare(unicode_type, unicode_type, compare_flags flags = default_compare); // normalized codepoint compare
+    
+    // Legacy, prefer the flag variants
+    int compare(const u8string& us, bool icase) const {
+        return compare(us, !icase ? default_compare : case_insensitive_compare);
+    }
+    int compare(size_type pos, size_type count, const u8string& other, bool icase) const {
+        return compare(pos, count, other, !icase ? default_compare : case_insensitive_compare);
+    }
+    int compare(size_type pos, size_type count, const u8string& other, size_type pos2, size_type count2, bool icase) const {
+        return compare(pos, count, other, pos2, count2, !icase ? default_compare : case_insensitive_compare);
+    }
+    static inline int compare(unicode_type u1, unicode_type u2, bool icase) {
+        return compare(u1, u2, !icase ? default_compare : case_insensitive_compare);
+    }
 
     // ==
 
@@ -281,7 +313,6 @@ public:
     PS_EXPORT u8string substr(size_type pos = 0, size_type length = npos) const;
 
     PS_EXPORT bool is_ascii() const;
-    PS_EXPORT bool is_valid() const;
     PS_EXPORT bool has_bom() const;
 
     // ==
@@ -366,13 +397,30 @@ private:
     bool ascii() const {
         return _u8._ascii;
     }
-
+    
     PS_EXPORT void _init(const std::string&);
+    PS_EXPORT void _init(std::string&&);
+    PS_EXPORT void _init(const char*, const char*);
+    PS_EXPORT void _init(container_type::iterator, container_type::iterator);
+    PS_EXPORT void _init(container_type::const_iterator, container_type::const_iterator);
+    // Reverse iterators are dangerous for unicode, but not ASCII. We'll leave these for now.
+    PS_EXPORT void _init(container_type::reverse_iterator, container_type::reverse_iterator);
+    PS_EXPORT void _init(container_type::const_reverse_iterator, container_type::const_reverse_iterator);
+    
+    
+    //  Again reverse iterators are dangerous, see u8string(reverse_iterator,reverse_iterator).
+    inline void _init(u16string::const_iterator i1, u16string::const_iterator i2) {
+        *this = u16string{i1, i2};
+    }
+    
+    inline void _init(u32string::const_iterator i1, u32string::const_iterator i2) {
+        *this = u8string{u32string{i1, i2}};
+    }
 
     void _invalidate_cache() {
         _u8.invalidate();
     }
-
+    
     PS_EXPORT u8string(std::string&&, size_type count, bool ascii);
 
     iterator make_iterator(container_type::iterator i) {
@@ -382,6 +430,15 @@ private:
         return const_iterator(i, _u8._s.begin(), _u8._s.end());
     }
 };
+
+inline u8string::u8string(const_iterator& start, const_iterator& fin)
+    // XXX: The iters are external; thus we cannot assume that movement() is correct for either. Therefore we don't cache the length here.
+    : u8string(std::string(start.base(), fin.base()), npos, false) {
+}
+
+inline u8string::u8string(iterator& start, iterator& fin) // Unlike std::, utf8 does not provide conversion from non-const to const iters.
+    : u8string(std::string(start.base(), fin.base()), npos, false) {
+}
 
 inline void swap(u8string& lhs, u8string& rhs) {
     lhs.swap(rhs);
@@ -482,12 +539,15 @@ PS_EXPORT u8string::unicode_type toupper(u8string::unicode_type);
 // Uniform access specializations
 
 template<>
-struct access_traits<u8string> : access_traits_base {
+struct access_traits<u8string> {
+    using const_byte_pointer = const char*;
+    using const_value_pointer = const_byte_pointer; // there's no direct access to the u32 codepoints
+
     size_t data_size(const u8string& s) const {
         return s.data_size();
     }
     
-    u8string::const_data_pointer data(const u8string& s) const {
+    const_value_pointer data(const u8string& s) const {
         return s.data();
     }
 
@@ -552,7 +612,7 @@ struct equal_to<prosoft::u8string> {
     typedef prosoft::u8string second_argument_type;
     typedef bool result_type;
     result_type operator()(const first_argument_type& s1, const second_argument_type& s2) const {
-        return (s1 == s2);
+        return s1 == s2;
     }
 };
 }

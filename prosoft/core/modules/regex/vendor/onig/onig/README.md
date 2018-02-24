@@ -3,6 +3,12 @@ Oniguruma
 
 https://github.com/kkos/oniguruma
 
+FIXED Security Issues:
+--------------------------
+  **CVE-2017-9224, CVE-2017-9225, CVE-2017-9226**
+  **CVE-2017-9227, CVE-2017-9228, CVE-2017-9229**
+
+
 Oniguruma is a regular expressions library.
 The characteristics of this library is that different character encoding
 for every regular expression object can be specified.
@@ -20,6 +26,76 @@ Supported character encodings:
 * CP1251:  contributed by Byte
 
 
+New feature of version 6.7.0
+--------------------------
+
+* NEW: hexadecimal codepoint \uHHHH
+* NEW: add ONIG_SYNTAX_ONIGURUMA (== ONIG_SYNTAX_DEFAULT)
+* Disabled \N and \O on ONIG_SYNTAX_RUBY
+* Reduced object size
+
+
+New feature of version 6.6.1
+--------------------------
+
+* Fix definition of \X
+
+
+New feature of version 6.6.0
+--------------------------
+
+* NEW: ASCII only mode options for character type/property (?WDSP)
+* NEW: Extended Grapheme Cluster boundary \y, \Y (*original)
+* NEW: Extended Grapheme Cluster \X
+* Range-clear (Absent-clear) operator restores previous range in backtrack.
+
+
+New feature of version 6.5.0
+--------------------------
+
+* NEW: \K (keep)
+* NEW: \R (general newline) \N (no newline)
+* NEW: \O (true anychar)
+* NEW: if-then-else syntax   (?(...)...\|...)
+* NEW: Backreference validity checker (?(xxx)) (*original)
+* NEW: Absent repeater (?~absent)
+* NEW: Absent expression   (?~|absent|expr)  (*original)
+* NEW: Absent stopper (?~|absent)     (*original)
+
+
+New feature of version 6.4.0
+--------------------------
+
+* Fix fatal problem of endless repeat on Windows
+* NEW: call zero (call the total regexp) \g<0>
+* NEW: relative backref/call by positive number \k<+n>, \g<+n>
+
+
+New feature of version 6.3.0
+--------------------------
+
+* NEW: octal codepoint \o{.....}
+
+
+New feature of version 6.1.2
+--------------------------
+
+* allow word bound, word begin and word end in look-behind.
+* NEW option: ONIG_OPTION_CHECK_VALIDITY_OF_STRING
+
+New feature of version 6.1
+--------------------------
+
+* improved doc/RE
+* NEW API: onig_scan()
+
+New feature of version 6.0
+--------------------------
+
+* Update Unicode 8.0 Property/Case-folding
+* NEW API: onig_unicode_define_user_property()
+
+
 License
 -------
 
@@ -31,17 +107,15 @@ Install
 
 ### Case 1: Unix and Cygwin platform
 
-   1. ./configure
-   2. make
-   3. make install
+   1. autoreconf -vfi   (* case: configure script is not found.)
+
+   2. ./configure
+   3. make
+   4. make install
 
    * uninstall
 
      make uninstall
-
-   * test (ASCII/EUC-JP)
-
-     make atest
 
    * configuration check
 
@@ -52,19 +126,20 @@ Install
 
 
 
-### Case 2: Win32 platform (VC++)
+### Case 2: Windows 64/32bit platform (Visual Studio)
 
-   1. copy win32\Makefile Makefile
-   2. copy win32\config.h config.h
-   3. nmake
+   execute make_win64 or make_win32
 
       onig_s.lib:  static link library
       onig.dll:    dynamic link library
 
    * test (ASCII/Shift_JIS)
 
-   4. copy win32\testc.c testc.c
-   5. nmake ctest
+      1. cd src
+      2. copy ..\windows\testc.c .
+      3. nmake -f Makefile.windows ctest
+
+   (I have checked by Visual Studio Community 2015)
 
 
 
@@ -101,14 +176,16 @@ Usage
 Sample Programs
 ---------------
 
-|File               |Description                              |
-|:------------------|:----------------------------------------|
-|sample/simple.c    |example of the minimum (Oniguruma API)   |
-|sample/names.c     |example of the named group callback.     |
-|sample/encode.c    |example of some encodings.               |
-|sample/listcap.c   |example of the capture history.          |
-|sample/posix.c     |POSIX API sample.                        |
-|sample/sql.c       |example of the variable meta characters. |
+|File                  |Description                               |
+|:---------------------|:-----------------------------------------|
+|sample/simple.c       |example of the minimum (Oniguruma API)    |
+|sample/names.c        |example of the named group callback.      |
+|sample/encode.c       |example of some encodings.                |
+|sample/listcap.c      |example of the capture history.           |
+|sample/posix.c        |POSIX API sample.                         |
+|sample/scan.c         |example of using onig_scan().             |
+|sample/sql.c          |example of the variable meta characters.  |
+|sample/user_property.c|example of user defined Unicode property. |
 
 
 Test Programs
@@ -146,37 +223,38 @@ Source Files
 |onigposix.h        |POSIX API header file (public)                          |
 |regposerr.c        |POSIX error message function                            |
 |regposix.c         |POSIX API functions                                     |
-|enc/mktable.c      |character type table generator                          |
-|enc/ascii.c        |ASCII encoding                                          |
-|enc/euc_jp.c       |EUC-JP encoding                                         |
-|enc/euc_tw.c       |EUC-TW encoding                                         |
-|enc/euc_kr.c       |EUC-KR, EUC-CN encoding                                 |
-|enc/sjis.c         |Shift_JIS encoding                                      |
-|enc/big5.c         |Big5      encoding                                      |
-|enc/gb18030.c      |GB18030   encoding                                      |
-|enc/koi8.c         |KOI8      encoding                                      |
-|enc/koi8_r.c       |KOI8-R    encoding                                      |
-|enc/cp1251.c       |CP1251    encoding                                      |
-|enc/iso8859_1.c    |ISO-8859-1 (Latin-1)                                    |
-|enc/iso8859_2.c    |ISO-8859-2 (Latin-2)                                    |
-|enc/iso8859_3.c    |ISO-8859-3 (Latin-3)                                    |
-|enc/iso8859_4.c    |ISO-8859-4 (Latin-4)                                    |
-|enc/iso8859_5.c    |ISO-8859-5 (Cyrillic)                                   |
-|enc/iso8859_6.c    |ISO-8859-6 (Arabic)                                     |
-|enc/iso8859_7.c    |ISO-8859-7 (Greek)                                      |
-|enc/iso8859_8.c    |ISO-8859-8 (Hebrew)                                     |
-|enc/iso8859_9.c    |ISO-8859-9 (Latin-5 or Turkish)                         |
-|enc/iso8859_10.c   |ISO-8859-10 (Latin-6 or Nordic)                         |
-|enc/iso8859_11.c   |ISO-8859-11 (Thai)                                      |
-|enc/iso8859_13.c   |ISO-8859-13 (Latin-7 or Baltic Rim)                     |
-|enc/iso8859_14.c   |ISO-8859-14 (Latin-8 or Celtic)                         |
-|enc/iso8859_15.c   |ISO-8859-15 (Latin-9 or West European with Euro)        |
-|enc/iso8859_16.c   |ISO-8859-16 (Latin-10)                                  |
-|enc/utf8.c         |UTF-8    encoding                                       |
-|enc/utf16_be.c     |UTF-16BE encoding                                       |
-|enc/utf16_le.c     |UTF-16LE encoding                                       |
-|enc/utf32_be.c     |UTF-32BE encoding                                       |
-|enc/utf32_le.c     |UTF-32LE encoding                                       |
-|enc/unicode.c      |Unicode information data                                |
+|mktable.c          |character type table generator                          |
+|ascii.c            |ASCII encoding                                          |
+|euc_jp.c           |EUC-JP encoding                                         |
+|euc_tw.c           |EUC-TW encoding                                         |
+|euc_kr.c           |EUC-KR, EUC-CN encoding                                 |
+|sjis.c             |Shift_JIS encoding                                      |
+|big5.c             |Big5      encoding                                      |
+|gb18030.c          |GB18030   encoding                                      |
+|koi8.c             |KOI8      encoding                                      |
+|koi8_r.c           |KOI8-R    encoding                                      |
+|cp1251.c           |CP1251    encoding                                      |
+|iso8859_1.c        |ISO-8859-1 (Latin-1)                                    |
+|iso8859_2.c        |ISO-8859-2 (Latin-2)                                    |
+|iso8859_3.c        |ISO-8859-3 (Latin-3)                                    |
+|iso8859_4.c        |ISO-8859-4 (Latin-4)                                    |
+|iso8859_5.c        |ISO-8859-5 (Cyrillic)                                   |
+|iso8859_6.c        |ISO-8859-6 (Arabic)                                     |
+|iso8859_7.c        |ISO-8859-7 (Greek)                                      |
+|iso8859_8.c        |ISO-8859-8 (Hebrew)                                     |
+|iso8859_9.c        |ISO-8859-9 (Latin-5 or Turkish)                         |
+|iso8859_10.c       |ISO-8859-10 (Latin-6 or Nordic)                         |
+|iso8859_11.c       |ISO-8859-11 (Thai)                                      |
+|iso8859_13.c       |ISO-8859-13 (Latin-7 or Baltic Rim)                     |
+|iso8859_14.c       |ISO-8859-14 (Latin-8 or Celtic)                         |
+|iso8859_15.c       |ISO-8859-15 (Latin-9 or West European with Euro)        |
+|iso8859_16.c       |ISO-8859-16 (Latin-10)                                  |
+|utf8.c             |UTF-8    encoding                                       |
+|utf16_be.c         |UTF-16BE encoding                                       |
+|utf16_le.c         |UTF-16LE encoding                                       |
+|utf32_be.c         |UTF-32BE encoding                                       |
+|utf32_le.c         |UTF-32LE encoding                                       |
+|unicode.c          |common codes of Unicode encoding                        |
+|unicode_fold_data.c|Unicode folding data                                    |
 |win32/Makefile     |Makefile for Win32 (VC++)                               |
 |win32/config.h     |config.h for Win32                                      |

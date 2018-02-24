@@ -1,4 +1,4 @@
-// Copyright © 2014-2015, Prosoft Engineering, Inc. (A.K.A "Prosoft")
+// Copyright © 2014-2018, Prosoft Engineering, Inc. (A.K.A "Prosoft")
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without
@@ -54,17 +54,17 @@ struct semaphore_value {
     PS_DISABLE_DEFAULT_CONSTRUCTOR(semaphore_value);
     PS_DISABLE_COPY(semaphore_value);
 
-    value_type operator--() {
+    value_type operator--() noexcept {
         return --val;
     }
 
-    value_type operator++(int) {
+    value_type operator++(int) noexcept {
         value_type v{val};
         ++val;
         return v;
     }
 
-    operator value_type() {
+    operator value_type() const noexcept {
         return val;
     }
 
@@ -87,15 +87,15 @@ struct event_semaphore_value {
     PS_DISABLE_DEFAULT_CONSTRUCTOR(event_semaphore_value);
     PS_DISABLE_COPY(event_semaphore_value);
 
-    value_type operator--() {
+    value_type operator--() noexcept {
         return operator value_type();
     }
 
-    value_type operator++(int) {
+    value_type operator++(int) noexcept {
         return --val;
     }
 
-    operator value_type() {
+    operator value_type() const noexcept {
         value_type v = val;
         // In the latter case the events have already completed before the wait.
         return v >= signal_value ? -v : signal_value;
@@ -117,29 +117,29 @@ struct binary_semaphore_value {
     static PS_CONSTEXPR const value_type signal_value = 1;
     static PS_CONSTEXPR const value_type default_value = 0; // default to wait state
 
-    explicit binary_semaphore_value(value_type v)
+    explicit binary_semaphore_value(value_type v) noexcept
         : val(!!v) {} // just convert all values to 1/0
     
     PS_DISABLE_DEFAULT_CONSTRUCTOR(binary_semaphore_value);
     PS_DISABLE_COPY(binary_semaphore_value);
 
-    value_type operator--() { // XXX: unlike other semaphores we only wait if the previous (not new) value was < signal_value.
+    value_type operator--() noexcept { // XXX: unlike other semaphores we only wait if the previous (not new) value was < signal_value.
         using std::swap;
         value_type v{0};
         swap(val, v);
         return v;
     }
-    value_type operator++(int) {
+    value_type operator++(int) noexcept {
         using std::swap;
         value_type v{1};
         swap(val, v);
         return v;
     }
-    operator value_type() {
+    operator value_type() const noexcept {
         return val;
     }
 
-    void reset() {
+    void reset() noexcept {
         val = 0;
     }
 
@@ -174,16 +174,21 @@ public:
         }
     }
 
-    template <typename = typename std::enable_if<std::is_same<Value, isemaphore::binary_semaphore_value>::value>>
-    void reset() {
+    template <typename Reset = void>
+    void reset(typename std::enable_if<std::is_same<Value, isemaphore::binary_semaphore_value>::value, Reset>::type* = 0) {
         std::lock_guard<std::mutex> l(m_lck);
         m_val.reset();
     }
 
-    template <typename = typename std::enable_if<std::is_same<Value, isemaphore::event_semaphore_value>::value>>
-    void reset(integral_type count) {
+    template <typename Reset = void>
+    void reset(integral_type count, typename std::enable_if<std::is_same<Value, isemaphore::event_semaphore_value>::value, Reset>::type* = 0) {
         std::lock_guard<std::mutex> l(m_lck);
         m_val.reset(count);
+    }
+    
+    typename value_type::value_type count() { // for testing
+        std::lock_guard<std::mutex> l(m_lck);
+        return m_val.operator typename value_type::value_type();
     }
 
 private:

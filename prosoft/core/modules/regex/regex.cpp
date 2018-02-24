@@ -30,15 +30,10 @@
 namespace prosoft {
 
 namespace {
+
 void throw_onig_error(int oerr);
-}
 
-regex_error::regex_error(regex_constants::error_type err, int onigErr)
-    : std::runtime_error("regex error")
-    , _code(err)
-    , _onigErr(onigErr) {}
-
-void prosoft::iregex::compile(Regex* rx, const uchar* first, const uchar* last, regex_constants::syntax_option_type flags, encoding enc) {
+OnigOptionType options(prosoft::regex_constants::syntax_option_type flags) {
     using namespace prosoft::regex_constants;
 
     OnigOptionType opt = ONIG_OPTION_NONE;
@@ -58,10 +53,16 @@ void prosoft::iregex::compile(Regex* rx, const uchar* first, const uchar* last, 
     }
 
     // ONIG_OPTION_MULTILINE -- Allow . to match any character, including line separators.
+    return opt;
+}
 
+using OnigSyntaxPtr = OnigSyntaxType*;
+
+OnigOptionType options(prosoft::regex_constants::syntax_option_type flags, OnigSyntaxPtr& syntax) {
     static PS_CONSTEXPR auto syntax_mask = regex_constants::syntax_option_type::basic | regex_constants::syntax_option_type::extended | regex_constants::syntax_option_type::grep | regex_constants::syntax_option_type::egrep;
 
-    OnigSyntaxType* syntax = ONIG_SYNTAX_RUBY;
+    auto opt = options(flags);
+    syntax = ONIG_SYNTAX_RUBY;
     if (PS_UNEXPECTED(0 != (flags & syntax_mask))) {
         if (0 != (flags & regex_constants::syntax_option_type::basic)) {
             syntax = ONIG_SYNTAX_POSIX_BASIC;
@@ -76,6 +77,12 @@ void prosoft::iregex::compile(Regex* rx, const uchar* first, const uchar* last, 
             PSASSERT_UNREACHABLE("bad syntax");
         }
     }
+
+    return opt;
+}
+
+OnigEncoding onig_encoding(prosoft::iregex::encoding enc) {
+    using namespace prosoft::iregex;
 
     OnigEncoding oenc;
     switch (enc) {
@@ -96,9 +103,23 @@ void prosoft::iregex::compile(Regex* rx, const uchar* first, const uchar* last, 
             break;
     }
     PS_THROW_IF(nullptr == oenc, std::invalid_argument{"regex encoding is not supported"});
+    return oenc;
+}
 
+} // anon
+
+regex_error::regex_error(regex_constants::error_type err, int onigErr)
+    : std::runtime_error("regex error")
+    , _code(err)
+    , _onigErr(onigErr) {}
+
+void prosoft::iregex::compile(Regex* rx, const uchar* first, const uchar* last, regex_constants::syntax_option_type flags, encoding enc) {
+    using namespace prosoft::regex_constants;
+
+    OnigSyntaxPtr syntax;
+    const auto opt = options(flags, syntax);
     int err;
-    if (ONIG_NORMAL != (err = ::onig_new(rx, first, last, opt, oenc, syntax, nullptr))) {
+    if (ONIG_NORMAL != (err = ::onig_new(rx, first, last, opt, onig_encoding(enc), syntax, nullptr))) {
         throw_onig_error(err);
     }
 }
@@ -242,3 +263,73 @@ bool prosoft::iregex::rsearch(OnigRegex rx, const uchar* haystack, size_t length
 }
 
 } // prosoft
+
+#if PSTEST_HARNESS
+// Internal tests.
+#include "catch.hpp"
+
+TEST_CASE("regex internal") {
+    using namespace prosoft;
+    using namespace prosoft::regex_constants;
+
+    SECTION("compile options") {
+        const auto expected = ONIG_OPTION_IGNORECASE|ONIG_OPTION_DONT_CAPTURE_GROUP|ONIG_OPTION_SINGLELINE;
+        CHECK(options(syntax_option_type::icase|syntax_option_type::nosubs|syntax_option_type::noendl) == expected);
+        CHECK(ONIG_OPTION_NONE == options(syntax_option_type::basic));
+
+        OnigSyntaxPtr syntax = nullptr;
+        options(syntax_option_type::basic, syntax);
+        CHECK(ONIG_SYNTAX_POSIX_BASIC == syntax);
+
+        syntax = nullptr;
+        options(syntax_option_type::extended, syntax);
+        CHECK(ONIG_SYNTAX_POSIX_EXTENDED == syntax);
+
+        syntax = nullptr;
+        options(syntax_option_type::grep, syntax);
+        CHECK(ONIG_SYNTAX_GREP == syntax);
+
+        syntax = nullptr;
+        const auto opt = options(syntax_option_type::egrep, syntax);
+        CHECK(ONIG_SYNTAX_GREP == syntax);
+        CHECK(0 != (opt & ONIG_OPTION_EXTEND));
+
+        syntax = nullptr;
+        options(syntax_option_type::icase, syntax);
+        CHECK(ONIG_SYNTAX_RUBY == syntax); // default syntax
+    }
+
+    SECTION("encodings") {
+        using namespace prosoft::iregex;
+        CHECK(ONIG_ENCODING_UTF8 == onig_encoding(encoding::utf8));
+        CHECK(ONIG_ENCODING_UTF16_LE == onig_encoding(encoding::utf16le));
+        CHECK(ONIG_ENCODING_UTF16_BE == onig_encoding(encoding::utf16be));
+
+        CHECK_THROWS(onig_encoding(encoding::utf16)); // utf16 is a platform specific meta-value handled at higher levels.
+    }
+
+    SECTION("ONIG errors") {
+        try { throw_onig_error(ONIGERR_TOO_BIG_BACKREF_NUMBER); } catch(const regex_error& e) { CHECK(e.code() == error_type::error_backref); }
+        try { throw_onig_error(ONIGERR_INVALID_BACKREF); } catch(const regex_error& e) { CHECK(e.code() == error_type::error_backref); }
+        try { throw_onig_error(ONIGERR_NUMBERED_BACKREF_OR_CALL_NOT_ALLOWED); } catch(const regex_error& e) { CHECK(e.code() == error_type::error_backref); }
+
+        try { throw_onig_error(ONIGERR_END_PATTERN_AT_LEFT_BRACE); } catch(const regex_error& e) { CHECK(e.code() == error_type::error_brace); }
+
+        try { throw_onig_error(ONIGERR_CHAR_CLASS_VALUE_AT_END_OF_RANGE); } catch(const regex_error& e) { CHECK(e.code() == error_type::error_range); }
+        try { throw_onig_error(ONIGERR_CHAR_CLASS_VALUE_AT_START_OF_RANGE); } catch(const regex_error& e) { CHECK(e.code() == error_type::error_range); }
+
+        try { throw_onig_error(ONIGERR_MEMORY); } catch(const regex_error& e) { CHECK(e.code() == error_type::error_space); }
+        
+        try { throw_onig_error(ONIGERR_TARGET_OF_REPEAT_OPERATOR_NOT_SPECIFIED); } catch(const regex_error& e) { CHECK(e.code() == error_type::error_badrepeat); }
+        try { throw_onig_error(ONIGERR_TARGET_OF_REPEAT_OPERATOR_INVALID); } catch(const regex_error& e) { CHECK(e.code() == error_type::error_badrepeat); }
+        try { throw_onig_error(ONIGERR_NESTED_REPEAT_OPERATOR); } catch(const regex_error& e) { CHECK(e.code() == error_type::error_badrepeat); }
+        try { throw_onig_error(ONIGERR_TOO_BIG_NUMBER_FOR_REPEAT_RANGE); } catch(const regex_error& e) { CHECK(e.code() == error_type::error_badrepeat); }
+        try { throw_onig_error(ONIGERR_UPPER_SMALLER_THAN_LOWER_IN_REPEAT_RANGE); } catch(const regex_error& e) { CHECK(e.code() == error_type::error_badrepeat); }
+        try { throw_onig_error(ONIGERR_INVALID_REPEAT_RANGE_PATTERN); } catch(const regex_error& e) { CHECK(e.code() == error_type::error_badrepeat); }
+        
+        try { throw_onig_error(ONIGERR_MATCH_STACK_LIMIT_OVER); } catch(const regex_error& e) { CHECK(e.code() == error_type::error_stack); };
+
+        try { throw_onig_error(ONIGERR_PARSER_BUG); } catch(const regex_error& e) { CHECK(e.code() == error_type::error_onig); };
+    }
+}
+#endif // PSTEST_HARNESS

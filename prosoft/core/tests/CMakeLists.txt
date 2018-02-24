@@ -1,4 +1,4 @@
-# Copyright © 2015, Prosoft Engineering, Inc. (A.K.A "Prosoft")
+# Copyright © 2015-2018, Prosoft Engineering, Inc. (A.K.A "Prosoft")
 # All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
@@ -42,10 +42,23 @@ include("${CORETESTS}/../config/cmake/config_coverage.cmake")
 set(SRCTESTS
     ${CORETESTS}/src/byteorder_tests.cpp
     ${CORETESTS}/src/case_convert_tests.cpp
+    ${CORETESTS}/src/filesystem_tests.cpp
+    ${CORETESTS}/src/filesystem_acl_tests.cpp
+    ${CORETESTS}/src/filesystem_change_iterator_tests.cpp
+    ${CORETESTS}/src/filesystem_iterator_tests.cpp
+    ${CORETESTS}/src/filesystem_monitor_tests.cpp
+    ${CORETESTS}/src/filesystem_path_tests.cpp
+	${CORETESTS}/src/filesystem_snapshot_tests.cpp
+    ${CORETESTS}/src/path_utils_tests.cpp
     ${CORETESTS}/src/regex_tests.cpp
     ${CORETESTS}/src/semaphore_tests.cpp
+    ${CORETESTS}/src/stable_hash_wrapper_tests.cpp
+	${CORETESTS}/src/stream_utils_tests.cpp
     ${CORETESTS}/src/string_component_tests.cpp
     ${CORETESTS}/src/string_convert_tests.cpp
+    ${CORETESTS}/src/system_error_tests.cpp
+    ${CORETESTS}/src/system_identity_tests.cpp
+    ${CORETESTS}/src/uniform_access_tests.cpp
     ${CORETESTS}/src/unique_resource_tests.cpp
     ${CORETESTS}/src/u8string_tests.cpp
 )
@@ -58,10 +71,17 @@ add_executable(${PROJECT_NAME}
 if(APPLE)
     target_sources(${PROJECT_NAME} PRIVATE
         ${CORETESTS}/src/apple_convert_tests.mm
+        ${CORETESTS}/src/spawn_tests.cpp
     )
     set_source_files_properties(
         ${CORETESTS}/src/apple_convert_tests.mm
         PROPERTIES COMPILE_FLAGS -fobjc-arc
+    )
+endif()
+
+if(WIN32)
+	 target_sources(${PROJECT_NAME} PRIVATE
+        ${CORETESTS}/src/winutils_tests.cpp
     )
 endif()
 
@@ -72,11 +92,14 @@ if (UNIX AND NOT APPLE)
 endif()
 
 ps_core_configure(${PROJECT_NAME})
+
+# This must be done before using modules so that the modules can setup their internal tests (if any)
+enable_testing()
+
+ps_core_use_filesystem(${PROJECT_NAME}) # brings in identity, u8string and winutils
 ps_core_use_regex(${PROJECT_NAME})
-ps_core_use_u8string(${PROJECT_NAME})
 
 # We add all of our tests to coverage as they will produce the coverage for header-only implementations
 ps_core_enable_target_code_coverage(${PROJECT_NAME})
 
-enable_testing()
 ps_add_ctests_from_catch_tests(${PROJECT_NAME})

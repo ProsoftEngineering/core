@@ -1,4 +1,4 @@
-// Copyright © 2015, Prosoft Engineering, Inc. (A.K.A "Prosoft")
+// Copyright © 2015-2017, Prosoft Engineering, Inc. (A.K.A "Prosoft")
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without
@@ -49,13 +49,11 @@ public:
 
     // Default implements the case where the types are the same.
     // Specializations are needed for actual conversion.
-    template <typename = typename std::enable_if<std::is_same<result_type, argument_type>::value>>
-    const argument_type& operator()(const argument_type& us) {
+    const result_type& operator()(const result_type& us) {
         return us;
     }
-
-    template <typename = typename std::enable_if<std::is_same<result_type, argument_type>::value>>
-    argument_type operator()(argument_type&& us) {
+    
+    result_type operator()(result_type&& us) {
         return result_type{std::move(us)};
     }
 };
@@ -76,6 +74,14 @@ struct uppercase {
         return std::toupper(c);
     }
 };
+
+// Placeholder for future use, both args should be constant C strings
+#if !defined(PSLocalizedString)
+#define PSLocalizedString(key, comment) key
+#endif
+
+template <class Result>
+using from_localized_string = to_string<Result, std::string>;
 
 #if PS_HAVE_INLINE_NAMESPACES
 } // conversion

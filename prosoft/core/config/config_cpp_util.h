@@ -69,6 +69,7 @@
 #endif
 
 // clang-format off
+// XXX: Clang will throw a "unused function" if these are declared in an anon namespace.
 #define PS_ENUM_BITMASK_OPS(ET) \
 inline PS_CONSTEXPR ET operator|(ET lhs, ET rhs) { using int_t = std::underlying_type<ET>::type; return ET(int_t(lhs) | int_t(rhs)); } \
 inline PS_CONSTEXPR_IF_CPP14 ET& operator|=(ET& lhs, ET rhs) { lhs = operator|(lhs, rhs); return lhs; }                                \

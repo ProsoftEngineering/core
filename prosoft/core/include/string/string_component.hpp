@@ -27,6 +27,7 @@
 #define PS_CORE_STRING_COMPONENT_HPP
 
 #include <algorithm>
+#include <type_traits>
 #include <vector>
 
 #include <prosoft/core/config/config.h>
@@ -171,14 +172,14 @@ String& trim(String& str) {
 }
 
 template <class String, typename = typename std::enable_if<!std::is_lvalue_reference<String>::value>::type>
-String trim(String&& str) {
+String PS_WARN_UNUSED_RESULT trim(String&& str) {
     String s{std::move(str)};
     trim(s);
     return s;
 }
 
 template <class String>
-String trim(const String& str) {
+String PS_WARN_UNUSED_RESULT trim(const String& str) {
     String s{str};
     trim(s);
     return s;
@@ -193,6 +194,37 @@ typename String::size_type replace_all(String& str, const String& findStr, const
         ++count;
     }
     return count;
+}
+
+enum class for_each_options {
+    none,
+    want_empty_lines = 0x1,
+};
+PS_ENUM_BITMASK_OPS(for_each_options);
+
+template <class Iterator>
+using for_each_newline = typename std::iterator_traits<Iterator>::value_type;
+
+template <class Iterator, class Function>
+void for_each_line(Iterator first, Iterator last, Function callback, for_each_options opts = for_each_options::none, for_each_newline<Iterator> nl = '\n') {
+    auto i = first;
+    while (i != last) {
+        auto eol = std::find(i, last, nl);
+        if (eol > i) {
+            callback(i, eol);
+            i = eol;
+        } else if (is_set(opts & for_each_options::want_empty_lines)) {
+            callback(i, i);
+        }
+        if (eol != last) {
+            ++i;
+        }
+    }
+}
+
+template <class String, class Function>
+inline void for_each_line(String&& s, Function callback, for_each_options opts = for_each_options::none, for_each_newline<decltype(s.begin())> nl = '\n') {
+    for_each_line(s.begin(), s.end(), callback, opts, nl);
 }
 
 #if PS_HAVE_INLINE_NAMESPACES

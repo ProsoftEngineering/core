@@ -35,6 +35,8 @@
 #include <memory>
 
 #include <prosoft/core/include/string/string_convert.hpp>
+#include <prosoft/core/include/uniform_access.hpp>
+#include <prosoft/core/include/unique_resource.hpp>
 #include <prosoft/core/modules/u8string/u8string.hpp>
 
 namespace prosoft {
@@ -103,6 +105,34 @@ public:
 template <class Result>
 using from_CFString = to_string<Result, CFStringRef>;
 
+template <>
+class to_string<CFStringRef, u8string> {
+public:
+    typedef CF::unique_string result_type;
+    typedef u8string argument_type;
+    
+    enum options {
+        none,
+        nocopy,
+    };
+    
+    result_type operator()(const argument_type& s, options opt = none) {
+        if (nocopy == opt) {
+            return result_type{ ::CFStringCreateWithBytesNoCopy(kCFAllocatorDefault, as_utf8(s.c_str()), byte_size(s), kCFStringEncodingUTF8, false, kCFAllocatorNull) };
+        } else {
+            return result_type{ ::CFStringCreateWithBytes(kCFAllocatorDefault, as_utf8(s.c_str()), byte_size(s), kCFStringEncodingUTF8, false) };
+        }
+    }
+    
+    result_type operator()(argument_type&& s, options opt = none) {
+        (void)opt;
+        return operator()(s, none); // force none for temp strings
+    }
+};
+
+template <class Argument>
+using to_CFString = to_string<CFStringRef, Argument>;
+
 #if __OBJC__
 
 template <>
@@ -134,7 +164,25 @@ public:
 template <class Result>
 using from_NSString = to_string<Result, NSString*>;
 
-#endif
+#if __has_feature(objc_arc)
+
+template <>
+class to_string<NSString*, u8string> {
+public:
+    typedef NSString* result_type;
+    typedef u8string argument_type;
+
+    result_type operator()(const argument_type& s) {
+        return (__bridge_transfer NSString*)to_CFString<u8string>{}(s).release(); // never use nocopy for NSString
+    }
+};
+
+template <class Argument>
+using to_NSString = to_string<NSString*, Argument>;
+
+#endif // objc_arc
+
+#endif // __OBJC__
 
 #if PS_HAVE_INLINE_NAMESPACES
 } // conversion

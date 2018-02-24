@@ -178,15 +178,102 @@ SECTION("trim") {
 
 SECTION("replace_all") {
     S s("a,b,c");
-    CHECK(replace_all(s, S{","}, S{"."}));
+    CHECK(replace_all(s, S{","}, S{"."}) > 0);
     CHECK(s == "a.b.c");
-    CHECK(replace_all(s, S{"."}, S{".."}));
+    CHECK(replace_all(s, S{"."}, S{".."}) > 0);
     CHECK(s == "a..b..c");
     s = S{"a,b,c"};
-    CHECK_FALSE(replace_all(s, S{"d"}, S{"e"}));
-    CHECK(replace_all(s, S{","}, S{"."}, 2));
+    CHECK_FALSE(replace_all(s, S{"d"}, S{"e"}) > 0);
+    CHECK(replace_all(s, S{","}, S{"."}, 2) > 0);
     CHECK(s == "a,b.c");
     s = S{"a,b,c"};
-    CHECK(replace_all(s, S{","}, S{"."}, 1));
+    CHECK(replace_all(s, S{","}, S{"."}, 1) > 0);
     CHECK(s == "a.b.c");
+}
+
+SECTION("for_each_line") {
+#if !PS_PREFERRED_CPP14
+    using iterator_type = decltype(S{}.begin());
+#endif
+
+    S results;
+    size_t count;
+    auto cb = [&results,&count]
+#if PS_PREFERRED_CPP14
+    (auto first, auto last)
+#else
+    (iterator_type first, iterator_type last)
+#endif
+    {
+        if (std::distance(first, last) > 0) {
+            results.append(S{first, last});
+        }
+        ++count;
+    };
+    
+    auto clear = [&results,&count]() {
+        results.clear();
+        count = 0;
+    };
+    
+    
+    S s;
+    
+    clear();
+    for_each_line(s, cb);
+    CHECK(results == "");
+    CHECK(count == 0);
+    
+    clear();
+    s = S{"abc"};
+    for_each_line(s.begin(), s.end(), cb);
+    CHECK(results == "abc");
+    CHECK(count == 1);
+    
+    clear();
+    s = S{"a\nb\nc"};
+    for_each_line(s.begin(), s.end(), cb);
+    CHECK(results == "abc");
+    CHECK(count == 3);
+    
+    clear();
+    s = S{"a\nb\nc\n"};
+    for_each_line(s.begin(), s.end(), cb);
+    CHECK(results == "abc");
+    CHECK(count == 3);
+    
+    clear();
+    for_each_line(s.begin(), s.end(), cb, for_each_options::want_empty_lines);
+    CHECK(results == "abc");
+    CHECK(count == 3);
+    
+    clear();
+    s = S{"\na\nb\nc\n"};
+    for_each_line(s.begin(), s.end(), cb, for_each_options::want_empty_lines);
+    CHECK(results == "abc");
+    CHECK(count == 4);
+    
+    clear();
+    s = S{"\na\nb\nc\n\n"};
+    for_each_line(s.begin(), s.end(), cb, for_each_options::want_empty_lines);
+    CHECK(results == "abc");
+    CHECK(count == 5);
+    
+    clear();
+    for_each_line(s, cb, for_each_options::none, '\r');
+    CHECK(results == s);
+    CHECK(count == 1);
+    
+#if PS_PREFERRED_CPP14
+    clear();
+    for_each_line((char*)0, (char*)0, cb);
+    CHECK(results == "");
+    CHECK(count == 0);
+
+    clear();
+    const S cs{s};
+    for_each_line(cs, cb, for_each_options::none, '\r');
+    CHECK(results == s);
+    CHECK(count == 1);
+#endif
 }

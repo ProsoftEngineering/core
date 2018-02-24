@@ -8,8 +8,14 @@
 
 #############################################################################
 # Julia 0.3/0.4 compatibility (taken from Compat package)
+if VERSION < v"0.4.0-dev+1387"
+    typealias AbstractString String
+end
 if VERSION < v"0.4.0-dev+1419"
-    const UInt16 = Uint16
+    const UInt32 = Uint32
+end
+if VERSION < v"0.4.0-dev+3874"
+    Base.parse{T<:Integer}(::Type{T}, s::AbstractString) = parseint(T, s)
 end
 
 CharWidths = Dict{Int,Int}()
@@ -51,14 +57,8 @@ end
 #############################################################################
 # Widths from GNU Unifont
 
-universion=get(ENV, "UNIFONT_VERSION", "7.0.06")
-for fontfile in ["unifont-$universion", "unifont_upper-$universion"]
-    isfile("$fontfile.ttf") || download("http://unifoundry.com/pub/unifont-$universion/font-builds/$fontfile.ttf", "$fontfile.ttf")
-    isfile("$fontfile.sfd") || run(`fontforge -lang=ff -c "Open(\"$fontfile.ttf\");Save(\"$fontfile.sfd\");Quit(0);"`)
-end
-
 #Read sfdfile for character widths
-function parsesfd(filename::String, CharWidths::Dict{Int,Int}=Dict{Int,Int}())
+function parsesfd(filename::AbstractString, CharWidths::Dict{Int,Int}=Dict{Int,Int}())
     state=:seekchar
     lineno = 0
     codepoint = width = nothing
@@ -71,8 +71,8 @@ function parsesfd(filename::String, CharWidths::Dict{Int,Int}=Dict{Int,Int}())
                 state = :readdata
             end
         elseif state==:readdata #Encoding: 65538 -1 2, Width: 1024
-            contains(line, "Encoding:") && (codepoint = int(split(line)[3]))
-            contains(line, "Width:") && (width = int(split(line)[2]))
+            contains(line, "Encoding:") && (codepoint = parse(Int, split(line)[3]))
+            contains(line, "Width:") && (width = parse(Int, split(line)[2]))
             if codepoint!=nothing && width!=nothing && codepoint >= 0
                 w=div(width, 512) # 512 units to the en
                 if w > 0
@@ -87,15 +87,14 @@ function parsesfd(filename::String, CharWidths::Dict{Int,Int}=Dict{Int,Int}())
     end
     CharWidths
 end
-CharWidths=parsesfd("unifont-$universion.sfd", CharWidths)
-CharWidths=parsesfd("unifont_upper-$universion.sfd", CharWidths)
+CharWidths=parsesfd("unifont.sfd", CharWidths)
+CharWidths=parsesfd("unifont_upper.sfd", CharWidths)
 
 #############################################################################
 # Widths from UAX #11: East Asian Width
 #   .. these take precedence over the Unifont width for all codepoints
 #      listed explicitly as wide/full/narrow/half-width
 
-isfile("EastAsianWidth.txt") || download("http://www.unicode.org/Public/UNIDATA/EastAsianWidth.txt", "EastAsianWidth.txt")
 for line in readlines(open("EastAsianWidth.txt"))
     #Strip comments
     line[1] == '#' && continue
@@ -107,8 +106,8 @@ for line in readlines(open("EastAsianWidth.txt"))
     width = strip(tokens[2])
     #Parse code point range into Julia UnitRange
     rangetokens = split(charrange, "..")
-    charstart = uint32("0x"*rangetokens[1])
-    charend = uint32("0x"*rangetokens[length(rangetokens)>1 ? 2 : 1])
+    charstart = parse(UInt32, "0x"*rangetokens[1])
+    charend = parse(UInt32, "0x"*rangetokens[length(rangetokens)>1 ? 2 : 1])
 
     #Assign widths
     for c in charstart:charend

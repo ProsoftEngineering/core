@@ -1,7 +1,6 @@
-# http://clang.llvm.org/docs/ClangFormatStyleOptions.html
-# http://clangformat.com
-# Xcode integration: https://github.com/travisjeffery/ClangFormat-Xcode
-# Binaries for other platforms: http://llvm.org/releases/download.html
+# https://clang.llvm.org/docs/ClangFormatStyleOptions.html
+# https://clangformat.com
+# Binaries: http://llvm.org/releases/download.html
 
 BasedOnStyle: WebKit
 
@@ -19,15 +18,19 @@ AllowShortIfStatementsOnASingleLine: true
 AllowShortLoopsOnASingleLine: true
 BinPackArguments: true
 BinPackParameters: false
-# Requires clang-format 3.8+
-# BreakBeforeBraces: WebKit
 BreakBeforeBraces: Attach
-BreakConstructorInitializersBeforeComma: true
+BreakConstructorInitializers: BeforeComma
 ColumnLimit: 0
+CompactNamespaces: false
+KeepEmptyLinesAtTheStartOfBlocks: false
 IndentCaseLabels: true
 MaxEmptyLinesToKeep: 1
+NamespaceIndentation: Inner
 ObjCSpaceAfterProperty: true
+ObjCSpaceBeforeProtocolList: true
 PointerAlignment: Left
+SpaceAfterCStyleCast: false
+SpaceAfterTemplateKeyword: true
 SpaceBeforeAssignmentOperators: true
 SpaceBeforeParens: ControlStatements
 SpaceInEmptyParentheses: false
@@ -36,6 +39,7 @@ SpacesInAngles: false
 SpacesInCStyleCastParentheses: false
 SpacesInContainerLiterals: true
 SpacesInParentheses: false
+SpacesInSquareBrackets: false
 
 Standard: Cpp11
 NamespaceIndentation: None

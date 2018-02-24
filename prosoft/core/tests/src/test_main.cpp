@@ -1,4 +1,4 @@
-// Copyright © 2015, Prosoft Engineering, Inc. (A.K.A "Prosoft")
+// Copyright © 2015-2017, Prosoft Engineering, Inc. (A.K.A "Prosoft")
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without
@@ -23,6 +23,8 @@
 // (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
+#include <prosoft/core/config/config_platform.h>
+
 #include <stdio.h>
 #if _WIN32
 #include <windows.h>
@@ -31,7 +33,7 @@
 #define CATCH_CONFIG_RUNNER
 #include "catch.hpp"
 
-int main(int argc, char * const argv[])
+int main(int argc, char* argv[])
 {
 	int catchResult = Catch::Session().run(argc, argv);
 	

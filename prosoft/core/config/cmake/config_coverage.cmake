@@ -25,7 +25,7 @@
 
 macro(ps_enable_code_coverage TARGET_FILES)
     if(NOT WIN32)
-        set_source_files_properties(${TARGET_FILES} PROPERTIES COMPILE_FLAGS -coverage)
+        set_property(SOURCE ${TARGET_FILES} APPEND_STRING PROPERTY COMPILE_FLAGS " -coverage ")
     endif()
 endmacro()
 

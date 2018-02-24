@@ -1,4 +1,4 @@
-# Copyright © 2015, Prosoft Engineering, Inc. (A.K.A "Prosoft")
+# Copyright © 2015-2017, Prosoft Engineering, Inc. (A.K.A "Prosoft")
 # All rights reserved.
 # 
 # Redistribution and use in source and binary forms, with or without
@@ -59,6 +59,16 @@ macro(ps_core_configure TARGET_NAME)
     endif()
 endmacro()
 
+macro(ps_core_use_filesystem TARGET_NAME)
+    ps_core_use_u8string(${TARGET_NAME})
+    ps_core_use_system_identity(${TARGET_NAME})
+	ps_core_use_winutils(${TARGET_NAME})
+    if(NOT TARGET filesystem)
+        add_subdirectory(${PSCORE}/modules/filesystem ${CMAKE_BINARY_DIR}/psfilesystem)
+    endif()
+    target_link_libraries(${TARGET_NAME} PUBLIC filesystem)
+endmacro()
+
 macro(ps_core_use_u8string TARGET_NAME)
     if(NOT TARGET u8string)
         add_subdirectory(${PSCORE}/modules/u8string ${CMAKE_BINARY_DIR}/u8string)
@@ -72,3 +82,21 @@ macro(ps_core_use_regex TARGET_NAME)
     endif()
     target_link_libraries(${TARGET_NAME} PUBLIC regex)
 endmacro()
+
+macro(ps_core_use_system_identity TARGET_NAME)
+    ps_core_use_u8string(${TARGET_NAME})
+    if(NOT TARGET system_identity)
+        add_subdirectory(${PSCORE}/modules/system_identity ${CMAKE_BINARY_DIR}/pssystem_identity)
+    endif()
+    target_link_libraries(${TARGET_NAME} PUBLIC system_identity)
+endmacro()
+
+macro(ps_core_use_winutils TARGET_NAME)
+	if(WIN32)
+		if (NOT TARGET winutils)
+			add_subdirectory(${PSCORE}/modules/winutils ${CMAKE_BINARY_DIR}/pswinutils)
+		endif()
+		target_link_libraries(${TARGET_NAME} PUBLIC winutils)
+	endif()
+endmacro()
+
