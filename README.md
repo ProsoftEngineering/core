@@ -4,13 +4,13 @@
 
 [![Travis Status](https://travis-ci.org/ProsoftEngineering/core.svg?branch=master)](https://travis-ci.org/ProsoftEngineering/core) [![Appveyor Status](https://ci.appveyor.com/api/projects/status/pjmfq9eqmtiywxh4?branch=master&svg=true)](https://ci.appveyor.com/project/bdb/core) [![Codecov Status](https://codecov.io/github/ProsoftEngineering/core/coverage.svg?branch=master)](https://codecov.io/github/ProsoftEngineering/core)
 
-Core is a library of cross platform C++11 modules and headers that adds core functionality to the standard library.
+Core is a library of cross platform C++11/14/17 modules and headers that adds core functionality to the standard library.
 
 This core set of extensions powers all of Prosoft's applications.
 
 ## Brief
 
-* filesystem: Implementation of C++17 filesystem, with extensions for: ACLs, extended attributes, alternate data streams, and more.
+* filesystem: Implementation of C++17 filesystem, with extensions for: ACLs, extended attributes, alternate data streams, filesystem snapshots and more.
 
 * u8string: Full UTF8 string class that is modeled to match std::string as much as possible.
 
@@ -32,7 +32,7 @@ Modified BSD. See the LICENSE.txt file.
 	* [CMake](https://cmake.org) 3.1+
 
 * Compilers
-	* Xcode 6+
+	* Xcode 7+
 	* Clang 3.3+
 	* GCC 4.8.2+
 	* Microsoft Visual Studio 2015
