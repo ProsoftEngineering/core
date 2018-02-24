@@ -351,7 +351,7 @@ void prosoft::filesystem::v1::detach_snapshot(snapshot& snap, std::error_code& e
 
 void prosoft::filesystem::v1::delete_snapshot(snapshot& snap) {
     error_code ec;
-    detach_snapshot(snap, ec);
+    delete_snapshot(snap, ec);
     PS_THROW_IF(ec.value(), filesystem_error("Could not delete snapshot", ec));
 }
 
