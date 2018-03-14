@@ -113,8 +113,8 @@ macro(ps_core_config_compiler_maximum_warnings TARGET_NAME)
     endif()
 endmacro()
 
-set(CMAKE_POLICY_DEFAULT_CMP0063 NEW)
 function(ps_core_config_symbols_hidden TARGET_NAME)
+    # CMAKE_POLICY_DEFAULT_CMP0063=NEW is set by rake
     set_target_properties(${TARGET_NAME} PROPERTIES CXX_VISIBILITY_PRESET hidden)
     set_target_properties(${TARGET_NAME} PROPERTIES C_VISIBILITY_PRESET hidden)
 endfunction()

@@ -98,7 +98,7 @@ end
 def cmake_generate(builddir, config, srcdir, generator=CMAKE_DEFAULT_GENERATOR)
   FileUtils.mkdir_p builddir
   Dir.chdir builddir do
-    sh 'cmake', '-G', generator, '-DCMAKE_BUILD_TYPE=' + config, srcdir
+    sh 'cmake', '-G', generator, '-DCMAKE_POLICY_DEFAULT_CMP0063=NEW', '-DCMAKE_BUILD_TYPE=' + config, srcdir
   end
 end
 
