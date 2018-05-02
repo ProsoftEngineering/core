@@ -2,7 +2,7 @@
   regerror.c -  Oniguruma (regular expression library)
 **********************************************************************/
 /*-
- * Copyright (c) 2002-2017  K.Kosako  <sndgk393 AT ybb DOT ne DOT jp>
+ * Copyright (c) 2002-2018  K.Kosako  <sndgk393 AT ybb DOT ne DOT jp>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -43,19 +43,21 @@ onig_error_code_to_format(int code)
 {
   char *p;
 
-  if (code >= 0) return (UChar* )0;
-
   switch (code) {
   case ONIG_MISMATCH:
     p = "mismatch"; break;
   case ONIG_NO_SUPPORT_CONFIG:
     p = "no support in this configuration"; break;
+  case ONIG_ABORT:
+    p = "abort"; break;
   case ONIGERR_MEMORY:
     p = "fail to memory allocation"; break;
   case ONIGERR_MATCH_STACK_LIMIT_OVER:
     p = "match-stack limit over"; break;
   case ONIGERR_PARSE_DEPTH_LIMIT_OVER:
     p = "parse depth limit over"; break;
+  case ONIGERR_RETRY_LIMIT_IN_MATCH_OVER:
+    p = "retry-limit-in-match over"; break;
   case ONIGERR_TYPE_BUG:
     p = "undefined type (bug)"; break;
   case ONIGERR_PARSER_BUG:
@@ -172,6 +174,18 @@ onig_error_code_to_format(int code)
     p = "invalid absent group pattern"; break;
   case ONIGERR_INVALID_ABSENT_GROUP_GENERATOR_PATTERN:
     p = "invalid absent group generator pattern"; break;
+  case ONIGERR_INVALID_CALLOUT_PATTERN:
+    p = "invalid callout pattern"; break;
+  case ONIGERR_INVALID_CALLOUT_NAME:
+    p = "invalid callout name"; break;
+  case ONIGERR_UNDEFINED_CALLOUT_NAME:
+    p = "undefined callout name"; break;
+  case ONIGERR_INVALID_CALLOUT_BODY:
+    p = "invalid callout body"; break;
+  case ONIGERR_INVALID_CALLOUT_TAG_NAME:
+    p = "invalid callout tag name"; break;
+  case ONIGERR_INVALID_CALLOUT_ARG:
+    p = "invalid callout arg"; break;
   case ONIGERR_NOT_SUPPORTED_ENCODING_COMBINATION:
     p = "not supported encoding combination"; break;
   case ONIGERR_INVALID_COMBINATION_OF_OPTIONS:

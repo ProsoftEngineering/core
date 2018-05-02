@@ -21,6 +21,9 @@
 /* Define to 1 if you have the <inttypes.h> header file. */
 #undef HAVE_INTTYPES_H
 
+/* Define to 1 if you have the <limits.h> header file. */
+#undef HAVE_LIMITS_H
+
 /* Define to 1 if you have the <memory.h> header file. */
 #undef HAVE_MEMORY_H
 
@@ -103,9 +106,6 @@
 
 /* Define to 1 if you can safely include both <sys/time.h> and <time.h>. */
 #undef TIME_WITH_SYS_TIME
-
-/* Define if combination explosion check */
-#undef USE_COMBINATION_EXPLOSION_CHECK
 
 /* Define if enable CR+NL as line terminator */
 #undef USE_CRNL_AS_LINE_TERMINATOR

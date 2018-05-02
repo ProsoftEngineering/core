@@ -295,6 +295,7 @@ extern int main(int argc, char* argv[])
   x2("(?m:a.)", "a\n", 0, 2);
   x2("(?m:.b)", "a\nb", 1, 3);
   x2(".*abc", "dddabdd\nddabc", 8, 13);
+  x2(".+abc", "dddabdd\nddabcaa\naaaabc", 8, 13);
   x2("(?m:.*abc)", "dddabddabc", 0, 10);
   n("(?i)(?-i)a", "A");
   n("(?i)(?-i:a)", "A");
@@ -594,6 +595,10 @@ extern int main(int argc, char* argv[])
   x2("a\\Kb", "ab", 1, 2);
   x2("(a\\Kb|ac\\Kd)", "acd", 2, 3);
   x2("(a\\Kb|\\Kac\\K)*", "acababacab", 9, 10);
+  x2("(?:()|())*\\1", "abc", 0, 0);
+  x2("(?:()|())*\\2", "abc", 0, 0);
+  x2("(?:()|()|())*\\3\\1", "abc", 0, 0);
+  x2("(|(?:a(?:\\g'1')*))b|", "abc", 0, 2);
 
   x2("(?~)", "", 0, 0);
   x2("(?~)", "A", 0, 0);
@@ -1064,9 +1069,19 @@ extern int main(int argc, char* argv[])
   x2("c.*\\b", "abc", 2, 3);
   x2("\\b.*abc.*\\b", "abc", 0, 3);
 
+  n("(*FAIL)", "abcdefg");
+  n("abcd(*FAIL)(*FAIL)(*FAIL)(*FAIL)(*FAIL)(*FAIL)(*FAIL)(*FAIL)(*FAIL)(*FAIL)(*FAIL)(*FAIL)(*FAIL)(*FAIL)(*FAIL)(*FAIL)(*FAIL)(*FAIL)(*FAIL)(*FAIL)(*FAIL)(*FAIL)(*FAIL)(*FAIL)(*FAIL)(*FAIL)(*FAIL)(*FAIL)(*FAIL)(*FAIL)(*FAIL)(*FAIL)(*FAIL)(*FAIL)(*FAIL)(*FAIL)(*FAIL)(*FAIL)(*FAIL)(*FAIL)(*FAIL)(*FAIL)(*FAIL)(*FAIL)(*FAIL)(*FAIL)(*FAIL)(*FAIL)(*FAIL)(*FAIL)(*FAIL)(*FAIL)(*FAIL)(*FAIL)(*FAIL)(*FAIL)", "abcdefg");
+  x2("(?:[ab]|(*MAX{2}).)*", "abcbaaccaaa", 0, 7);
+  x2("(?:(*COUNT[AB]{X})[ab]|(*COUNT[CD]{X})[cd])*(*CMP{AB,<,CD})",
+     "abababcdab", 5, 8);
+  x2("(?(?{....})123|456)", "123", 0, 3);
+  x2("(?(*FAIL)123|456)", "456", 0, 3);
+
+
   e("\\u040", "@", ONIGERR_INVALID_CODE_POINT_VALUE);
   e("(?<abc>\\g<abc>)", "zzzz", ONIGERR_NEVER_ENDING_RECURSION);
   e("(?<=(?>abc))", "abc", ONIGERR_INVALID_LOOK_BEHIND_PATTERN);
+  e("(*FOO)", "abcdefg", ONIGERR_UNDEFINED_CALLOUT_NAME);
 
   fprintf(stdout,
        "\nRESULT   SUCC: %d,  FAIL: %d,  ERROR: %d      (by Oniguruma %s)\n",

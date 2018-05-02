@@ -1,5 +1,5 @@
 dnl Process this file with autoconf to produce a configure script.
-AC_INIT(onig, 6.7.0)
+AC_INIT(onig, 6.8.2)
 
 AC_CONFIG_MACRO_DIR([m4])
 
@@ -14,13 +14,19 @@ AC_ARG_WITH(statistics,
 	[ STATISTICS=-DONIG_DEBUG_STATISTICS ])
 AC_SUBST(STATISTICS)
 
-dnl check for COMBINATION_EXPLOSION
-AC_ARG_ENABLE(combination-explosion-check,
-	[  --enable-combination-explosion-check   deprecated],
-	[comb_expl_check=$enableval])
-if test "${comb_expl_check}" = yes; then
-  AC_DEFINE(USE_COMBINATION_EXPLOSION_CHECK,1,[Define if combination explosion check])
-fi
+
+dnl check for POSIX API
+AC_ARG_ENABLE(posix-api,
+[  --enable-posix-api      turn on to include POSIX API [[default=yes]]],
+[\
+case "${enableval}" in
+ yes) enable_posix_api=yes ;;
+ no)  enable_posix_api=no ;;
+ *)   AC_MSG_ERROR(bad value for --enable-posix-api) ;;
+esac],
+enable_posix_api=yes)
+AM_CONDITIONAL(ENABLE_POSIX_API, test x"${enable_posix_api}" = xyes)
+
 
 dnl check for CRNL_AS_LINE_TERMINATOR
 AC_ARG_ENABLE(crnl-as-line-terminator,
@@ -34,7 +40,7 @@ fi
 dnl Checks for programs.
 AC_PROG_CC
 AM_PROG_LIBTOOL
-LTVERSION="4:0:0"
+LTVERSION="5:0:0"
 AC_SUBST(LTVERSION)
 
 AC_PROG_INSTALL
@@ -44,7 +50,7 @@ dnl Checks for libraries.
 
 dnl Checks for header files.
 AC_HEADER_STDC
-AC_CHECK_HEADERS(stdlib.h string.h strings.h sys/time.h unistd.h sys/times.h)
+AC_CHECK_HEADERS(stdlib.h string.h strings.h limits.h sys/time.h unistd.h sys/times.h)
 
 dnl Checks for typedefs, structures, and compiler characteristics.
 AC_CHECK_SIZEOF(int, 4)

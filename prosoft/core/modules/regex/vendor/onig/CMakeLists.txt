@@ -49,6 +49,7 @@ check_include_files(sys/times.h HAVE_SYS_TIMES_H)
 check_include_files(sys/time.h HAVE_SYS_TIME_H)
 check_include_files(sys/types.h HAVE_SYS_TYPES_H)
 check_include_files(unistd.h HAVE_UNISTD_H)
+check_include_files(limits.h HAVE_LIMITS_H)
 # if both are present assume we can include both at the same time
 check_include_files("sys/time.h;sys/times.h" TIME_WITH_SYS_TIME)
 

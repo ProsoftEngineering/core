@@ -18,6 +18,7 @@
 #cmakedefine HAVE_SYS_TYPES_H 1
 #cmakedefine HAVE_UNISTD_H 1
 #cmakedefine TIME_WITH_SYS_TIME 1
+#cmakedefine HAVE_LIMITS_H 1
 
 #define SIZEOF_INT @SIZEOF_INT@
 #define SIZEOF_LONG @SIZEOF_LONG@
