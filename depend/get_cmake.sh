@@ -1,6 +1,6 @@
 #!/bin/sh
 #
-# Copyright © 2015-2017, Prosoft Engineering, Inc. (A.K.A "Prosoft")
+# Copyright © 2015-2018, Prosoft Engineering, Inc. (A.K.A "Prosoft")
 # All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
@@ -50,7 +50,7 @@ done
 
 # Could not find a link/feed to automatically find the latest version, so we just hardcode it.
 if [ -z $CMAKE_VER ]; then
-CMAKE_VER=3.9.4
+CMAKE_VER=3.10.3
 fi
 
 VROOT=`echo ${CMAKE_VER} | grep -oE '[0-9]+\.[0-9]+'`
