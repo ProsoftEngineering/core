@@ -67,6 +67,16 @@ matrix:
         env: PSCC=gcc-6 PSCXX=g++-6
         sudo: required
         dist: trusty
+
+      - os: linux
+        compiler: gcc
+        addons: &gcc7
+            apt:
+                sources: ['ubuntu-toolchain-r-test']
+                packages: ['gcc-7', 'g++-7', 'libacl1-dev']
+        env: PSCC=gcc-7 PSCXX=g++-7
+        sudo: required
+        dist: trusty
         
 install:
     - |
