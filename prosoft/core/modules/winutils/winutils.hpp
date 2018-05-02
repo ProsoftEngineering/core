@@ -96,13 +96,17 @@ std::basic_ostream<Char, Traits>& operator<<(std::basic_ostream<Char, Traits>& o
     static const std::basic_string<Char> dash(1, static_cast<Char>('-'));
     prosoft::stream_guard ss{os};
     return os << std::setfill(static_cast<Char>('0')) << std::hex
-    // each non-int operator<< resets width to 0
+    // width is reset every time
         << std::setw(2) << g.Data1 << dash
         << std::setw(2) << g.Data2 << dash
         << std::setw(2) << g.Data3 << dash
-        << std::setw(2) << uint16_t(g.Data4[0]) << uint16_t(g.Data4[1]) << dash
-        << std::setw(2) << uint16_t(g.Data4[2]) << uint16_t(g.Data4[3]) << uint16_t(g.Data4[4])
-        << uint16_t(g.Data4[5]) << uint16_t(g.Data4[6]) << uint16_t(g.Data4[7]);
+        << std::setw(2) << uint16_t(g.Data4[0]) << std::setw(2) << uint16_t(g.Data4[1]) << dash
+        << std::setw(2) << uint16_t(g.Data4[2])
+        << std::setw(2) << uint16_t(g.Data4[3])
+        << std::setw(2) << uint16_t(g.Data4[4])
+        << std::setw(2) << uint16_t(g.Data4[5])
+        << std::setw(2) << uint16_t(g.Data4[6])
+        << std::setw(2) << uint16_t(g.Data4[7]);
 }
 
 namespace prosoft {

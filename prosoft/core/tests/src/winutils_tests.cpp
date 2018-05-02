@@ -102,6 +102,9 @@ TEST_CASE("winutils") {
         // Leading zero
         REQUIRE(S_OK == IIDFromString(L"{d9085bf4-4b74-47df-a6af-06e970ebc2a6}", &g));
         CHECK(guid_string(g) == "d9085bf4-4b74-47df-a6af-06e970ebc2a6");
+
+        REQUIRE(S_OK == IIDFromString(L"{c4775ab0-fb84-11e6-9598-0800200c9a66}", &g));
+        CHECK(guid_string(g) == "c4775ab0-fb84-11e6-9598-0800200c9a66");
     }
 }
 
