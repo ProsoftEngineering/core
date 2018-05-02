@@ -61,6 +61,9 @@ struct snapshot_id {
     int compare(const snapshot_id& other) const noexcept {
         return std::memcmp(m_id, other.m_id, sizeof(m_id));
     }
+
+    PS_WARN_UNUSED_RESULT
+    std::string string() const;
 #else
     native_string_type m_id;
     path m_from;
@@ -76,6 +79,10 @@ struct snapshot_id {
 
     int compare(const snapshot_id& other) const {
         return m_id.compare(other.m_id);
+    }
+
+    const std::string& string() const noexcept {
+        return m_id;
     }
 #endif
 };

@@ -54,6 +54,7 @@ TEST_CASE("filesystem_snapshot") {
         CHECK_FALSE(snapshot_id() != snapshot_id());
         CHECK(snapshot_id(test_id) == snapshot_id(test_id));
         CHECK(snapshot_id(test_id) != snapshot_id());
+        CHECK(snapshot_id(test_id).string() == std::string("c4775ab0-fb84-11e6-9598-0800200c9a66"));
     }
 
     WHEN("attaching an invalid snapshot") {

@@ -704,8 +704,12 @@ inline bool attached(const fs::snapshot& snap) noexcept {
     return 0 != (snap.reserved() & snapshot_attached);
 }
 
+inline const GUID& guid(const fs::snapshot_id& sid) noexcept {
+    return *reinterpret_cast<const GUID*>(&sid.m_id[0]);
+}
+
 inline const GUID& guid(const fs::snapshot& snap) noexcept {
-    return *reinterpret_cast<const GUID*>(&snap.id().m_id[0]);
+    return guid(snap.id());
 }
 
 } // anon
@@ -713,6 +717,10 @@ inline const GUID& guid(const fs::snapshot& snap) noexcept {
 namespace prosoft {
 namespace filesystem {
 inline namespace v1 {
+
+std::string snapshot_id::string() const {
+    return prosoft::windows::guid_string(guid(*this));
+}
 
 /*
 XXX: When operating on persistent snapshots (deletion, or list via Query) the backup componenents context MUST match the context of the snapshot or the snapshot will be ignored.
