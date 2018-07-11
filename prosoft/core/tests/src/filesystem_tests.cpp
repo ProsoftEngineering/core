@@ -411,14 +411,15 @@ TEST_CASE("filesystem") {
         CHECK(system_complete(p) == cur.root_name() / p);
     }
 
-    WHEN("resolve a root-name relative path") {
+    WHEN("resolving a root-name relative path") {
         path p{PS_TEXT("C:a")};
         const auto cur = current_path();
         CHECK(absolute(p) == cur / p.relative_path());
         CHECK(system_complete(p) == cur / p.relative_path());
 
-        p = path{PS_TEXT("F:a")};
+        p = path{PS_TEXT("Y:a")};
         CHECK(absolute(p) == p.root_name() / cur.relative_path() / p.relative_path());
+        // XXX: if the drive exists, it may have a different CWD and this test could fail as system_complete() is aware of the drive specific CWD
         CHECK(system_complete(p) == p.root_name() / p.relative_path());
     }
 
