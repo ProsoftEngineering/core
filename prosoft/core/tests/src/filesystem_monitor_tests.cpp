@@ -62,9 +62,7 @@ TEST_CASE("filesystem_monitor") {
         CHECK_THROWS(stop(reg));
     }
     
-    WHEN("args are invalid") {
-        auto nopcb = [](const change_notifications&){};
-        
+    WHEN("args are invalid") {        
         CHECK_THROWS(monitor(PS_TEXT(""), change_event::none, change_callback{}));
         CHECK_THROWS(monitor(PS_TEXT("test"), change_event::none, change_callback{}));
         CHECK_THROWS(monitor(PS_TEXT("test"), change_event::created, change_callback{}));
