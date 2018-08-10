@@ -21,7 +21,7 @@ matrix:
         env: PSCC=clang PSCXX=clang++
 
       - os: osx
-        osx_image: xcode9.3
+        osx_image: xcode9.4
         compiler: clang
         env: PSCC=clang PSCXX=clang++
 
