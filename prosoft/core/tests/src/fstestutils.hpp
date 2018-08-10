@@ -1,4 +1,4 @@
-// Copyright © 2016, Prosoft Engineering, Inc. (A.K.A "Prosoft")
+// Copyright © 2016-2018, Prosoft Engineering, Inc. (A.K.A "Prosoft")
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without
@@ -45,6 +45,7 @@ namespace {
         return path{std::to_string(mypid)};
     }
     
+    inline
     prosoft::filesystem::path process_name(const char* s) {
         return  process_name().concat("_").concat(s);
     }
