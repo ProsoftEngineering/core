@@ -1,4 +1,4 @@
-// Copyright © 2006-2017, Prosoft Engineering, Inc. (A.K.A "Prosoft")
+// Copyright © 2006-2018, Prosoft Engineering, Inc. (A.K.A "Prosoft")
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without
@@ -135,6 +135,7 @@
 // GCC < 4.7 sets __cplusplus to 1 for compat with an old Solaris version.
 // MS sets their __cplusplus to 199711.
 // http://connect.microsoft.com/VisualStudio/feedback/details/763051/a-value-of-predefined-macro-cplusplus-is-still-199711l
+// As of VS2017 15.7, MSVC finally reports the correct __cplusplus version.
 //
 #define PS_CPP11 (__cplusplus >= 201103L || __GXX_EXPERIMENTAL_CXX0X__ || PS_MSVC_REQ(16, 0))
 #if PS_CPP11
@@ -167,7 +168,7 @@
 #define PS_COMPLETE_CPP14 0
 #endif // __cplusplus
 
-#define PS_CPP17 (__cplusplus > 201402L)
+#define PS_CPP17 (__cplusplus > 201402L || _MSVC_LANG > 201402L)
 
 //// Compiler name ////
 
@@ -308,6 +309,18 @@
 #define PS_WARN_UNUSED_RESULT _Check_return_
 #else
 #define PS_WARN_UNUSED_RESULT
+#endif
+
+#if PS_CPP17
+#define PS_FALLTHROUGH [[fallthrough]]
+#elif PS_GCC_REQ(7, 0, 0)
+#if __cplusplus
+#define PS_FALLTHROUGH [[gnu:fallthrough]]
+#else
+#define PS_FALLTHROUGH __attribute__ ((fallthrough))
+#endif
+#else // GCC
+#define PS_FALLTHROUGH
 #endif
 
 // Pre-main module constructors. Mostly unnecessary with C++.
