@@ -383,7 +383,12 @@ const typename state<Ops>::entry* state<Ops>::peek_valid() {
 
 inline bool is_permssion_denied(const fs::error_code& ec) {
 #if !_WIN32
-    return ec.value() == EACCES;
+    return ec.value() == EACCES
+#if __APPLE__
+    // 'User Data Protection' dirs in 10.14 (WWDC 2018 S-702) and certain iCloud drive tmp folders.
+    || ec.value() == EPERM;
+#endif
+    ;
 #else
     return ec.value() == ERROR_ACCESS_DENIED;
 #endif
