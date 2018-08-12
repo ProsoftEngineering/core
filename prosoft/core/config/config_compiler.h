@@ -315,7 +315,7 @@
 #define PS_FALLTHROUGH [[fallthrough]]
 #elif PS_GCC_REQ(7, 0, 0)
 #if __cplusplus
-#define PS_FALLTHROUGH [[gnu:fallthrough]]
+#define PS_FALLTHROUGH [[gnu::fallthrough]]
 #else
 #define PS_FALLTHROUGH __attribute__ ((fallthrough))
 #endif
