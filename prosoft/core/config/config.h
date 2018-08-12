@@ -1,4 +1,4 @@
-// Copyright © 2015-2017, Prosoft Engineering, Inc. (A.K.A "Prosoft")
+// Copyright © 2015-2018, Prosoft Engineering, Inc. (A.K.A "Prosoft")
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without
@@ -26,6 +26,7 @@
 // An include-all default for specific config headers.
 
 #ifndef PS_CORE_CONFIG_H
+#define PS_CORE_CONFIG_H
 
 #include <prosoft/core/config/config_compiler.h>
 #include <prosoft/core/config/config_cpp.h>
