@@ -289,13 +289,19 @@
 #define PS_FORMAT_PRINTF(x, y)
 #endif
 
-#if defined(__GNUC__) || defined(__clang__)
+#if PS_COMPLETE_CPP11
+#define PS_NORETURN [[noreturn]]
+#elif defined(__GNUC__) || defined(__clang__)
 #define PS_NORETURN __attribute__((noreturn))
+#elif _MSC_VER
+#define PS_NORETURN __declspec(noreturn)
 #else
 #define PS_NORETURN
 #endif
 
-#if defined(__clang__) || defined(__GNUC__)
+#if PS_CPP17
+#define PS_UNUSED [[maybe_unused]]
+#elif defined(__clang__) || defined(__GNUC__)
 #define PS_UNUSED __attribute__((unused)) // Mostly unnecessary with C++.
 #define PS_USED __attribute__((used)) // C/C++ module globals.
 #else
