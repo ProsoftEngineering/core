@@ -302,10 +302,14 @@
 #if PS_CPP17
 #define PS_UNUSED [[maybe_unused]]
 #elif defined(__clang__) || defined(__GNUC__)
-#define PS_UNUSED __attribute__((unused)) // Mostly unnecessary with C++.
-#define PS_USED __attribute__((used)) // C/C++ module globals.
+#define PS_UNUSED __attribute__((unused))
 #else
 #define PS_UNUSED
+#endif
+
+#if defined(__clang__) || defined(__GNUC__)
+#define PS_USED __attribute__((used))
+#else
 #define PS_USED
 #endif
 
