@@ -1,4 +1,4 @@
-// Copyright © 2016-2017, Prosoft Engineering, Inc. (A.K.A "Prosoft")
+// Copyright © 2016-2018, Prosoft Engineering, Inc. (A.K.A "Prosoft")
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without
@@ -533,8 +533,7 @@ fs::path state<Ops>::next(fsiterator_cache& cinfo, prosoft::system::error_code& 
                         
                         if (!push(copy_link_path(cpath, ent), ec)) {
                             PSASSERT(peek_unsafe().m_path == copy_link_path(cpath, ent), "Broken assumption"); // assuming placeholder is pushed
-                            pop();
-                            break;
+                            // Fallthrough to return entry, even though there was an open error
                         }
                     }
                 }
@@ -890,9 +889,9 @@ TEST_CASE("filesystem_iterator_internal") {
         REQUIRE(ents.size() > 2);
         auto p = s->next(ec);
         CHECK_FALSE(0 == ec.value());
-        CHECK(s->size() == 1);
+        CHECK(s->size() == 2);
         CHECK(s->depth() == 0);
-        CHECK(p.empty());
+        CHECK_FALSE(p.empty());
         p = s->next(ec);
         CHECK(0 == ec.value());
         CHECK(p.empty());
