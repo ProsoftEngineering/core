@@ -1,4 +1,4 @@
-// Copyright © 2014-2017, Prosoft Engineering, Inc. (A.K.A "Prosoft")
+// Copyright © 2014-2018, Prosoft Engineering, Inc. (A.K.A "Prosoft")
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without
@@ -134,7 +134,11 @@ public:
     virtual ~regex_error() PS_NOEXCEPT{};
 
     regex_constants::error_type code() const PS_NOEXCEPT { return _code; }
-
+    
+    int engine_code() const PS_NOEXCEPT {
+        return _onigErr;
+    }
+    
 private:
     regex_constants::error_type _code;
     int _onigErr;
