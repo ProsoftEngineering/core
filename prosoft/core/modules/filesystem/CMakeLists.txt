@@ -72,6 +72,10 @@ if(WIN32)
 	ps_core_module_use_external_module(${fs_lib} winutils)
 endif()
 
+if(PSLINUX)
+    target_link_libraries(${fs_lib} PUBLIC acl)
+endif()
+
 if (UNIX AND NOT APPLE)
     target_sources(${fs_lib} PRIVATE
         ${PSFS}/src/snapshot_nop.cpp
