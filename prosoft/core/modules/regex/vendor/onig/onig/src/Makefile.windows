@@ -24,6 +24,12 @@ libname   = $(libbase)_s.lib
 dllname   = $(libbase).dll
 dlllib    = $(libbase).lib
 
+!IF defined(ENABLE_POSIX_API) && "$(ENABLE_POSIX_API)" == "NO"
+posixobjs = 
+!ELSE
+posixobjs = $(BUILD_DIR)/regposix.obj $(BUILD_DIR)/regposerr.obj
+!ENDIF
+
 onigheaders  = $(ONIG_DIR)/oniguruma.h $(ONIG_DIR)/regint.h $(ONIG_DIR)/regparse.h $(ONIG_DIR)/regenc.h $(ONIG_DIR)/st.h
 posixheaders = $(ONIG_DIR)/onigposix.h
 headers      = $(posixheaders) $(onigheaders)
@@ -31,7 +37,6 @@ headers      = $(posixheaders) $(onigheaders)
 onigobjs     = $(BUILD_DIR)/reggnu.obj $(BUILD_DIR)/regerror.obj $(BUILD_DIR)/regparse.obj $(BUILD_DIR)/regext.obj $(BUILD_DIR)/regcomp.obj \
 	       $(BUILD_DIR)/regexec.obj $(BUILD_DIR)/regenc.obj $(BUILD_DIR)/regsyntax.obj $(BUILD_DIR)/regtrav.obj \
 	       $(BUILD_DIR)/regversion.obj $(BUILD_DIR)/st.obj $(BUILD_DIR)/onig_init.obj
-posixobjs    = $(BUILD_DIR)/regposix.obj $(BUILD_DIR)/regposerr.obj
 libobjs      = $(onigobjs) $(posixobjs)
 
 jp_objs      =  $(BUILD_DIR)/euc_jp.obj $(BUILD_DIR)/sjis.obj
@@ -156,23 +161,23 @@ ptest: $(testp)
 	.\$(testp)
 
 $(testc): $(testc).c $(libname)
-	$(CC) -nologo -o $(testc) -DONIG_EXTERN=extern $(testc).c $(libname)
+	$(CC) -nologo /Fe:$(testc) -DONIG_EXTERN=extern $(testc).c $(libname)
 
 $(testp): $(testc).c $(dlllib)
-	$(CC) -nologo -DPOSIX_TEST -o $(testp) $(testc).c $(dlllib)
+	$(CC) -nologo -DPOSIX_TEST /Fe:$(testp) $(testc).c $(dlllib)
 
 $(testc)u: $(testc)u.c $(libname)
-	$(CC) -nologo -o $(testc)u -DONIG_EXTERN=extern $(testc)u.c $(libname)
+	$(CC) -nologo /Fe:$(testc)u -DONIG_EXTERN=extern $(testc)u.c $(libname)
 
 clean:
 	del $(BUILD_DIR)\*.obj $(BUILD_DIR)\*.lib $(BUILD_DIR)\*.exp $(BUILD_DIR)\*.dll $(BUILD_DIR)\$(testp).exe $(BUILD_DIR)\$(testc).exe $(BUILD_DIR)\$(testc).obj
 
 
 samples: all
-	$(CC) $(CFLAGS) -I. -o simple  $(ONIG_DIR)\sample\simple.c  $(dlllib)
-	$(CC) $(CFLAGS) -I. -o posix   $(ONIG_DIR)\sample\posix.c   $(dlllib)
-	$(CC) $(CFLAGS) -I. -o names   $(ONIG_DIR)\sample\names.c   $(dlllib)
-	$(CC) $(CFLAGS) -I. -o listcap $(ONIG_DIR)\sample\listcap.c $(dlllib)
-	$(CC) $(CFLAGS) -I. -o sql     $(ONIG_DIR)\sample\sql.c     $(dlllib)
-	$(CC) $(CFLAGS) -I. -o encode  $(ONIG_DIR)\sample\encode.c  $(dlllib)
-	$(CC) $(CFLAGS) -I. -o syntax  $(ONIG_DIR)\sample\syntax.c  $(dlllib)
+	$(CC) $(CFLAGS) -I. /Fe:simple  $(ONIG_DIR)\sample\simple.c  $(dlllib)
+	$(CC) $(CFLAGS) -I. /Fe:posix   $(ONIG_DIR)\sample\posix.c   $(dlllib)
+	$(CC) $(CFLAGS) -I. /Fe:names   $(ONIG_DIR)\sample\names.c   $(dlllib)
+	$(CC) $(CFLAGS) -I. /Fe:listcap $(ONIG_DIR)\sample\listcap.c $(dlllib)
+	$(CC) $(CFLAGS) -I. /Fe:sql     $(ONIG_DIR)\sample\sql.c     $(dlllib)
+	$(CC) $(CFLAGS) -I. /Fe:encode  $(ONIG_DIR)\sample\encode.c  $(dlllib)
+	$(CC) $(CFLAGS) -I. /Fe:syntax  $(ONIG_DIR)\sample\syntax.c  $(dlllib)

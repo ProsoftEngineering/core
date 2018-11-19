@@ -394,6 +394,10 @@ extern int main(int argc, char* argv[])
   x2("a|(?i)c", "C", 0, 1);
   x2("(?i)c|a", "C", 0, 1);
   x2("(?i)c|a", "A", 0, 1);
+  x2("a(?i)b|c", "aB", 0, 2);
+  x2("a(?i)b|c", "aC", 0, 2);
+  n("a(?i)b|c", "AC");
+  n("a(?:(?i)b)|c", "aC");
   x2("(?i:c)|a", "C", 0, 1);
   n("(?i:c)|a", "A");
   x2("[abc]?", "abc", 0, 1);
@@ -933,6 +937,10 @@ extern int main(int argc, char* argv[])
 
   x2("\\p{Hiragana}", "ぴ", 0, 3);
   n("\\P{Hiragana}", "ぴ");
+  x2("\\p{Emoji}", "\xE2\xAD\x90", 0, 3);
+  x2("\\p{^Emoji}", "\xEF\xBC\x93", 0, 3);
+  x2("\\p{Extended_Pictographic}", "\xE2\x9A\xA1", 0, 3);
+  n("\\p{Extended_Pictographic}", "\xE3\x81\x82");
 
   x2("\\p{Word}", "こ", 0, 3);
   n("\\p{^Word}", "こ");
@@ -1034,6 +1042,11 @@ extern int main(int argc, char* argv[])
   // DEVANAGARI LETTER SSA, DEVANAGARI VOWEL SIGN I
   x2(".\\Y.", "\xE0\xA4\xB7\xE0\xA4\xBF", 0, 6);
   n(".\\y.", "\xE0\xA4\xB7\xE0\xA4\xBF");
+
+  // {Extended_Pictographic} Extend* ZWJ x {Extended_Pictographic}
+  x2("..\\Y.", "\xE3\x80\xB0\xE2\x80\x8D\xE2\xAD\x95", 0, 9);
+  x2("...\\Y.", "\xE3\x80\xB0\xCC\x82\xE2\x80\x8D\xE2\xAD\x95", 0, 11);
+  n("...\\Y.", "\xE3\x80\xB0\xCD\xB0\xE2\x80\x8D\xE2\xAD\x95");
 
   // CR + LF
   n("^\\X\\X$", "\x0d\x0a");

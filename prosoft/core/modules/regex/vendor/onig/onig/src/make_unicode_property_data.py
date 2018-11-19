@@ -1,7 +1,7 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 # make_unicode_property_data.py
-# Copyright (c) 2016-2017  K.Kosako
+# Copyright (c) 2016-2018  K.Kosako
 
 import sys
 import re
@@ -19,7 +19,7 @@ GRAPHEME_CLUSTER_BREAK_NAME_PREFIX = 'Grapheme_Cluster_Break_'
 
 UD_FIRST_REG = re.compile("<.+,\s*First>")
 UD_LAST_REG  = re.compile("<.+,\s*Last>")
-PR_TOTAL_REG = re.compile("#\s*Total\s+code\s+points:")
+PR_TOTAL_REG = re.compile("#\s*Total\s+(?:code\s+points|elements):")
 PR_LINE_REG  = re.compile("([0-9A-Fa-f]+)(?:..([0-9A-Fa-f]+))?\s*;\s*(\w+)")
 PA_LINE_REG  = re.compile("(\w+)\s*;\s*(\w+)")
 PVA_LINE_REG = re.compile("(sc|gc)\s*;\s*(\w+)\s*;\s*(\w+)(?:\s*;\s*(\w+))?")
@@ -31,6 +31,7 @@ DIC  = { }
 KDIC = { }
 PropIndex = { }
 PROPERTY_NAME_MAX_LEN = 0
+PROPS = None
 
 def normalize_prop_name(name):
   name = re.sub(r'[ _]', '', name)
@@ -84,6 +85,16 @@ def dic_find_by_value(dic, v):
 
   return None
 
+def make_reverse_dic(dic):
+  rev = {}
+  for key, val in dic.items():
+    d = rev.get(val, None)
+    if d is None:
+      rev[val] = [key]
+    else:
+      d.append(key)
+
+  return rev
 
 def normalize_ranges(in_ranges, sort=False):
   if sort:
@@ -405,6 +416,12 @@ def entry_and_print_prop_and_index(name, index):
   nname = normalize_prop_name(name)
   print_prop_and_index(nname, index)
 
+def parse_and_merge_properties(path, klass):
+  dic, props = parse_properties(path, klass)
+  merge_dic(DIC, dic)
+  merge_props(PROPS, props)
+  return dic, props
+
 ### main ###
 argv = sys.argv
 argc = len(argv)
@@ -424,18 +441,12 @@ with open('UnicodeData.txt', 'r') as f:
 PROPS = DIC.keys()
 PROPS = list_sub(PROPS, POSIX_LIST)
 
-dic, props = parse_properties('DerivedCoreProperties.txt', 'Derived Property')
-merge_dic(DIC, dic)
-merge_props(PROPS, props)
-
-dic, props = parse_properties('Scripts.txt', 'Script')
-merge_dic(DIC, dic)
-merge_props(PROPS, props)
+dic, props = parse_and_merge_properties('DerivedCoreProperties.txt', 'Derived Property')
+dic, props = parse_and_merge_properties('Scripts.txt', 'Script')
 DIC['Unknown'] = inverse_ranges(add_ranges_in_dic(dic))
+dic, props = parse_and_merge_properties('PropList.txt',   'Binary Property')
+dic, props = parse_and_merge_properties('emoji-data.txt', 'Emoji Property')
 
-dic, props = parse_properties('PropList.txt', 'Binary Property')
-merge_dic(DIC, dic)
-merge_props(PROPS, props)
 PROPS.append('Unknown')
 KDIC['Unknown'] = 'Script'
 
@@ -551,12 +562,19 @@ if not(POSIX_ONLY):
 
 print '%%'
 print ''
-if VERSION_INFO is not None:
-  print "#define PROPERTY_VERSION  %s" % re.sub(r'[\.-]', '_', VERSION_INFO)
-  print ''
+if not(POSIX_ONLY):
+  if VERSION_INFO is not None:
+    print "#define UNICODE_PROPERTY_VERSION  %s" % re.sub(r'[\.-]', '_', VERSION_INFO)
+    print ''
 
 print "#define PROPERTY_NAME_MAX_SIZE  %d" % (PROPERTY_NAME_MAX_LEN + 10)
 print "#define CODE_RANGES_NUM         %d" % (index + 1)
+
+index_props = make_reverse_dic(PropIndex)
+print ''
+for i in range(index + 1):
+  for p in index_props[i]:
+    print "#define PROP_INDEX_%s %d" % (p.upper(), i)
 
 if OUTPUT_LIST_MODE:
   UPF.close()

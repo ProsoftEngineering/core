@@ -1,10 +1,10 @@
 dnl Process this file with autoconf to produce a configure script.
-AC_INIT(onig, 6.8.2)
+AC_INIT(onig, 6.9.0)
 
 AC_CONFIG_MACRO_DIR([m4])
 
 AM_INIT_AUTOMAKE([-Wno-portability 1.14])
-AC_CONFIG_HEADER(src/config.h)
+AC_CONFIG_HEADERS([src/config.h])
 
 
 dnl default value for STATISTICS
@@ -39,7 +39,7 @@ fi
 
 dnl Checks for programs.
 AC_PROG_CC
-AM_PROG_LIBTOOL
+LT_INIT
 LTVERSION="5:0:0"
 AC_SUBST(LTVERSION)
 
@@ -64,15 +64,17 @@ AC_FUNC_ALLOCA
 AC_FUNC_MEMCMP
 
 AC_CACHE_CHECK(for prototypes, _cv_have_prototypes,
-  [AC_TRY_COMPILE([int foo(int x) { return 0; }], [return foo(10);],
-	_cv_have_prototypes=yes,
-	_cv_have_prototypes=no)])
+  [AC_COMPILE_IFELSE(
+    [AC_LANG_PROGRAM([[int foo(int x) { return 0; }]],
+      [[return foo(10);]])],
+    [_cv_have_prototypes=yes],
+    [_cv_have_prototypes=no])])
 if test "$_cv_have_prototypes" = yes; then
   AC_DEFINE(HAVE_PROTOTYPES,1,[Define if compilerr supports prototypes])
 fi
 
 AC_CACHE_CHECK(for variable length prototypes and stdarg.h, _cv_stdarg,
-  [AC_TRY_COMPILE([
+  [AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[
 #include <stdarg.h>
 int foo(int x, ...) {
 	va_list va;
@@ -82,9 +84,7 @@ int foo(int x, ...) {
 	va_arg(va, double);
 	return 0;
 }
-], [return foo(10, "", 3.14);],
-	_cv_stdarg=yes,
-	_cv_stdarg=no)])
+]], [[return foo(10, "", 3.14);]])],[_cv_stdarg=yes],[_cv_stdarg=no])])
 if test "$_cv_stdarg" = yes; then
   AC_DEFINE(HAVE_STDARG_PROTOTYPES,1,[Define if compiler supports stdarg prototypes])
 fi
