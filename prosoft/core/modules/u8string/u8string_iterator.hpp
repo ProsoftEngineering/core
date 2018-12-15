@@ -1,4 +1,4 @@
-// Copyright © 2014-2015, Prosoft Engineering, Inc. (A.K.A "Prosoft")
+// Copyright © 2014-2018, Prosoft Engineering, Inc. (A.K.A "Prosoft")
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without
@@ -38,8 +38,14 @@ typedef char32_t unicode_type;
 
 // XXX: NOT THREAD SAFE
 template <typename octet_iterator> // see notes below for reference and pointer type why.
-class u8_iterator : public std::iterator<std::bidirectional_iterator_tag, unicode_type, ptrdiff_t, unicode_type, unicode_type> {
+class u8_iterator {
 public:
+    typedef unicode_type value_type;
+    typedef ptrdiff_t  difference_type;
+    typedef unicode_type  pointer;
+    typedef unicode_type reference;
+    typedef std::bidirectional_iterator_tag  iterator_category;
+    
     typedef octet_iterator iterator_type;
 
 private:

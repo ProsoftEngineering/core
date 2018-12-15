@@ -1,4 +1,4 @@
-// Copyright © 2013-2017, Prosoft Engineering, Inc. (A.K.A "Prosoft")
+// Copyright © 2013-2018, Prosoft Engineering, Inc. (A.K.A "Prosoft")
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without
@@ -37,8 +37,17 @@
 #include <prosoft/core/include/uniform_access.hpp>
 
 // "utf8.h" may conflict
+#ifndef _SILENCE_CXX17_ITERATOR_BASE_CLASS_DEPRECATION_WARNING
+#define _SILENCE_CXX17_ITERATOR_BASE_CLASS_DEPRECATION_WARNING
+#define PS__SILENCE_CXX17_ITERATOR_BASE_CLASS_DEPRECATION_WARNING
+#endif
 #include "utf8/checked.h"
 #include "utf8/unchecked.h"
+#ifdef PS__SILENCE_CXX17_ITERATOR_BASE_CLASS_DEPRECATION_WARNING
+#undef _SILENCE_CXX17_ITERATOR_BASE_CLASS_DEPRECATION_WARNING
+#undef PS__SILENCE_CXX17_ITERATOR_BASE_CLASS_DEPRECATION_WARNING
+#endif
+
 #include "u8string_iterator.hpp"
 
 namespace prosoft {
