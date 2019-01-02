@@ -1,5 +1,5 @@
 dnl Process this file with autoconf to produce a configure script.
-AC_INIT(onig, 6.9.0)
+AC_INIT(onig, 6.9.1)
 
 AC_CONFIG_MACRO_DIR([m4])
 
@@ -10,7 +10,7 @@ AC_CONFIG_HEADERS([src/config.h])
 dnl default value for STATISTICS
 STATISTICS=""
 AC_ARG_WITH(statistics,
-	[  --with-statistics       take matching time statistical data], 
+	[  --with-statistics       take matching time statistical data],
 	[ STATISTICS=-DONIG_DEBUG_STATISTICS ])
 AC_SUBST(STATISTICS)
 
@@ -49,45 +49,16 @@ AC_PROG_MAKE_SET
 dnl Checks for libraries.
 
 dnl Checks for header files.
-AC_HEADER_STDC
-AC_CHECK_HEADERS(stdlib.h string.h strings.h limits.h sys/time.h unistd.h sys/times.h)
+AC_CHECK_HEADERS(sys/time.h unistd.h sys/times.h)
 
 dnl Checks for typedefs, structures, and compiler characteristics.
 AC_CHECK_SIZEOF(int, 4)
 AC_CHECK_SIZEOF(short, 2)
 AC_CHECK_SIZEOF(long, 4)
-AC_C_CONST
-AC_HEADER_TIME
 
 dnl Checks for library functions.
 AC_FUNC_ALLOCA
-AC_FUNC_MEMCMP
 
-AC_CACHE_CHECK(for prototypes, _cv_have_prototypes,
-  [AC_COMPILE_IFELSE(
-    [AC_LANG_PROGRAM([[int foo(int x) { return 0; }]],
-      [[return foo(10);]])],
-    [_cv_have_prototypes=yes],
-    [_cv_have_prototypes=no])])
-if test "$_cv_have_prototypes" = yes; then
-  AC_DEFINE(HAVE_PROTOTYPES,1,[Define if compilerr supports prototypes])
-fi
-
-AC_CACHE_CHECK(for variable length prototypes and stdarg.h, _cv_stdarg,
-  [AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[
-#include <stdarg.h>
-int foo(int x, ...) {
-	va_list va;
-	va_start(va, x);
-	va_arg(va, int);
-	va_arg(va, char *);
-	va_arg(va, double);
-	return 0;
-}
-]], [[return foo(10, "", 3.14);]])],[_cv_stdarg=yes],[_cv_stdarg=no])])
-if test "$_cv_stdarg" = yes; then
-  AC_DEFINE(HAVE_STDARG_PROTOTYPES,1,[Define if compiler supports stdarg prototypes])
-fi
-
-
-AC_OUTPUT([Makefile src/Makefile test/Makefile sample/Makefile onig-config], [chmod +x onig-config])
+AC_CONFIG_FILES([Makefile src/Makefile test/Makefile sample/Makefile onig-config])
+AC_CONFIG_COMMANDS([default],[chmod +x onig-config],[])
+AC_OUTPUT

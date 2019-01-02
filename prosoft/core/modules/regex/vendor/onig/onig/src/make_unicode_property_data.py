@@ -6,8 +6,6 @@
 import sys
 import re
 
-INCLUDE_GRAPHEME_CLUSTER_DATA = False
-
 POSIX_LIST = [
     'NEWLINE', 'Alpha', 'Blank', 'Cntrl', 'Digit', 'Graph', 'Lower',
     'Print', 'Punct', 'Space', 'Upper', 'XDigit', 'Word', 'Alnum', 'ASCII'
@@ -427,9 +425,17 @@ argv = sys.argv
 argc = len(argv)
 
 POSIX_ONLY = False
-if argc >= 2:
-  if argv[1] == '-posix':
+INCLUDE_GRAPHEME_CLUSTER_DATA = False
+
+for i in range(1, argc):
+  arg = argv[i]
+  if arg == '-posix':
     POSIX_ONLY = True
+  elif arg == '-gc':
+    INCLUDE_GRAPHEME_CLUSTER_DATA = True
+  else:
+    print >> sys.stderr, "Invalid argument: %s" % arg
+
 
 OUTPUT_LIST_MODE = not(POSIX_ONLY)
 
@@ -441,11 +447,11 @@ with open('UnicodeData.txt', 'r') as f:
 PROPS = DIC.keys()
 PROPS = list_sub(PROPS, POSIX_LIST)
 
-dic, props = parse_and_merge_properties('DerivedCoreProperties.txt', 'Derived Property')
+parse_and_merge_properties('DerivedCoreProperties.txt', 'Derived Property')
 dic, props = parse_and_merge_properties('Scripts.txt', 'Script')
 DIC['Unknown'] = inverse_ranges(add_ranges_in_dic(dic))
-dic, props = parse_and_merge_properties('PropList.txt',   'Binary Property')
-dic, props = parse_and_merge_properties('emoji-data.txt', 'Emoji Property')
+parse_and_merge_properties('PropList.txt',   'Binary Property')
+parse_and_merge_properties('emoji-data.txt', 'Emoji Property')
 
 PROPS.append('Unknown')
 KDIC['Unknown'] = 'Script'

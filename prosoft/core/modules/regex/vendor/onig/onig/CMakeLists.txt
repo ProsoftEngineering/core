@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.1)
-project(oniguruma VERSION 6.9.0)
+project(oniguruma VERSION 6.9.1)
 
 set(PACKAGE onig)
 set(PACKAGE_VERSION ${PROJECT_VERSION})
@@ -33,13 +33,7 @@ include(TestBigEndian)
 
 check_function_exists(alloca HAVE_ALLOCA)
 check_include_files(alloca.h HAVE_ALLOCA_H)
-set(HAVE_PROTOTYPES 1)
-check_include_files(stdarg.h    HAVE_STDARG_PROTOTYPES)
 check_include_files(stdint.h    HAVE_STDINT_H)
-check_include_files(stdlib.h    HAVE_STDLIB_H)
-check_include_files(strings.h   HAVE_STRINGS_H)
-check_include_files(string.h    HAVE_STRING_H)
-check_include_files(limits.h    HAVE_LIMITS_H)
 check_include_files(sys/times.h HAVE_SYS_TIMES_H)
 check_include_files(sys/time.h  HAVE_SYS_TIME_H)
 check_include_files(sys/types.h HAVE_SYS_TYPES_H)
@@ -48,7 +42,6 @@ check_include_files(inttypes.h  HAVE_INTTYPES_H)
 check_type_size(int SIZEOF_INT)
 check_type_size(long SIZEOF_LONG)
 check_type_size(short SIZEOF_SHORT)
-check_include_files("stdlib.h;stdarg.h;string.h;float.h" STDC_HEADERS)
 
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/src/config.h.cmake.in ${CMAKE_CURRENT_BINARY_DIR}/config.h)
 

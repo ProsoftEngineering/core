@@ -1,4 +1,4 @@
-# Copyright © 2013-2016, Prosoft Engineering, Inc. (A.K.A "Prosoft")
+# Copyright © 2013-2018, Prosoft Engineering, Inc. (A.K.A "Prosoft")
 # All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
@@ -41,9 +41,6 @@ check_include_files(dlfcn.h HAVE_DLFCN_H)
 check_include_files(inttypes.h HAVE_INTTYPES_H)
 check_include_files(memory.h HAVE_MEMORY_H)
 check_include_files(stdint.h HAVE_STDINT_H)
-check_include_files(stdlib.h HAVE_STDLIB_H)
-check_include_files(strings.h HAVE_STRINGS_H)
-check_include_files(string.h HAVE_STRING_H)
 check_include_files(sys/stat.h HAVE_SYS_STAT_H)
 check_include_files(sys/times.h HAVE_SYS_TIMES_H)
 check_include_files(sys/time.h HAVE_SYS_TIME_H)

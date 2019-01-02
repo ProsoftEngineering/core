@@ -21,17 +21,8 @@
 /* Define to 1 if you have the <inttypes.h> header file. */
 #undef HAVE_INTTYPES_H
 
-/* Define to 1 if you have the <limits.h> header file. */
-#undef HAVE_LIMITS_H
-
 /* Define to 1 if you have the <memory.h> header file. */
 #undef HAVE_MEMORY_H
-
-/* Define if compilerr supports prototypes */
-#undef HAVE_PROTOTYPES
-
-/* Define if compiler supports stdarg prototypes */
-#undef HAVE_STDARG_PROTOTYPES
 
 /* Define to 1 if you have the <stdint.h> header file. */
 #undef HAVE_STDINT_H
@@ -104,17 +95,11 @@
 /* Define to 1 if you have the ANSI C header files. */
 #undef STDC_HEADERS
 
-/* Define to 1 if you can safely include both <sys/time.h> and <time.h>. */
-#undef TIME_WITH_SYS_TIME
-
 /* Define if enable CR+NL as line terminator */
 #undef USE_CRNL_AS_LINE_TERMINATOR
 
 /* Version number of package */
 #undef VERSION
-
-/* Define to empty if `const' does not conform to ANSI C. */
-#undef const
 
 /* Define to `unsigned int' if <sys/types.h> does not define. */
 #undef size_t
