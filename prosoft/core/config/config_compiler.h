@@ -63,11 +63,12 @@
 #define PS_GCC_REQ(_M, _m, _p) 0
 #endif
 
-// No patch level.
 #ifdef _MSC_VER
-#define PS_MSVC_REQ(_M, _m) (_MSC_VER >= (_M * 100 + _m * 10))
+#define PS_MSVC_REQ(_M, _m) (_MSC_VER >= (_M * 100 + _m * 10)) // legacy, no patch level.
+#define PS_MSCV_REQ(_M, _m, _p) (PS_MSVC_REQ(_M, _m) + _p)
 #else
 #define PS_MSVC_REQ(_M, _m) 0
+#define PS_MSCV_REQ(_M, _m, _p)
 #endif
 
 //// Link defines ////
@@ -128,6 +129,7 @@
 // GCC: https://gcc.gnu.org/projects/cxx0x.html, https://gcc.gnu.org/projects/cxx1y.html
 // MSVC (2017): https://docs.microsoft.com/en-us/cpp/visual-cpp-language-conformance
 // MSVC: http://msdn.microsoft.com/en-us/library/vstudio/hh567368.aspx
+// Apple Clang: https://gist.github.com/yamaya/2924292
 // All: http://en.cppreference.com/w/cpp/compiler_support
 //
 
@@ -159,6 +161,22 @@
 #define PS_PREFERRED_CPP14 0
 #define PS_COMPLETE_CPP14 0
 #endif // PS_CPP14
+
+#define PS_CPP17 (__cplusplus > 201402L || _MSVC_LANG > 201402L)
+#if PS_CPP17
+#if !__APPLE__
+#define PS_CLANG_VER_CPP17 5
+#else
+// Xcode 9 supposedly used clang5, but it does not support template constructor deduction
+#define PS_CLANG_VER_CPP17 10
+#endif
+#define PS_PREFERRED_CPP17 (PS_CLANG_REQ(PS_CLANG_VER_CPP17, 0, 0) || PS_GCC_REQ(7, 0, 0) || PS_MSCV_REQ(19, 1, 4))
+#define PS_COMPLETE_CPP17 PS_PREFERRED_CPP17
+#else
+#define PS_PREFERRED_CPP17 0
+#define PS_COMPLETE_CPP17 0
+#endif // PS_CPP17
+
 #else // __cplusplus
 #define PS_CPP11 0
 #define PS_PREFERRED_CPP11 0
@@ -166,9 +184,10 @@
 #define PS_CPP14 0
 #define PS_PREFERRED_CPP14 0
 #define PS_COMPLETE_CPP14 0
+#define PS_CPP17 0
+#define PS_PREFERRED_CPP17 0
+#define PS_COMPLETE_CPP17 0
 #endif // __cplusplus
-
-#define PS_CPP17 (__cplusplus > 201402L || _MSVC_LANG > 201402L)
 
 //// Compiler name ////
 

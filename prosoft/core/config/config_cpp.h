@@ -48,11 +48,17 @@
 #define PS_COMPLETE_CPP11_STDLIB (PS_CPP11_STDLIB && (PS_CLANG_REQ(3, 3, 0) || (PS_GCC_REQ(5, 1, 0) && _GLIBCXX_USE_CXX11_ABI == 1)))
 
 #define PS_CPP14_STDLIB (PS_CPP14 && (_LIBCPP_STD_VER > 11 || PS_MSVC_REQ(19, 0) || PS_GCC_REQ(4, 9, 0)))
+#define PS_CPP17_STDLIB (PS_CPP17 && (_LIBCPP_STD_VER > 14 || PS_MSVC_REQ(19, 1) || PS_GCC_REQ(6, 0, 0)))
 // Clang 3.4 (and pre-release 3.5) are using the draft 'shared_mutex' instead of the ratified 'shared_timed_mutex'
 // VS2015 final added shared_mutex support, that's our criteria for "preferred" status.
 #if !__APPLE__
 #define PS_PREFERRED_CPP14_STDLIB (PS_CPP14_STDLIB && (PS_CLANG_REQ(3, 5, 0) || PS_GCC_REQ(4, 9, 0) || PS_MSVC_REQ(19, 0)))
 #define PS_COMPLETE_CPP14_STDLIB (PS_CPP14_STDLIB && (PS_CLANG_REQ(3, 5, 0) || PS_GCC_REQ(5, 1, 0)))
+
+// Preferred criteria is std::filesystem support
+#define PS_PREFERRED_CPP17_STDLIB (PS_CPP17_STDLIB && (PS_CLANG_REQ(7, 0, 0) || PS_GCC_REQ(8, 0, 0) || PS_MSCV_REQ(19, 1, 4)))
+// As of 2019-01-01, only VS 2017.9 has a complete library implemenation. (Microsoft has made great strides in VS 2017!)
+#define PS_COMPLETE_CPP17_STDLIB (PS_CPP17_STDLIB && (PS_MSCV_REQ(19, 1, 5)))
 #else
 // XXX: Xcode 6.1 claims to fully support C++14.
 // However the libc++ lib does not provide C++14 support until 10.12. (e.g. shared_timed_mutex fails to link)
@@ -63,6 +69,16 @@
 #else
 #define PS_PREFERRED_CPP14_STDLIB 0
 #define PS_COMPLETE_CPP14_STDLIB 0
+#endif
+
+// 10.14 is required to use std::any, std::optional, etc
+// However std::filesystem is still not present
+#ifdef MAC_OS_X_VERSION_10_13
+#define PS_PREFERRED_CPP17_STDLIB (MAC_OS_X_VERSION_MIN_REQUIRED > MAC_OS_X_VERSION_10_13)
+#define PS_COMPLETE_CPP17_STDLIB 0
+#else
+#define PS_PREFERRED_CPP17_STDLIB 0
+#define PS_COMPLETE_CPP17_STDLIB 0
 #endif
 #endif // !__APPLE__
 
