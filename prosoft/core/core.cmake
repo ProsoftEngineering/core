@@ -1,4 +1,4 @@
-# Copyright © 2015-2018, Prosoft Engineering, Inc. (A.K.A "Prosoft")
+# Copyright © 2015-2019, Prosoft Engineering, Inc. (A.K.A "Prosoft")
 # All rights reserved.
 # 
 # Redistribution and use in source and binary forms, with or without
@@ -32,6 +32,7 @@ macro(ps_core_include TARGET_NAME)
     target_include_directories(${TARGET_NAME} PRIVATE
         "${PSCORE}/../.." # Allow unambigous includes. e.g. <prosoft/core/include/...>
         "${PSCORE}/include"
+        "${PSCORE}/include/vendor"
         "${PSCORE}/modules"
     )
 endmacro()
