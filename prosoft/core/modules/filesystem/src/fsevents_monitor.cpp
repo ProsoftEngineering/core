@@ -41,6 +41,7 @@
 #include "fsmonitor_private.hpp"
 #include "string/platform_convert.hpp"
 #include "unique_resource.hpp"
+#include "prosoft/core/config/config_analyzer.h"
 
 #include "nlohmann/json.hpp"
 
@@ -493,9 +494,22 @@ void stop_events_monitor(shared_state& ss) {
     return f.get();
 }
 
-std::vector<shared_state> monitor_registrations;
-std::mutex monitor_registration_lck;
-using reg_guard = std::lock_guard<decltype(monitor_registration_lck)>;
+struct gstate {
+    std::vector<shared_state> registrations;
+    std::mutex lck;
+    gstate() = default;
+    PS_DISABLE_COPY(gstate);
+    PS_DISABLE_MOVE(gstate);
+};
+
+PS_NOINLINE
+gstate& gs() {
+    prosoft::intentional_leak_guard lg;
+    static auto gp = new gstate;
+    return *gp;
+}
+
+using g_guard = std::lock_guard<decltype(gstate::lck)>;
 
 enum class get_state_opts {
     none,
@@ -503,14 +517,15 @@ enum class get_state_opts {
 };
 
 shared_state get_shared_state(platform_state* state, get_state_opts opts) {
-    reg_guard lg{monitor_registration_lck};
-    auto i = std::find_if(monitor_registrations.begin(), monitor_registrations.end(), [state](const shared_state& p) {
+    auto& g = gs();
+    g_guard lg{g.lck};
+    auto i = std::find_if(g.registrations.begin(), g.registrations.end(), [state](const shared_state& p) {
         return state == p.get();
     });
-    if (i != monitor_registrations.end()) {
+    if (i != g.registrations.end()) {
         shared_state ss{*i};
         if (get_state_opts::delete_master == opts) {
-            monitor_registrations.erase(i);
+            g.registrations.erase(i);
         }
         return ss;
     } else {
@@ -527,8 +542,9 @@ fs::change_registration register_events_monitor(shared_state&& state, fs::change
     auto p = state.get();
     PSASSERT_NOTNULL(p);
     {
-        reg_guard lg{monitor_registration_lck};
-        monitor_registrations.emplace_back(std::move(state));
+        auto& g = gs();
+        g_guard lg{g.lck};
+        g.registrations.emplace_back(std::move(state));
     }
     
     if (start_events_monitor(p, std::move(cb))) {
