@@ -42,7 +42,11 @@
 #include "string/platform_convert.hpp"
 #include "unique_resource.hpp"
 
+#include "nlohmann/json.hpp"
+
 namespace {
+
+using json = nlohmann::json;
 
 using cfduration = std::chrono::duration<double, std::chrono::seconds::period>;
 
@@ -93,7 +97,10 @@ struct platform_state : public fs::change_state {
         , m_uuid()
         , m_lastid(kFSEventStreamEventIdSinceNow) {}
     platform_state(const fs::path&, const fs::change_config&, fs::error_code&);
+    platform_state(const std::string&); // from serial
     virtual ~platform_state();
+    
+    virtual std::string serialize() const override;
     
     operator FSEventStreamRef() const noexcept(noexcept(m_stream.get())) {
         return m_stream.get();
@@ -196,6 +203,25 @@ fs::path canonical_root_path(const platform_state* state) {
         return fs::path{buf};
     }
     return fs::path{};
+}
+
+dev_t device(const fs::path& p, fs::error_code& ec) {
+    struct stat sb;
+    if (0 == lstat(p.c_str(), &sb)) {
+        return sb.st_dev;
+    } else {
+        ec = prosoft::system::system_error();
+        return 0; // assuming major,minor of 0,0 is invalid
+    }
+}
+
+FSEventStreamEventId eventid(const fs::change_config& cc, CFUUIDRef fsUUID) {
+    if (auto pc = dynamic_cast<const platform_state*>(cc.state)) {
+        if (pc->m_uuid && fsUUID && CFEqual(pc->m_uuid.get(), fsUUID)) {
+            return pc->m_lastid;
+        }
+    }
+    return kFSEventStreamEventIdSinceNow;
 }
 
 template <class Dispatch = dispatch_events>
@@ -304,29 +330,62 @@ platform_state::platform_state(const fs::path& p, const fs::change_config& cfg, 
             .release = nullptr,
             .copyDescription = nullptr
         };
-        const auto latency = std::chrono::duration_cast<cfduration>(cfg.notification_latency).count();
-        if (auto stream = FSEventStreamCreate(kCFAllocatorDefault, fsevents_callback, &ctx, cfpa.get(), m_lastid, latency, platform_flags(cfg))) {
-            m_stream.reset(stream);
-            struct stat sb;
-            if (0 == lstat(p.c_str(), &sb)) {
-                m_rootfd = open(p.c_str(), O_EVTONLY); // for root renames
-                m_uuid.reset(FSEventsCopyUUIDForDevice(sb.st_dev));
+        const auto dev = device(p, ec);
+        if (dev != 0) {
+            m_uuid.reset(FSEventsCopyUUIDForDevice(dev));
+            m_lastid = eventid(cfg, m_uuid.get());
+            const auto latency = std::chrono::duration_cast<cfduration>(cfg.notification_latency).count();
+            if (auto stream = FSEventStreamCreate(kCFAllocatorDefault, fsevents_callback, &ctx, cfpa.get(), m_lastid, latency, platform_flags(cfg))) {
+                m_stream.reset(stream);
                 m_dispatch_q.reset(dispatch_queue_create("fse_monitor", nullptr));
+                m_rootfd = open(p.c_str(), O_EVTONLY); // for root renames
+                return;
             } else {
-                ec = prosoft::system::system_error();
-                m_stream.reset();
+                m_uuid.reset();
             }
-            return;
         }
     }
     
     ec = fs::error_code(platform_error::monitor_create, platform_category());
 }
 
+constexpr const char* json_key_uuid = "uuid";
+constexpr const char* json_key_evid = "evid";
+
+platform_state::platform_state(const std::string& s)
+    : platform_state() {
+    
+    // throws for invalid json, but not empty string
+    auto j = !s.empty() ? json::parse(s) : json{};
+    auto i = j.find(json_key_uuid);
+    if (i != j.end()) {
+        if (auto s = prosoft::CF::unique_string{CFStringCreateWithCStringNoCopy(kCFAllocatorDefault, i->get_ref<const std::string&>().c_str(), kCFStringEncodingASCII, kCFAllocatorNull)}) {
+            m_uuid.reset(CFUUIDCreateFromString(kCFAllocatorDefault, s.get()));
+        }
+    }
+    i = j.find(json_key_evid);
+    if (i != j.end()) {
+        m_lastid = i->get<FSEventStreamEventId>();
+    }
+}
+
 platform_state::~platform_state() {
     if (-1 != m_rootfd) {
         close(m_rootfd);
     }
+}
+
+std::string platform_state::serialize() const {
+    if (m_uuid) {
+        using namespace prosoft;
+        CF::unique_string uid{CFUUIDCreateString(kCFAllocatorDefault, m_uuid.get())};
+        json j {
+            {json_key_uuid, from_CFString<std::string>{}(uid.get())},
+            {json_key_evid, m_lastid.load()}
+        };
+        return j.dump();
+    }
+    return "";
 }
 
 CFRunLoopRef monitor_thread_run_loop{};
@@ -496,10 +555,38 @@ void unregister_events_monitor(platform_state* state, fs::error_code& ec) {
 namespace prosoft {
 namespace filesystem {
 inline namespace v1 {
+    
+std::string change_state::serialize(const path& p, error_code& ec) {
+    const auto dev = device(p, ec);
+    if (0 != dev) {
+        if (auto uuid = unique_cftype<CFUUIDRef>{FSEventsCopyUUIDForDevice(dev)}) {
+            using namespace prosoft;
+            CF::unique_string uid{CFUUIDCreateString(kCFAllocatorDefault, uuid.get())};
+            json j {
+                {json_key_uuid, from_CFString<std::string>{}(uid.get())},
+                {json_key_evid, FSEventsGetLastEventIdForDeviceBeforeTime(dev, CFAbsoluteTimeGetCurrent())}
+            };
+            return j.dump();
+        } else {
+            ec.assign(ENOTSUP, std::system_category());
+        }
+    }
+    return "";
+}
 
-std::ostream& operator<<(std::ostream& os, const change_state&) { // TODO
-    //auto& fes = dynamic_cast<const platform_state&>(state);
-    return os;
+std::string change_state::serialize(const path& p) {
+    fs::error_code ec;
+    auto s = serialize(p, ec);
+    PS_THROW_IF(ec.value(), filesystem_error("Could not serialize filesystem monitor state", p, ec));
+    return s;
+}
+    
+std::unique_ptr<change_state> change_state::serialize(const std::string& s) {
+#if PS_HAVE_MAKE_UNIQUE
+    return std::make_unique<platform_state>(s);
+#else
+    return std::unique_ptr<platform_state>{new platform_state{s}};
+#endif
 }
 
 bool operator==(const change_state& lhs, const change_state& rhs) {
@@ -675,11 +762,27 @@ TEST_CASE("filesystem_monitor_internal") {
         CHECK(p);
         CHECK(!ec.value());
         CHECK(p->m_stream);
+        CHECK(p->m_lastid == kFSEventStreamEventIdSinceNow);
         CHECK(p->m_dispatch_q);
         CHECK(p->m_uuid);
         CHECK(p->m_rootfd > -1);
         CHECK(*p == *p);
         CHECK(canonical_root_path(p.get()).native() == "/");
+    }
+    
+    WHEN("state is created with a valid path and restore state") {
+        change_config cfg(change_event::all);
+        const auto archive = change_state::serialize(path{"/"});
+        CHECK_FALSE(archive.empty());
+        auto state = change_state::serialize(archive);
+        cfg.state = state.get();
+        error_code ec;
+        auto p = std::make_unique<platform_state>("/", cfg, ec);
+        CHECK(p);
+        CHECK(!ec.value());
+        CHECK(p->m_uuid);
+        CHECK(p->m_lastid != kFSEventStreamEventIdSinceNow);
+        CHECK(p->m_lastid == dynamic_cast<platform_state*>(cfg.state)->m_lastid);
     }
     
     WHEN("state is not registered") {
