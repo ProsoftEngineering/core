@@ -1,4 +1,4 @@
-// Copyright © 2016-2017, Prosoft Engineering, Inc. (A.K.A "Prosoft")
+// Copyright © 2016-2019, Prosoft Engineering, Inc. (A.K.A "Prosoft")
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without
@@ -79,6 +79,11 @@ struct dispatch_delete {
     }
 };
 using unique_dispatch_queue = std::unique_ptr<dispatch_queue_s, dispatch_delete>;
+
+enum class get_state_opts {
+    none,
+    delete_master
+};
 
 struct platform_state : public fs::change_state {
     fs::change_callback m_callback;
@@ -311,6 +316,49 @@ void fsevents_callback(ConstFSEventStreamRef, void* info, size_t nevents, void* 
     }
 }
 
+class gstate {
+    dispatch_queue_t rootq = nullptr;
+public:
+    std::vector<shared_state> registrations;
+    std::mutex lck;
+    
+    gstate() = default;
+    PS_DISABLE_COPY(gstate);
+    PS_DISABLE_MOVE(gstate);
+    
+    dispatch_queue_t root_queue(dev_t);
+};
+
+PS_NOINLINE
+gstate& gs() {
+    prosoft::intentional_leak_guard lg;
+    static auto gp = new gstate;
+    return *gp;
+}
+
+using g_guard = std::lock_guard<decltype(gstate::lck)>;
+
+#if MAC_OS_X_VERSION_10_12 && MAC_OS_X_VERSION_MIN_REQUIRED >= MAC_OS_X_VERSION_10_12
+PS_NOINLINE
+dispatch_queue_t gstate::root_queue(dev_t) {
+    // In the future we could use device-specific roots for better granularity (if needed).
+    static dispatch_once_t onceToken;
+    dispatch_once(&onceToken, ^{
+        this->rootq = dispatch_queue_create_with_target("ps_fse_root", nullptr, nullptr);
+    });
+    return this->rootq;
+}
+#endif
+
+PS_WARN_UNUSED_RESULT
+dispatch_queue_t make_monitor_queue(dev_t dev) {
+#if MAC_OS_X_VERSION_10_12 && MAC_OS_X_VERSION_MIN_REQUIRED >= MAC_OS_X_VERSION_10_12
+    return dispatch_queue_create_with_target("ps_fse_client", nullptr, gs().root_queue(dev));
+#else
+    return dispatch_queue_create("ps_fse_client", nullptr);
+#endif
+}
+
 platform_state::platform_state(const fs::path& p, const fs::change_config& cfg, fs::error_code& ec)
     : platform_state() {
     using namespace fs;
@@ -338,7 +386,7 @@ platform_state::platform_state(const fs::path& p, const fs::change_config& cfg, 
             const auto latency = std::chrono::duration_cast<cfduration>(cfg.notification_latency).count();
             if (auto stream = FSEventStreamCreate(kCFAllocatorDefault, fsevents_callback, &ctx, cfpa.get(), m_lastid, latency, platform_flags(cfg))) {
                 m_stream.reset(stream);
-                m_dispatch_q.reset(dispatch_queue_create("fse_monitor", nullptr));
+                m_dispatch_q.reset(make_monitor_queue(dev));
                 m_rootfd = open(p.c_str(), O_EVTONLY); // for root renames
                 return;
             } else {
@@ -354,8 +402,7 @@ constexpr const char* json_key_uuid = "uuid";
 constexpr const char* json_key_evid = "evid";
 
 platform_state::platform_state(const std::string& s)
-    : platform_state() {
-    
+    : platform_state() {    
     // throws for invalid json, but not empty string
     auto j = !s.empty() ? json::parse(s) : json{};
     auto i = j.find(json_key_uuid);
@@ -493,28 +540,6 @@ void stop_events_monitor(shared_state& ss) {
     
     return f.get();
 }
-
-struct gstate {
-    std::vector<shared_state> registrations;
-    std::mutex lck;
-    gstate() = default;
-    PS_DISABLE_COPY(gstate);
-    PS_DISABLE_MOVE(gstate);
-};
-
-PS_NOINLINE
-gstate& gs() {
-    prosoft::intentional_leak_guard lg;
-    static auto gp = new gstate;
-    return *gp;
-}
-
-using g_guard = std::lock_guard<decltype(gstate::lck)>;
-
-enum class get_state_opts {
-    none,
-    delete_master
-};
 
 shared_state get_shared_state(platform_state* state, get_state_opts opts) {
     auto& g = gs();
@@ -691,6 +716,8 @@ using namespace prosoft::filesystem;
 // However I did create a unique type that was a duplicate of change_notification that was used for testing only
 // and there was no crash with that type. The only difference being that nothing else referenced the test type.
 // After many, many hours of debugging, I have no idea what is going on.
+//
+// As of Xcode 10.1 std::vector has no problem. Probably an issue with the Xcode 8 clang version.
 
 void reduced_fsevents_callback_crash(ConstFSEventStreamRef, void*, size_t nevents, void*, const FSEventStreamEventFlags[], const FSEventStreamEventId[]) {
     fs::change_notifications notes;
