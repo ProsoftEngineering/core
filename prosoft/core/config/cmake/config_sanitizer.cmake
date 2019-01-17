@@ -1,4 +1,4 @@
-# Copyright © 2015, Prosoft Engineering, Inc. (A.K.A "Prosoft")
+# Copyright © 2015-2019, Prosoft Engineering, Inc. (A.K.A "Prosoft")
 # All rights reserved.
 # 
 # Redistribution and use in source and binary forms, with or without
@@ -26,7 +26,7 @@
 macro(ps_core_config_xcode_asan)
     # The normal compile flag check does not work with the Xcode generator as CMAKE_REQUIRED_FLAGS are not set in the Xcode file for the linker.
     # This hack works around that by checking if the Xcode generator is enabled and if Apple's clang version is correct (Xcode 7 has Apple clang version 7.0.0).
-    if(CMAKE_GENERATOR STREQUAL "Xcode" AND PSCLANG AND NOT CMAKE_C_COMPILER_VERSION MATCHES "^[0-6]\..*")
+    if(CMAKE_GENERATOR STREQUAL "Xcode" AND PSCLANG AND NOT CMAKE_C_COMPILER_VERSION MATCHES "^[0-6]\\..*")
         set(HAVE_XCODE_ADDRESS_SANITIZER true)
     endif()
 endmacro()
