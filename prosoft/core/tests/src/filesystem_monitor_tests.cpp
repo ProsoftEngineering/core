@@ -48,6 +48,7 @@ TEST_CASE("filesystem_monitor") {
     
         change_registration reg;
         CHECK_FALSE(reg);
+        CHECK(reg.serialize() == "");
         CHECK_FALSE(reg == change_registration());
         
         change_config cfg;
@@ -82,6 +83,26 @@ TEST_CASE("filesystem_monitor") {
         }
         // The reg may still be valid (if internal state is still alive) but it should no longer be registered as a monitor.
         CHECK_THROWS(stop(reg));
+    }
+    
+    WHEN("serializing monitor state") {
+        CHECK_THROWS(change_state::serialize(path()));
+    
+        // macOS SPECIFIC for now
+        
+        CHECK_THROWS(change_state::serialize(path("/dev"))); // devfs virtual filesystem
+        
+        auto state = change_state::serialize(std::string{});
+        CHECK(state->serialize() == "");
+        
+        CHECK_THROWS(change_state::serialize(std::string{"hello"}));
+        
+        // Valid data test
+        auto archive = change_state::serialize(path{"/"});
+        CHECK_FALSE(archive.empty());
+        
+        state = change_state::serialize(archive);
+        CHECK(archive == state->serialize());
     }
     
     SECTION("recursive monitor") {

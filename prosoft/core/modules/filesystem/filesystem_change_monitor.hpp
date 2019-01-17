@@ -1,4 +1,4 @@
-// Copyright © 2016-2017, Prosoft Engineering, Inc. (A.K.A "Prosoft")
+// Copyright © 2016-2019, Prosoft Engineering, Inc. (A.K.A "Prosoft")
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without
@@ -189,11 +189,25 @@ struct change_state {
     virtual ~change_state() = default;
     PS_DISABLE_COPY(change_state);
     PS_DISABLE_MOVE(change_state);
-
+    
+    // Serialization may throw!
+    PS_WARN_UNUSED_RESULT
+    virtual std::string serialize() const {
+        return "";
+    }
+    
+    PS_WARN_UNUSED_RESULT
+    static std::string serialize(const path&, error_code&); // for a path not being monitored
+    
+    PS_WARN_UNUSED_RESULT
+    static std::string serialize(const path&);
+    
+    PS_WARN_UNUSED_RESULT
+    static std::unique_ptr<change_state> serialize(const std::string&);
+    
 protected:
     change_state() = default;
 };
-std::ostream& operator<<(std::ostream&, const change_state&);
 
 bool operator==(const change_state&, const change_state&);
 inline bool operator!=(const change_state& lhs, const change_state& rhs) {
@@ -226,11 +240,12 @@ public:
         return false;
     }
     
-    std::ostream& operator<<(std::ostream& os) const {
-        if (auto p = m_state.lock()) {
-            os << *p;
+    std::string serialize() const {
+        auto p = m_state.lock();
+        if (p) {
+            return p->serialize();
         }
-        return os;
+        return "";
     }
 };
 
@@ -258,7 +273,8 @@ struct change_config {
     PS_DEFAULT_COPY(change_config);
     PS_DEFAULT_MOVE(change_config);
     
-    change_config(change_event evts) : change_config() {
+    change_config(change_event evts) noexcept
+        : change_config() {
         events = evts;
     }
 };

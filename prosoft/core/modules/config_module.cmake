@@ -1,4 +1,4 @@
-# Copyright © 2013-2016, Prosoft Engineering, Inc. (A.K.A "Prosoft")
+# Copyright © 2013-2019, Prosoft Engineering, Inc. (A.K.A "Prosoft")
 # All rights reserved.
 # 
 # Redistribution and use in source and binary forms, with or without
@@ -32,7 +32,8 @@ include("${CMAKE_CURRENT_LIST_DIR}/../config/cmake/config_coverage.cmake")
 
 set(PS_CORE_MODULE_INCLUDE_DIRS
     "${CMAKE_CURRENT_LIST_DIR}/../../.."
-    "${CMAKE_CURRENT_LIST_DIR}/../include"
+	"${CMAKE_CURRENT_LIST_DIR}/../include"
+	"${CMAKE_CURRENT_LIST_DIR}/../include/vendor"
 )
 
 if (DEFINED CORETESTS)
