@@ -54,6 +54,11 @@ macro(ps_core_module_config TARGET_NAME)
 	# XXX: can't config sanitizer for modules as we don't know if the host target has it configured
 	
 	if (DEFINED CORETESTS)
+		# However, we do know that our core test harness has the sanitizer enabled for debug builds
+		if(DEBUG)
+			ps_core_config_sanitizer(${TARGET_NAME})
+		endif()
+
 	    # Allows modules to define internal tests
 	    target_include_directories(${TARGET_NAME} PRIVATE "${CMAKE_CURRENT_LIST_DIR}/../../tests") # for catch
 	    target_compile_definitions(${TARGET_NAME} PRIVATE PSTEST_HARNESS=1)
