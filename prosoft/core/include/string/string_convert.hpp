@@ -1,4 +1,4 @@
-// Copyright © 2015-2017, Prosoft Engineering, Inc. (A.K.A "Prosoft")
+// Copyright © 2015-2019, Prosoft Engineering, Inc. (A.K.A "Prosoft")
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without
@@ -63,7 +63,7 @@ template <typename C>
 struct lowercase {
     typedef C char_type;
     char_type operator()(char_type c) {
-        return std::tolower(c);
+        return static_cast<char_type>(std::tolower(c));
     }
 };
 
@@ -71,7 +71,7 @@ template <typename C>
 struct uppercase {
     typedef C char_type;
     char_type operator()(char_type c) {
-        return std::toupper(c);
+        return static_cast<char_type>(std::toupper(c));
     }
 };
 
