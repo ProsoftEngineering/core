@@ -1,4 +1,4 @@
-// Copyright © 2015-2016, Prosoft Engineering, Inc. (A.K.A "Prosoft")
+// Copyright © 2015-2019, Prosoft Engineering, Inc. (A.K.A "Prosoft")
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without
@@ -261,7 +261,8 @@ class system_entry {
     static constexpr const size_t k_buf_size = 1024;
 
     void zero_entry() {
-        *(reinterpret_cast<uintptr_t*>(&m_entry)) = 0; // XXX: zero user/group name
+        static_assert(sizeof(m_entry) >= sizeof(uintptr_t), "Broken type assumption");
+        std::memset(reinterpret_cast<char*>(&m_entry), 0, sizeof(uintptr_t)); // XXX: zero user/group name
     }
 
     void reserve() {
