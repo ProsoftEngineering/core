@@ -368,8 +368,6 @@ platform_state::platform_state(const fs::path& p, const fs::change_config& cfg, 
         return;
     }
     
-    // XXX: handle cfg state restore
-    
     const void* values = cfp.get();
     if (auto cfpa = prosoft::CF::unique_array{ CFArrayCreate(kCFAllocatorDefault, &values, 1, &kCFTypeArrayCallBacks) }) {
         FSEventStreamContext ctx {
@@ -596,21 +594,67 @@ void unregister_events_monitor(platform_state* state, fs::error_code& ec) {
 namespace prosoft {
 namespace filesystem {
 inline namespace v1 {
+
+struct change_token {
+    dev_t m_device;
+    std::string m_uuid;
     
-std::string change_state::serialize(const path& p, error_code& ec) {
-    const auto dev = device(p, ec);
-    if (0 != dev) {
-        if (auto uuid = unique_cftype<CFUUIDRef>{FSEventsCopyUUIDForDevice(dev)}) {
+    change_token(const path&, error_code&);
+};
+
+change_token::change_token(const path& p, error_code& ec) {
+    m_device = device(p, ec);
+    if (0 != m_device) {
+        if (auto uuid = unique_cftype<CFUUIDRef>{FSEventsCopyUUIDForDevice(m_device)}) {
             using namespace prosoft;
-            CF::unique_string uid{CFUUIDCreateString(kCFAllocatorDefault, uuid.get())};
-            json j {
-                {json_key_uuid, from_CFString<std::string>{}(uid.get())},
-                {json_key_evid, FSEventsGetLastEventIdForDeviceBeforeTime(dev, CFAbsoluteTimeGetCurrent())}
-            };
-            return j.dump();
+            if (CF::unique_string us{CFUUIDCreateString(kCFAllocatorDefault, uuid.get())}) {
+                m_uuid = from_CFString<std::string>{}(us.get());
+            } else {
+                ec.assign(ENOMEM, std::system_category());
+            }
         } else {
             ec.assign(ENOTSUP, std::system_category());
         }
+    }
+}
+
+change_state::token_type change_state::serialize_token(const path& p, error_code& ec) {
+    auto ct = std::make_shared<change_token>(p, ec);
+    if (ec.value() == 0) {
+        return ct;
+    } else {
+        return {};
+    }
+}
+
+change_state::token_type change_state::serialize_token(const path& p) {
+    fs::error_code ec;
+    auto s = serialize_token(p, ec);
+    PS_THROW_IF(ec.value(), filesystem_error("Could not serialize filesystem monitor state", p, ec));
+    return s;
+}
+
+std::string change_state::serialize(const token_type& token, error_code& ec) {
+    if (token) {
+        json j {
+            {json_key_uuid, token->m_uuid},
+            {json_key_evid, FSEventsGetLastEventIdForDeviceBeforeTime(token->m_device, CFAbsoluteTimeGetCurrent())}
+        };
+        return j.dump();
+    }
+    return "";
+}
+
+std::string change_state::serialize(const token_type& token) {
+    fs::error_code ec;
+    auto s = serialize(token, ec);
+    PS_THROW_IF(ec.value(), filesystem_error("Could not serialize filesystem monitor state", ec));
+    return s;
+}
+    
+std::string change_state::serialize(const path& p, error_code& ec) {
+    if (auto token = serialize_token(p, ec)) {
+        return serialize(token, ec);
     }
     return "";
 }

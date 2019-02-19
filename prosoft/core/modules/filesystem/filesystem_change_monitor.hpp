@@ -185,6 +185,8 @@ using change_notifications = std::deque<change_notification>;
 using change_callback = std::function<void (change_notifications&&)>;
 
 // System specific state.
+struct change_token;
+
 struct change_state {
     virtual ~change_state() = default;
     PS_DISABLE_COPY(change_state);
@@ -196,8 +198,22 @@ struct change_state {
         return "";
     }
     
+    using token_type = std::shared_ptr<change_token>;
     PS_WARN_UNUSED_RESULT
-    static std::string serialize(const path&, error_code&); // for a path not being monitored
+    static token_type serialize_token(const path&, error_code&);
+    
+    PS_WARN_UNUSED_RESULT
+    static token_type serialize_token(const path&);
+    
+    PS_WARN_UNUSED_RESULT
+    static std::string serialize(const token_type&, error_code&); // for a path not being monitored
+    
+    PS_WARN_UNUSED_RESULT
+    static std::string serialize(const token_type&);
+    
+    // Wrapper for token API. The token API is better used if state will be serialized often as the setup only needs to be done once.
+    PS_WARN_UNUSED_RESULT
+    static std::string serialize(const path&, error_code&);
     
     PS_WARN_UNUSED_RESULT
     static std::string serialize(const path&);
