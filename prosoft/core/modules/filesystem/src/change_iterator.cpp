@@ -1,4 +1,4 @@
-// Copyright © 2017, Prosoft Engineering, Inc. (A.K.A "Prosoft")
+// Copyright © 2017-2019, Prosoft Engineering, Inc. (A.K.A "Prosoft")
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without
@@ -131,6 +131,10 @@ public:
     
     virtual fs::path next(fsiterator_cache&, prosoft::system::error_code&) override;
     virtual bool at_end() const override;
+    
+    std::string serialize() const {
+        return m_reg.serialize();
+    }
 };
 
 state::state(const fs::path& p, fs::directory_options opts, fs::change_iterator_config&& c, fs::error_code& ec)
@@ -143,6 +147,8 @@ state::state(const fs::path& p, fs::directory_options opts, fs::change_iterator_
         using namespace fs;
         const auto events = to_events(opts);
         change_config cfg;
+        auto state = change_state::serialize(c.serialize_data);
+        cfg.state = state.get();
         cfg.notification_latency = std::chrono::duration_cast<change_config::latency_type>(c.latency);
         m_reg = recursive_monitor(p, cfg, [this, events](change_notifications&& notes) {
             for (auto& n : notes) {
@@ -262,6 +268,14 @@ bool ifilesystem::change_iterator_traits::equal_to(const basic_iterator<change_i
 extraction_type ifilesystem::change_iterator_traits::extract_paths(basic_iterator<change_iterator_traits>& i) {
     auto p = reinterpret_cast<state*>(i.m_i.get());
     return p ? p->extract() : extraction_type{};
+}
+
+ifilesystem::change_iterator_traits::serialize_type
+ifilesystem::change_iterator_traits::serialize(const basic_iterator<change_iterator_traits>& i) {
+    if (auto p = reinterpret_cast<const state*>(i.m_i.get())) {
+        return p->serialize();
+    }
+    return "";
 }
 
 } // v1

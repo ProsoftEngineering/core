@@ -48,6 +48,12 @@ TEST_CASE("filesystem_change_iterator") {
         CHECK_THROWS(changed_directory_iterator(temp_directory_path(), directory_options::none));
     }
     
+    WHEN("constructed with invalid serialized data") {
+        config_type c;
+        c.serialize_data = "junk";
+        CHECK_THROWS(changed_directory_iterator(temp_directory_path(), traits_type::defaults, std::move(c)));
+    }
+    
     SECTION("event test") {
         const auto root = canonical(temp_directory_path()) / process_name("fs17test");
         create_directory(root);

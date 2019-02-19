@@ -1,4 +1,4 @@
-// Copyright © 2017, Prosoft Engineering, Inc. (A.K.A "Prosoft")
+// Copyright © 2017-2019, Prosoft Engineering, Inc. (A.K.A "Prosoft")
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without
@@ -53,6 +53,8 @@ struct change_iterator_config {
     // Passed on to FS monitor.
     using latency_type = std::chrono::milliseconds;
     latency_type latency;
+    using serialize_type = std::string;
+    serialize_type serialize_data;
     
     static constexpr latency_type default_latency() { return latency_type{1000L}; }
     
@@ -86,6 +88,8 @@ struct change_iterator_traits {
     static bool canceled(const basic_iterator<change_iterator_traits>&);
     static bool equal_to(const basic_iterator<change_iterator_traits>&, const change_registration&);
     static std::vector<path> extract_paths(basic_iterator<change_iterator_traits>&);
+    using serialize_type = typename change_iterator_config::serialize_type;
+    static serialize_type serialize(const basic_iterator<change_iterator_traits>&);
 };
 
 iterator_state_ptr make_iterator_state(const path&, directory_options, change_iterator_traits::configuration_type&&, error_code&);
@@ -108,6 +112,12 @@ inline bool canceled(const ifilesystem::change_iterator_t& i) {
 // A more efficient way than a range loop to grab all available paths. 
 inline std::vector<path> extract_paths(ifilesystem::change_iterator_t& i) {
     return ifilesystem::change_iterator_traits::extract_paths(i);
+}
+
+// XXX: this is very coarse, really only useful when an empty path is returned (IOW, the FS is idle)
+// For fine control (event level) you should use the change monitor API directly
+inline ifilesystem::change_iterator_traits::serialize_type serialize(const ifilesystem::change_iterator_t& i) {
+    return ifilesystem::change_iterator_traits::serialize(i);
 }
 
 // for finding the iterator from a callback
