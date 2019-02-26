@@ -107,6 +107,7 @@ struct platform_state : public fs::change_state {
     virtual ~platform_state();
     
     virtual std::string serialize() const override;
+    virtual std::string serialize(fs::change_event_id) const override;
     
     operator FSEventStreamRef() const noexcept(noexcept(m_stream.get())) {
         return m_stream.get();
@@ -422,12 +423,16 @@ platform_state::~platform_state() {
 }
 
 std::string platform_state::serialize() const {
-    if (m_uuid) {
+    return this->serialize(m_lastid.load());
+}
+
+std::string platform_state::serialize(fs::change_event_id evid) const {
+    if (m_uuid && evid > 0) {
         using namespace prosoft;
         CF::unique_string uid{CFUUIDCreateString(kCFAllocatorDefault, m_uuid.get())};
         json j {
             {json_key_uuid, from_CFString<std::string>{}(uid.get())},
-            {json_key_evid, m_lastid.load()}
+            {json_key_evid, evid}
         };
         return j.dump();
     }

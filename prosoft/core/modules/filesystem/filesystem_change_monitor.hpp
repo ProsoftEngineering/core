@@ -90,6 +90,7 @@ PS_ENUM_BITMASK_OPS(change_event);
 class change_manager;
 class change_registration;
 
+using change_event_id = uint64_t;
 class change_notification {
     using path_type = prosoft::filesystem::path;
     using platform_event_id_type = std::uint64_t;
@@ -125,6 +126,10 @@ public:
     
     change_event event() const noexcept {
         return m_event;
+    }
+    
+    change_event_id event_id() const noexcept {
+        return m_eventid;
     }
     
     regid_type registration_id() const noexcept {
@@ -198,6 +203,10 @@ struct change_state {
         return "";
     }
     
+    virtual std::string serialize(change_event_id) const {
+        return "";
+    }
+    
     using token_type = std::shared_ptr<change_token>;
     PS_WARN_UNUSED_RESULT
     static token_type serialize_token(const path&, error_code&);
@@ -248,8 +257,7 @@ public:
     }
     
     bool operator==(const change_registration& other) const {
-        auto p = m_state.lock();
-        if (p) {
+        if (auto p = m_state.lock()) {
             auto op = other.m_state.lock();
             return op && *p == *op;
         }
@@ -257,9 +265,15 @@ public:
     }
     
     std::string serialize() const {
-        auto p = m_state.lock();
-        if (p) {
+        if (auto p = m_state.lock()) {
             return p->serialize();
+        }
+        return "";
+    }
+    
+    std::string serialize(change_event_id evid) const {
+        if (auto p = m_state.lock()) {
+            return p->serialize(evid);
         }
         return "";
     }
