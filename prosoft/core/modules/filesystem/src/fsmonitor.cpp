@@ -1,4 +1,4 @@
-// Copyright © 2016-2017, Prosoft Engineering, Inc. (A.K.A "Prosoft")
+// Copyright © 2016-2019, Prosoft Engineering, Inc. (A.K.A "Prosoft")
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without
@@ -85,6 +85,8 @@ std::string platform_error_category::message(int code) const {
             return "Could not create filesystem event monitor.";
         case platform_error::monitor_start:
             return "Could not start filesystem event monitor.";
+        case platform_error::monitor_thaw:
+            return "Could not restore filesystem event monitor.";
         case platform_error::not_supported:
             return "Unsupported filesystem event monitor option.";
         case platform_error::noerr:

@@ -215,6 +215,7 @@ fs::path canonical_root_path(const platform_state* state) {
 dev_t device(const fs::path& p, fs::error_code& ec) {
     struct stat sb;
     if (0 == lstat(p.c_str(), &sb)) {
+        ec.clear();
         return sb.st_dev;
     } else {
         ec = prosoft::system::system_error();
@@ -222,10 +223,19 @@ dev_t device(const fs::path& p, fs::error_code& ec) {
     }
 }
 
-FSEventStreamEventId eventid(const fs::change_config& cc, CFUUIDRef fsUUID) {
+FSEventStreamEventId current_eventid(dev_t dev) {
+    return FSEventsGetLastEventIdForDeviceBeforeTime(dev, CFAbsoluteTimeGetCurrent() + kCFAbsoluteTimeIntervalSince1970);
+}
+
+FSEventStreamEventId eventid(const fs::change_config& cc, CFUUIDRef fsUUID, std::error_code& ec) {
     if (auto pc = dynamic_cast<const platform_state*>(cc.state)) {
-        if (pc->m_uuid && fsUUID && CFEqual(pc->m_uuid.get(), fsUUID)) {
-            return pc->m_lastid;
+        if (pc->m_uuid && fsUUID) {
+            const auto evid = pc->m_lastid.load();
+            if (CFEqual(pc->m_uuid.get(), fsUUID) && evid > 0) {
+                return evid;
+            } else {
+                ec.assign(EINVAL, std::system_category());
+            }
         }
     }
     return kFSEventStreamEventIdSinceNow;
@@ -381,7 +391,14 @@ platform_state::platform_state(const fs::path& p, const fs::change_config& cfg, 
         const auto dev = device(p, ec);
         if (dev != 0) {
             m_uuid.reset(FSEventsCopyUUIDForDevice(dev));
-            m_lastid = eventid(cfg, m_uuid.get());
+            m_lastid = eventid(cfg, m_uuid.get(), ec);
+            
+            if (m_lastid == kFSEventStreamEventIdSinceNow && ec) {
+                ec = fs::error_code(platform_error::monitor_thaw, platform_category());
+                m_uuid.reset();
+                return;
+            }
+            
             const auto latency = std::chrono::duration_cast<cfduration>(cfg.notification_latency).count();
             if (auto stream = FSEventStreamCreate(kCFAllocatorDefault, fsevents_callback, &ctx, cfpa.get(), m_lastid, latency, platform_flags(cfg))) {
                 m_stream.reset(stream);
@@ -643,7 +660,7 @@ std::string change_state::serialize(const token_type& token, error_code& ec) {
     if (token) {
         json j {
             {json_key_uuid, token->m_uuid},
-            {json_key_evid, FSEventsGetLastEventIdForDeviceBeforeTime(token->m_device, CFAbsoluteTimeGetCurrent())}
+            {json_key_evid, current_eventid(token->m_device)}
         };
         return j.dump();
     }
