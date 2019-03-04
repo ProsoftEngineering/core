@@ -87,6 +87,8 @@ std::string platform_error_category::message(int code) const {
             return "Could not start filesystem event monitor.";
         case platform_error::monitor_thaw:
             return "Could not restore filesystem event monitor.";
+        case platform_error::monitor_replay_past:
+            return "Could not replay filesystem event monitor as the event stream is in the past.";
         case platform_error::not_supported:
             return "Unsupported filesystem event monitor option.";
         case platform_error::noerr:

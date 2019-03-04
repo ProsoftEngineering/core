@@ -85,12 +85,15 @@ enum class get_state_opts {
     delete_master
 };
 
+constexpr FSEventStreamEventId wants_replay = kFSEventStreamEventIdSinceNow;
+
 struct platform_state : public fs::change_state {
     fs::change_callback m_callback;
     unique_fsstream m_stream;
     unique_dispatch_queue m_dispatch_q;
     std::uintptr_t m_regid;
     int m_rootfd;
+    FSEventStreamEventId m_stopid; // event to stop at
     // persistent values //
     prosoft::unique_cftype<CFUUIDRef> m_uuid; // set when constructed and then read-only
     std::atomic<FSEventStreamEventId> m_lastid;
@@ -100,10 +103,11 @@ struct platform_state : public fs::change_state {
         , m_stream()
         , m_dispatch_q()
         , m_rootfd(-1)
+        , m_stopid(0)
         , m_uuid()
         , m_lastid(kFSEventStreamEventIdSinceNow) {}
     platform_state(const fs::path&, const fs::change_config&, fs::error_code&);
-    platform_state(const std::string&); // from serial
+    platform_state(const std::string&, fs::change_thaw_options); // from serialzed data
     virtual ~platform_state();
     
     virtual std::string serialize() const override;
@@ -241,6 +245,19 @@ FSEventStreamEventId eventid(const fs::change_config& cc, CFUUIDRef fsUUID, std:
     return kFSEventStreamEventIdSinceNow;
 }
 
+bool replay(const fs::change_config& cc) {
+    if (auto pc = dynamic_cast<const platform_state*>(cc.state)) {
+        return pc->m_stopid == wants_replay;
+    }
+    return false;
+}
+
+void cancel(platform_state* state) {
+    if (state->m_stream) { // can be null in test harness
+        FSEventStreamStop(state->m_stream.get());
+    }
+}
+
 template <class Dispatch = dispatch_events>
 void fsevents_callback(ConstFSEventStreamRef, void* info, size_t nevents, void* evpaths, const FSEventStreamEventFlags evflags[], const FSEventStreamEventId evids[]) {
     static auto exists = [](const char* p) noexcept { // avoid need for copying string to a path{}
@@ -286,9 +303,7 @@ void fsevents_callback(ConstFSEventStreamRef, void* info, size_t nevents, void* 
                 fs::change_manager::emplace_back(*notes, std::move(rp), std::move(np), state, evids[i], ev, fs::file_type::directory);
                 
                 PSASSERT(is_set(ev & fs::change_event::canceled), "Broken assumption");
-                if (state->m_stream) { // can be null in test harness
-                    FSEventStreamStop(state->m_stream.get());
-                }
+                cancel(state);
                 break; // further events are invalid
             } // rescan
             
@@ -308,15 +323,22 @@ void fsevents_callback(ConstFSEventStreamRef, void* info, size_t nevents, void* 
                 }
             }
             
-            if (kFSEventStreamEventFlagHistoryDone == flags) {
-                continue;
+            const auto stopid = state->m_stopid;
+            const bool historyDone = kFSEventStreamEventFlagHistoryDone == flags;
+            if (!historyDone) {
+                lastID = evids[i];
+                fs::change_manager::emplace_back(*notes, fs::path{paths[i]}, fs::path{}, state, evids[i], to_event(flags & ~negated_flags), to_type(flags));
+#if 0 && PSTEST_HARNESS
+                std::cout << evids[i] << "," << paths[i] << "," << flags << "," << (flags & ~negated_flags) << "\n";
+#endif
             }
             
-            lastID = evids[i];
-            fs::change_manager::emplace_back(*notes, fs::path{paths[i]}, fs::path{}, state, evids[i], to_event(flags & ~negated_flags), to_type(flags));
-#if 0 && PSTEST_HARNESS
-            std::cout << evids[i] << "," << paths[i] << "," << flags << "," << (flags & ~negated_flags) << "\n";
-#endif
+             // historyDone should be enough, but in case there's some stream bug we'll use the stopid as a fallback case
+            if (stopid > 0 && (historyDone || lastID >= stopid)) {
+                fs::change_manager::emplace_back(*notes, fs::path{}, fs::path{}, state, 0, fs::change_event::replay_end, fs::file_type::none);
+                cancel(state);
+                break; // further events are invalid
+            }
         } // for
         
         if (!notes->empty()) {
@@ -399,6 +421,18 @@ platform_state::platform_state(const fs::path& p, const fs::change_config& cfg, 
                 return;
             }
             
+            if (replay(cfg)) {
+                m_stopid = current_eventid(dev);
+                if (m_stopid < m_lastid) {
+                    // This can happen if the clock drifts/resets. NTP is off. Or the user makes an explicit clock change.
+                    ec = fs::error_code(platform_error::monitor_replay_past, platform_category());
+                    m_uuid.reset();
+                    return;
+                }
+            } else {
+                PSASSERT(m_stopid == 0, "Broken assumption");
+            }
+            
             const auto latency = std::chrono::duration_cast<cfduration>(cfg.notification_latency).count();
             if (auto stream = FSEventStreamCreate(kCFAllocatorDefault, fsevents_callback, &ctx, cfpa.get(), m_lastid, latency, platform_flags(cfg))) {
                 m_stream.reset(stream);
@@ -417,7 +451,7 @@ platform_state::platform_state(const fs::path& p, const fs::change_config& cfg, 
 constexpr const char* json_key_uuid = "uuid";
 constexpr const char* json_key_evid = "evid";
 
-platform_state::platform_state(const std::string& s)
+platform_state::platform_state(const std::string& s, fs::change_thaw_options opts)
     : platform_state() {    
     // throws for invalid json, but not empty string
     auto j = !s.empty() ? json::parse(s) : json{};
@@ -430,6 +464,9 @@ platform_state::platform_state(const std::string& s)
     i = j.find(json_key_evid);
     if (i != j.end()) {
         m_lastid = i->get<FSEventStreamEventId>();
+        if (is_set(opts & fs::change_thaw_options::replay_to_current_event)) {
+            m_stopid = wants_replay;
+        }
     }
 }
 
@@ -688,11 +725,11 @@ std::string change_state::serialize(const path& p) {
     return s;
 }
     
-std::unique_ptr<change_state> change_state::serialize(const std::string& s) {
+std::unique_ptr<change_state> change_state::serialize(const std::string& s, change_thaw_options opts) {
 #if PS_HAVE_MAKE_UNIQUE
-    return std::make_unique<platform_state>(s);
+    return std::make_unique<platform_state>(s, opts);
 #else
-    return std::unique_ptr<platform_state>{new platform_state{s}};
+    return std::unique_ptr<platform_state>{new platform_state{s, opts}};
 #endif
 }
 
@@ -885,6 +922,7 @@ TEST_CASE("filesystem_monitor_internal") {
         CHECK_FALSE(archive.empty());
         auto state = change_state::serialize(archive);
         cfg.state = state.get();
+        CHECK_FALSE(replay(cfg));
         error_code ec;
         auto p = std::make_unique<platform_state>("/", cfg, ec);
         CHECK(p);
@@ -1164,6 +1202,24 @@ TEST_CASE("filesystem_monitor_internal") {
             CHECK(n.renamed_to_path() == np);
             CHECK(n.type() == file_type::regular);
             CHECK(lastID == 1);
+        }
+        
+        WHEN("history done flag is set") {
+            platform_state state;
+            paths.push_back(PS_TEXT(""));
+            flags.push_back(kFSEventStreamEventFlagHistoryDone);
+            ids.push_back(1);
+            
+            fsevents_callback<TestDispatcher>(nullptr, &state, paths.size(), paths.data(), flags.data(), ids.data());
+            CHECK(notes.size() == 0); // ignored as m_stopid is 0
+            
+            state.m_stopid = 2;
+            fsevents_callback<TestDispatcher>(nullptr, &state, paths.size(), paths.data(), flags.data(), ids.data());
+            REQUIRE(notes.size() == 1);
+            auto& n = notes[0];
+            CHECK(n.event() == change_event::replay_end);
+            CHECK(n.path().empty());
+            CHECK(n.type() == file_type::none);
         }
         
         WHEN("there are 2 rename events with matching ids and the 2nd event has the removed flag set") {

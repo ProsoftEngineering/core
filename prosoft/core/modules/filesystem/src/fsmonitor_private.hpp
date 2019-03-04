@@ -66,6 +66,7 @@ enum platform_error {
     monitor_create,
     monitor_start,
     monitor_thaw,
+    monitor_replay_past,
     not_supported
 };
 

@@ -65,6 +65,10 @@ enum class change_event : unsigned {
     
     all = created|removed|renamed|content_modified|metadata_modified,
     
+    // cancellation flags
+    
+    replay_done = 1<<28, // see change_thaw_options
+    
     // A full rescan of the tree is suggested.
     // This may be set in conjuction with canceled due to an error (in which case the rescan is required),
     // or it may be a standalone event that contains a path in the tree that has been hidden or exposed due to a volume mount/unmount.
@@ -83,7 +87,8 @@ enum class change_event : unsigned {
     // No more events will be received after a cancel event and the client should stop() the monitor to release resources.
     canceled = 1U<<31,
     
-    rescan_required = rescan|canceled
+    rescan_required = rescan|canceled,
+    replay_end = replay_done|canceled
 };
 PS_ENUM_BITMASK_OPS(change_event);
 
@@ -192,6 +197,13 @@ using change_callback = std::function<void (change_notifications&&)>;
 // System specific state.
 struct change_token;
 
+enum change_thaw_options : unsigned {
+    none,
+    // sets up the resulting monitor to automatically cancel after replaying the event stream to the current event (at time of creation)
+    replay_to_current_event = 1U<<1,
+};
+PS_ENUM_BITMASK_OPS(change_thaw_options);
+
 struct change_state {
     virtual ~change_state() = default;
     PS_DISABLE_COPY(change_state);
@@ -228,7 +240,7 @@ struct change_state {
     static std::string serialize(const path&);
     
     PS_WARN_UNUSED_RESULT
-    static std::unique_ptr<change_state> serialize(const std::string&);
+    static std::unique_ptr<change_state> serialize(const std::string&, change_thaw_options = change_thaw_options::none);
     
 protected:
     change_state() = default;
