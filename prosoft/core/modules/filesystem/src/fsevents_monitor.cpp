@@ -96,6 +96,7 @@ struct platform_state : public fs::change_state {
     FSEventStreamEventId m_stopid; // event to stop at
     // persistent values //
     prosoft::unique_cftype<CFUUIDRef> m_uuid; // set when constructed and then read-only
+    std::string m_uuid_str; // cached for persistence
     std::atomic<FSEventStreamEventId> m_lastid;
     
     platform_state()
@@ -438,6 +439,9 @@ platform_state::platform_state(const fs::path& p, const fs::change_config& cfg, 
                 m_stream.reset(stream);
                 m_dispatch_q.reset(make_monitor_queue(dev));
                 m_rootfd = open(p.c_str(), O_EVTONLY); // for root renames
+                using namespace prosoft;
+                CF::unique_string uid{CFUUIDCreateString(kCFAllocatorDefault, m_uuid.get())};
+                m_uuid_str = from_CFString<std::string>{}(uid.get());
                 return;
             } else {
                 m_uuid.reset();
@@ -459,6 +463,7 @@ platform_state::platform_state(const std::string& s, fs::change_thaw_options opt
     if (i != j.end()) {
         if (auto s = prosoft::CF::unique_string{CFStringCreateWithCStringNoCopy(kCFAllocatorDefault, i->get_ref<const std::string&>().c_str(), kCFStringEncodingASCII, kCFAllocatorNull)}) {
             m_uuid.reset(CFUUIDCreateFromString(kCFAllocatorDefault, s.get()));
+            m_uuid_str = *i;
         }
     }
     i = j.find(json_key_evid);
@@ -481,11 +486,9 @@ std::string platform_state::serialize() const {
 }
 
 std::string platform_state::serialize(fs::change_event_id evid) const {
-    if (m_uuid && evid > 0) {
-        using namespace prosoft;
-        CF::unique_string uid{CFUUIDCreateString(kCFAllocatorDefault, m_uuid.get())};
+    if (!m_uuid_str.empty() && evid > 0) {
         json j {
-            {json_key_uuid, from_CFString<std::string>{}(uid.get())},
+            {json_key_uuid, m_uuid_str},
             {json_key_evid, evid}
         };
         return j.dump();
