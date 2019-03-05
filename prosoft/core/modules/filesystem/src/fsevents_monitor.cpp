@@ -111,6 +111,8 @@ struct platform_state : public fs::change_state {
     platform_state(const std::string&, fs::change_thaw_options); // from serialzed data
     virtual ~platform_state();
     
+    virtual fs::change_event_id last_event_id() const override;
+    
     virtual std::string serialize() const override;
     virtual std::string serialize(fs::change_event_id) const override;
     
@@ -479,6 +481,10 @@ platform_state::~platform_state() {
     if (-1 != m_rootfd) {
         close(m_rootfd);
     }
+}
+
+fs::change_event_id platform_state::last_event_id() const {
+    return m_lastid.load();
 }
 
 std::string platform_state::serialize() const {

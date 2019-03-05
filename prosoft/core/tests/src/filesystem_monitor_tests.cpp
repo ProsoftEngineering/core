@@ -23,6 +23,10 @@
 // (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
+#if __APPLE__
+#include <CoreFoundation/CFBase.h>
+#endif
+
 #include <prosoft/core/config/config_platform.h>
 
 #include <thread>
@@ -102,7 +106,14 @@ TEST_CASE("filesystem_monitor") {
         CHECK_FALSE(archive.empty());
         
         state = change_state::serialize(archive);
-        CHECK(archive == state->serialize());
+        // 10.12 Travis image is returning 0 from FSEventsGetLastEventIdForDeviceBeforeTime() given the current time
+        if (state->last_event_id() > 0) {
+            CHECK(archive == state->serialize());
+        } else {
+            constexpr double sierraMax = 1399;
+            CHECK(kCFCoreFoundationVersionNumber <= sierraMax);
+            CHECK(state->serialize().empty());
+        }
     }
     
     SECTION("recursive monitor") {

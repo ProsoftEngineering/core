@@ -209,12 +209,17 @@ struct change_state {
     PS_DISABLE_COPY(change_state);
     PS_DISABLE_MOVE(change_state);
     
+    virtual change_event_id last_event_id() const { // for testing
+        return 0;
+    }
+    
     // Serialization may throw!
     PS_WARN_UNUSED_RESULT
     virtual std::string serialize() const {
         return "";
     }
     
+    PS_WARN_UNUSED_RESULT
     virtual std::string serialize(change_event_id) const {
         return "";
     }
