@@ -45,8 +45,10 @@ macro(ps_core_config_asan TARGET_NAME)
         ps_core_config_xcode_asan()
         if(HAVE_XCODE_ADDRESS_SANITIZER)
             set (HAVE_ADDRESS_SANITIZER true)
-            message(STATUS "Xcode sanitizer enabled: ${TARGET_NAME}")
+            message(STATUS "Xcode ASAN enabled: ${TARGET_NAME}")
         endif()
+    else()
+        message(STATUS "ASAN enabled: ${TARGET_NAME}")
     endif()
     
     # WARNING: For bundled Apple apps this will not copy the ASAN lib to the bundle as Xcode schemes do.
@@ -54,6 +56,7 @@ macro(ps_core_config_asan TARGET_NAME)
     if(HAVE_ADDRESS_SANITIZER)
         target_compile_options(${TARGET_NAME} PRIVATE "-fsanitize=address" "-fno-omit-frame-pointer")
         target_link_libraries(${TARGET_NAME} PUBLIC "-fsanitize=address")
+        set_property(TARGET ${TARGET_NAME} PROPERTY PS_USING_ASAN true)
     endif()
     
     set(CMAKE_REQUIRED_FLAGS ${SAVED_CMAKE_REQUIRED_FLAGS})
@@ -82,6 +85,8 @@ macro(ps_core_config_ubsan TARGET_NAME)
         if(HAVE_UNDEFINED_SANITIZER)
             target_compile_options(${TARGET_NAME} PRIVATE "-fsanitize=undefined" "-fno-omit-frame-pointer")
             target_link_libraries(${TARGET_NAME} PUBLIC "-fsanitize=undefined")
+            set_property(TARGET ${TARGET_NAME} PROPERTY PS_USING_UBSAN true)
+            message(STATUS "UBSAN enabled: ${TARGET_NAME}")
         endif()
 
         set(CMAKE_REQUIRED_FLAGS ${SAVED_CMAKE_REQUIRED_FLAGS})
@@ -91,20 +96,22 @@ endmacro()
 macro(ps_core_config_sanitizer TARGET_NAME)
     # Clang (3.1+) and GCC (4.8+) support these. For Apple, Xcode 7 is required. (See notes above.)
     # The leak sanitizer is part of ASAN in recent versions.
-    # The general advise to get decent runtime performance with ASan is to use at least -O1.
+    # The general advice to get decent runtime performance with ASan is to use at least -O1.
     # But these should probably only be enabled for debug builds.
     #
     # break on __asan_report_error to catch ASan asserts in the debugger.
     
     # ASan on PPC is broken (internal crash) as of GCC 4.8.1. It may be fixed in 4.8.2 or 4.9.
     # HOST_SYSTEM_PROCESSOR may technically not be the same as the target CPU, but it's the best we have.
-    if(NOT ${CMAKE_HOST_SYSTEM_PROCESSOR} MATCHES "(ppc|powerpc)(32|64)?")
+    get_property(_using_asan TARGET ${TARGET_NAME} PROPERTY PS_USING_ASAN)
+    if(NOT _using_asan AND NOT ${CMAKE_HOST_SYSTEM_PROCESSOR} MATCHES "(ppc|powerpc)(32|64)?")
         ps_core_config_asan(${TARGET_NAME})
     endif()
-
+    
+    get_property(_using_ubsan TARGET ${TARGET_NAME} PROPERTY PS_USING_UBSAN)
     # Xcode 8.0 supports the ubsan compiler flags but does not have the support lib
     # This results in link errors. When asked, Apple said "behaves as expected". 
-    if(NOT CMAKE_GENERATOR STREQUAL "Xcode")
+    if(NOT _using_ubsan AND NOT CMAKE_GENERATOR STREQUAL "Xcode")
         ps_core_config_ubsan(${TARGET_NAME})
     endif()
     

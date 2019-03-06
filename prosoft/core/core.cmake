@@ -37,6 +37,13 @@ macro(ps_core_include TARGET_NAME)
     )
 endmacro()
 
+# This global will enable the sanitizer for any call to ps_core_configure_required() if true
+# For newer versions of clang ASAN is all or nothing due to the folloowing issue:
+# https://stackoverflow.com/questions/43389185/manual-poisoning-of-stdvector
+if(NOT DEFINED PS_CORE_ENABLE_SANITIZER)
+    set(PS_CORE_ENABLE_SANITIZER ${PS_BUILD_DEBUG})
+endif()
+
 macro(ps_core_configure_required TARGET_NAME)
     ps_core_include(${TARGET_NAME})
     # PS_BUILD_* are stable build type defines. They should never be set anywhere but here.
@@ -53,6 +60,9 @@ macro(ps_core_configure_required TARGET_NAME)
             target_compile_definitions(${TARGET_NAME} PRIVATE PS_LIB_IMPORTS=1)
         endif()
     endif()
+    if(PS_CORE_ENABLE_SANITIZER)
+        ps_core_config_sanitizer(${TARGET_NAME})
+    endif()
 endmacro()
 
 macro(ps_core_configure TARGET_NAME)
@@ -60,9 +70,6 @@ macro(ps_core_configure TARGET_NAME)
     ps_core_config_compiler_defaults(${TARGET_NAME})
     ps_core_config_cpp_version(${TARGET_NAME})
     ps_core_config_platform_required(${TARGET_NAME})
-    if(DEBUG)
-        ps_core_config_sanitizer(${TARGET_NAME})
-    endif()
 endmacro()
 
 macro(ps_core_use_filesystem TARGET_NAME)
