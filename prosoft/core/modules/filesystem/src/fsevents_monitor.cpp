@@ -416,8 +416,13 @@ platform_state::platform_state(const fs::path& p, const fs::change_config& cfg, 
         const auto dev = device(p, ec);
         if (dev != 0) {
             m_uuid.reset(FSEventsCopyUUIDForDevice(dev));
-            m_lastid = eventid(cfg, m_uuid.get(), ec);
+            if (!m_uuid) {
+                // most likely a read-only volume
+                ec = fs::error_code(ENOTSUP, std::system_category());
+                return;
+            }
             
+            m_lastid = eventid(cfg, m_uuid.get(), ec);
             if (m_lastid == kFSEventStreamEventIdSinceNow && ec) {
                 ec = fs::error_code(platform_error::monitor_thaw, platform_category());
                 m_uuid.reset();
