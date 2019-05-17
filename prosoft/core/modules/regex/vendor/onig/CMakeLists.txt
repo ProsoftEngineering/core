@@ -105,6 +105,10 @@ if(MSVC AND CMAKE_SIZEOF_VOID_P EQUAL 8)
         set_source_files_properties(${ONIG}/regparse.c PROPERTIES COMPILE_FLAGS "/wd4244 /wd4133 /wd4456")
     endif()
 endif()
+if(MSVC AND CMAKE_SIZEOF_VOID_P EQUAL 4)
+    # 4018: '<': signed/unsigned mismatch
+    set_source_files_properties(${ONIG}/regexec.c PROPERTIES COMPILE_FLAGS "/wd4018")
+endif()
 
 set (onig_slib_name onig)
 
