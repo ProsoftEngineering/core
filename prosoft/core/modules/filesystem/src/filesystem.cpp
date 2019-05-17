@@ -637,7 +637,7 @@ std::wstring first_unused_drive_letter(DWORD bits) {
         L"Y:\\",
         L"Z:\\",
     };
-    for (auto i = 3; i < letters.size(); ++i) { // Start at D:
+    for (decltype(letters.size()) i = 3; i < letters.size(); ++i) { // Start at D:
         if (0 == (bits & (1<<i))) { 
             return std::wstring{letters[i]};
         }
