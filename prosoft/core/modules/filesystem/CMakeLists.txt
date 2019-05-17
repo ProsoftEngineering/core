@@ -82,6 +82,12 @@ if (UNIX AND NOT APPLE)
     )
 endif()
 
+if(MSVC)
+    set_target_properties(${fs_lib} PROPERTIES STATIC_LIBRARY_FLAGS
+        "/ignore:4221"      # This object file does not define any previously undefined public symbols
+    )
+endif()
+
 ps_core_module_use_u8string_module(${fs_lib})
 ps_core_module_use_external_module(${fs_lib} system_identity)
 
