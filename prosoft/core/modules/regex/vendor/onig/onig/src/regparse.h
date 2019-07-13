@@ -4,7 +4,7 @@
   regparse.h -  Oniguruma (regular expression library)
 **********************************************************************/
 /*-
- * Copyright (c) 2002-2018  K.Kosako  <sndgk393 AT ybb DOT ne DOT jp>
+ * Copyright (c) 2002-2019  K.Kosako  <sndgk393 AT ybb DOT ne DOT jp>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -59,19 +59,18 @@ enum BagType {
 
 enum GimmickType {
   GIMMICK_FAIL       = 0,
-  GIMMICK_KEEP       = 1,
-  GIMMICK_SAVE       = 2,
-  GIMMICK_UPDATE_VAR = 3,
+  GIMMICK_SAVE       = 1,
+  GIMMICK_UPDATE_VAR = 2,
 #ifdef USE_CALLOUT
-  GIMMICK_CALLOUT    = 4,
+  GIMMICK_CALLOUT    = 3,
 #endif
 };
 
-enum QuantBodyEmpty {
-  QUANT_BODY_IS_NOT_EMPTY = 0,
-  QUANT_BODY_IS_EMPTY     = 1,
-  QUANT_BODY_IS_EMPTY_MEM = 2,
-  QUANT_BODY_IS_EMPTY_REC = 3
+enum BodyEmpty {
+  BODY_IS_NOT_EMPTY = 0,
+  BODY_IS_EMPTY     = 1,
+  BODY_IS_EMPTY_MEM = 2,
+  BODY_IS_EMPTY_REC = 3
 };
 
 typedef struct {
@@ -102,7 +101,7 @@ typedef struct {
   int lower;
   int upper;
   int greedy;
-  enum QuantBodyEmpty body_empty_info;
+  enum BodyEmpty empty_info;
   struct _Node* head_exact;
   struct _Node* next_head_exact;
   int is_refered;     /* include called node. don't eliminate even if {0} */

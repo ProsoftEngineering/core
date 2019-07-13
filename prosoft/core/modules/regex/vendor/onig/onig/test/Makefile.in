@@ -87,10 +87,11 @@ PRE_UNINSTALL = :
 POST_UNINSTALL = :
 build_triplet = @build@
 host_triplet = @host@
-TESTS = test_utf8$(EXEEXT) testc$(EXEEXT) testp$(EXEEXT) \
-	testcu$(EXEEXT)
-check_PROGRAMS = test_utf8$(EXEEXT) testc$(EXEEXT) testp$(EXEEXT) \
-	testcu$(EXEEXT)
+@ENABLE_POSIX_API_FALSE@TESTS = test_utf8$(EXEEXT) testc$(EXEEXT) \
+@ENABLE_POSIX_API_FALSE@	testcu$(EXEEXT)
+@ENABLE_POSIX_API_TRUE@TESTS = test_utf8$(EXEEXT) testc$(EXEEXT) \
+@ENABLE_POSIX_API_TRUE@	testp$(EXEEXT) testcu$(EXEEXT)
+check_PROGRAMS = $(am__EXEEXT_1)
 subdir = test
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/m4/libtool.m4 \
@@ -104,6 +105,11 @@ mkinstalldirs = $(install_sh) -d
 CONFIG_HEADER = $(top_builddir)/src/config.h
 CONFIG_CLEAN_FILES =
 CONFIG_CLEAN_VPATH_FILES =
+@ENABLE_POSIX_API_FALSE@am__EXEEXT_1 = test_utf8$(EXEEXT) \
+@ENABLE_POSIX_API_FALSE@	testc$(EXEEXT) testcu$(EXEEXT)
+@ENABLE_POSIX_API_TRUE@am__EXEEXT_1 = test_utf8$(EXEEXT) \
+@ENABLE_POSIX_API_TRUE@	testc$(EXEEXT) testp$(EXEEXT) \
+@ENABLE_POSIX_API_TRUE@	testcu$(EXEEXT)
 am_test_utf8_OBJECTS = test_utf8.$(OBJEXT)
 test_utf8_OBJECTS = $(am_test_utf8_OBJECTS)
 test_utf8_DEPENDENCIES = $(lib_onig)
@@ -516,7 +522,7 @@ top_srcdir = @top_srcdir@
 lib_onig = ../src/libonig.la
 AM_LDFLAGS = -L$(prefix)/lib
 AM_CFLAGS = -Wall -Wno-invalid-source-encoding
-AM_CPPFLAGS = -I$(top_srcdir)/src -I$(includedir)
+AM_CPPFLAGS = -I$(top_srcdir)/src
 test_utf8_SOURCES = test_utf8.c
 test_utf8_LDADD = $(lib_onig)
 testc_SOURCES = testc.c
@@ -850,16 +856,16 @@ testc.log: testc$(EXEEXT)
 	--log-file $$b.log --trs-file $$b.trs \
 	$(am__common_driver_flags) $(AM_LOG_DRIVER_FLAGS) $(LOG_DRIVER_FLAGS) -- $(LOG_COMPILE) \
 	"$$tst" $(AM_TESTS_FD_REDIRECT)
-testp.log: testp$(EXEEXT)
-	@p='testp$(EXEEXT)'; \
-	b='testp'; \
+testcu.log: testcu$(EXEEXT)
+	@p='testcu$(EXEEXT)'; \
+	b='testcu'; \
 	$(am__check_pre) $(LOG_DRIVER) --test-name "$$f" \
 	--log-file $$b.log --trs-file $$b.trs \
 	$(am__common_driver_flags) $(AM_LOG_DRIVER_FLAGS) $(LOG_DRIVER_FLAGS) -- $(LOG_COMPILE) \
 	"$$tst" $(AM_TESTS_FD_REDIRECT)
-testcu.log: testcu$(EXEEXT)
-	@p='testcu$(EXEEXT)'; \
-	b='testcu'; \
+testp.log: testp$(EXEEXT)
+	@p='testp$(EXEEXT)'; \
+	b='testp'; \
 	$(am__check_pre) $(LOG_DRIVER) --test-name "$$f" \
 	--log-file $$b.log --trs-file $$b.trs \
 	$(am__common_driver_flags) $(AM_LOG_DRIVER_FLAGS) $(LOG_DRIVER_FLAGS) -- $(LOG_COMPILE) \
@@ -1047,13 +1053,13 @@ uninstall-am:
 .PRECIOUS: Makefile
 
 
-test: test_uchar test_utf8 testc testp testcu
+test: test_uchar $(TESTS)
 	@echo "[Oniguruma API, UTF-8 check]"
 	@./test_utf8  | grep RESULT
 	@echo "[Oniguruma API, ASCII/EUC-JP check]"
 	@./testc  | grep RESULT
-	@echo "[POSIX API, ASCII/EUC-JP check]"
-	@./testp  | grep RESULT
+@ENABLE_POSIX_API_TRUE@	@echo "[POSIX API, ASCII/EUC-JP check]"
+@ENABLE_POSIX_API_TRUE@	@./testp  | grep RESULT
 	@echo "[Oniguruma API, UTF-16 check]"
 	@./testcu | grep RESULT
 
@@ -1061,6 +1067,12 @@ test_uchar:
 	@echo "[UChar in oniguruma.h check]"
 	@grep "\(^\|[^g]\)UChar" $(top_srcdir)/src/oniguruma.h
 	@echo ""
+
+gcov:
+	make CFLAGS="--coverage" test_utf8
+	make CFLAGS="--coverage" testc
+	make CFLAGS="--coverage" testp
+	make CFLAGS="--coverage" testcu
 
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.

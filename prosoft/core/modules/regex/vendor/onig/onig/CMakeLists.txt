@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.1)
-project(oniguruma VERSION 6.9.1)
+project(oniguruma VERSION 6.9.2)
 
 set(PACKAGE onig)
 set(PACKAGE_VERSION ${PROJECT_VERSION})
@@ -41,7 +41,6 @@ check_include_files(unistd.h    HAVE_UNISTD_H)
 check_include_files(inttypes.h  HAVE_INTTYPES_H)
 check_type_size(int SIZEOF_INT)
 check_type_size(long SIZEOF_LONG)
-check_type_size(short SIZEOF_SHORT)
 
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/src/config.h.cmake.in ${CMAKE_CURRENT_BINARY_DIR}/config.h)
 

@@ -2,7 +2,7 @@
   regerror.c -  Oniguruma (regular expression library)
 **********************************************************************/
 /*-
- * Copyright (c) 2002-2018  K.Kosako  <sndgk393 AT ybb DOT ne DOT jp>
+ * Copyright (c) 2002-2019  K.Kosako  <sndgk393 AT ybb DOT ne DOT jp>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -205,13 +205,17 @@ static void sprint_byte_with_x(char* s, unsigned int v)
 }
 
 static int to_ascii(OnigEncoding enc, UChar *s, UChar *end,
-		    UChar buf[], int buf_size, int *is_over)
+                    UChar buf[], int buf_size, int *is_over)
 {
   int len;
   UChar *p;
   OnigCodePoint code;
 
-  if (ONIGENC_MBC_MINLEN(enc) > 1) {
+  if (!s) {
+    len = 0;
+    *is_over = 0;
+  }
+  else if (ONIGENC_MBC_MINLEN(enc) > 1) {
     p = s;
     len = 0;
     while (p < end) {
