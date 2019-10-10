@@ -63,7 +63,7 @@
 #define USE_CALL
 #define USE_CALLOUT
 #define USE_BACKREF_WITH_LEVEL        /* \k<name+n>, \k<name-n> */
-#define USE_INSISTENT_CHECK_CAPTURES_IN_EMPTY_REPEAT    /* /(?:()|())*\2/ */
+#define USE_STUBBORN_CHECK_CAPTURES_IN_EMPTY_REPEAT     /* /(?:()|())*\2/ */
 #define USE_NEWLINE_AT_END_OF_STRING_HAS_EMPTY_LINE     /* /\n$/ =~ "\n" */
 #define USE_WARNING_REDUNDANT_NESTED_REPEAT_OPERATOR
 #define USE_RETRY_LIMIT_IN_MATCH
@@ -348,8 +348,8 @@ typedef unsigned int  MemStatusType;
 #define DISABLE_CASE_FOLD_MULTI_CHAR(case_fold_flag) \
   ((case_fold_flag) & ~INTERNAL_ONIGENC_CASE_FOLD_MULTI_CHAR)
 
-#define REPEAT_INFINITE         -1
-#define IS_REPEAT_INFINITE(n)   ((n) == REPEAT_INFINITE)
+#define INFINITE_REPEAT         -1
+#define IS_INFINITE_REPEAT(n)   ((n) == INFINITE_REPEAT)
 
 /* bitset */
 #define BITS_PER_BYTE      8

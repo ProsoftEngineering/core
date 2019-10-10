@@ -1202,10 +1202,23 @@ extern int main(int argc, char* argv[])
   x2("a{3,2}b", "aab", 0, 3);
   x2("a{3,2}?", "", 0, 0);     /* == (?:a{3,2})?*/
   x2("a{2,3}+a", "aaa", 0, 3); /* == (?:a{2,3})+*/
+  x2("[\\x{0}-\\x{7fffffff}]", "a", 0, 1);
+  x2("[\\x{7f}-\\x{7fffffff}]", "\xe5\xae\xb6", 0, 3);
+
+  n("   \xfd", ""); /* https://bugs.php.net/bug.php?id=77370 */
+  /* can't use \xfc00.. because compiler error: hex escape sequence out of range */
+  n("()0\\xfc00000\\xfc00000\\xfc00000\xfc", ""); /* https://bugs.php.net/bug.php?id=77371 */
+  x2("000||0\xfa", "0", 0, 0); /* https://bugs.php.net/bug.php?id=77381 */
+  e("(?i)000000000000000000000\xf0", "", ONIGERR_INVALID_CODE_POINT_VALUE); /* https://bugs.php.net/bug.php?id=77382 */
+  n("0000\\\xf5", "0"); /* https://bugs.php.net/bug.php?id=77385 */
+  n("(?i)FFF00000000000000000\xfd", ""); /* https://bugs.php.net/bug.php?id=77394 */
+
 
   x2("\\p{Common}", "\xe3\x8b\xbf", 0, 3);   /* U+32FF */
   x2("\\p{In_Enclosed_CJK_Letters_and_Months}", "\xe3\x8b\xbf", 0, 3); /* U+32FF */
 
+  e("\\x{7fffffff}", "", ONIGERR_TOO_BIG_WIDE_CHAR_VALUE);
+  e("[\\x{7fffffff}]", "", ONIGERR_INVALID_CODE_POINT_VALUE);
   e("\\u040", "@", ONIGERR_INVALID_CODE_POINT_VALUE);
   e("(?<abc>\\g<abc>)", "zzzz", ONIGERR_NEVER_ENDING_RECURSION);
   e("(?<=(?>abc))", "abc", ONIGERR_INVALID_LOOK_BEHIND_PATTERN);
