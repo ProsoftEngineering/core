@@ -1,4 +1,4 @@
-// Copyright © 2015-2018, Prosoft Engineering, Inc. (A.K.A "Prosoft")
+// Copyright © 2015-2020, Prosoft Engineering, Inc. (A.K.A "Prosoft")
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without
@@ -133,6 +133,9 @@ std::wstring first_unused_drive_letter(DWORD); // exposed for testing
 std::wstring first_unused_drive_letter(error_code&);
 
 #endif //_WIN32
+
+// currently only implemented for macOS (in attrs.cpp)
+bool is_mounted_readonly(const path&, error_code&);
 
 } // ifilesystem
 

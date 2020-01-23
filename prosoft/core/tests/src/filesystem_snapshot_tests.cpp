@@ -1,4 +1,4 @@
-// Copyright © 2017-2018, Prosoft Engineering, Inc. (A.K.A "Prosoft")
+// Copyright © 2017-2020, Prosoft Engineering, Inc. (A.K.A "Prosoft")
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without
@@ -145,6 +145,8 @@ TEST_CASE("filesystem_snapshot") {
             CHECK_THROWS(delete_snapshot(dead));
             #endif
             // There will be another delete attempt on destruction of 'dead'
+        } else {
+            std::cerr << "WARNING: failed to create test snapshot\n";
         }
     }
 }

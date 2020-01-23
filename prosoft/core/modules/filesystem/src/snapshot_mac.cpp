@@ -1,4 +1,4 @@
-// Copyright © 2018, Prosoft Engineering, Inc. (A.K.A "Prosoft")
+// Copyright © 2018-2020, Prosoft Engineering, Inc. (A.K.A "Prosoft")
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without
@@ -30,6 +30,8 @@
 #include "filesystem_snapshot.hpp"
 #include "spawn.hpp"
 #include <string/string_component.hpp>
+
+#include "filesystem_private.hpp"
 
 namespace {
 
@@ -82,7 +84,13 @@ std::string datestr(const prosoft::filesystem::snapshot_id& sid) {
     using namespace prosoft;
     static const auto tmprefix = std::string{"com.apple.TimeMachine."};
     if (starts_with(sid.m_id, tmprefix)) {
-        return sid.m_id.substr(tmprefix.length());
+        auto d = sid.m_id.substr(tmprefix.length());
+        // remove '.local' suffix
+        const auto i = d.find(".");
+        if (i != std::string::npos) {
+            d.erase(i);
+        }
+        return d;
     } else {
         return "";
     }
@@ -98,9 +106,12 @@ std::string tmutil_getsnapshot(const std::string& cout, const std::string& date,
     com.apple.TimeMachine.2018-02-15-193329
     com.apple.TimeMachine.2018-02-15-195835
     \n
+    -- 10.15 --
+    com.apple.TimeMachine.2020-01-22-144343.local
     */
     const auto searchid = std::string("com.apple.TimeMachine.").append(date);
-    if (cout.find(searchid) == std::string::npos) {
+    const auto where = cout.find(searchid);
+    if (where == std::string::npos) {
         if (cout.find(date) == std::string::npos) {
             ec.assign(ENOTSUP, std::system_category()); // Volume must not be in TM backup.
         } else {
@@ -108,9 +119,19 @@ std::string tmutil_getsnapshot(const std::string& cout, const std::string& date,
         }
         return "";
     }
-
+    
+    const auto i = cout.find("\n", where);
+    if (i == where) {
+        ec.assign(tmutil_listsnapshots_unknown_output, tmutil_category());
+        return "";
+    }
+    
     ec.clear();
-    return searchid;
+    
+    if (i != std::string::npos) {
+        return cout.substr(where, i-where);
+    }
+    return cout.substr(where);
 }
 
 std::string tmutil_findsnapshot(const prosoft::filesystem::path& path, const std::string& date, std::error_code& ec) {
@@ -244,6 +265,14 @@ bool can_snapshot(const struct statfs& sb, std::error_code& ec) {
 bool can_snapshot(const prosoft::filesystem::path& path, std::error_code& ec) {
     struct statfs sb;
     if (0 == statfs(path.c_str(), &sb)) {
+        // For 10.15 APFS vgroup, root will be mounted read-only and data mounted read-write.
+        // statfs is not aware of this, so we have to query the URL resource properties
+        std::error_code lec{};
+        if (!prosoft::filesystem::ifilesystem::is_mounted_readonly(path, lec)) {
+            if (!lec) {
+                sb.f_flags &= ~MNT_RDONLY;
+            }
+        }
         return can_snapshot(sb, ec);
     } else {
         ec.assign(errno, std::system_category());
@@ -390,16 +419,35 @@ TEST_CASE("snapshot_internal") {
     using namespace prosoft::filesystem;
     CHECK(datestr(snapshot_id("")).empty());
     CHECK(datestr(snapshot_id("com.apple.TimeMachine.2018-02-15-195835")) == "2018-02-15-195835");
+    CHECK(datestr(snapshot_id("com.apple.TimeMachine.2020-01-22-144343.local")) == "2020-01-22-144343");
 
     std::error_code ec;
     auto sid = tmutil_getsnapshot("Created local snapshot with date: 2018-02-15-195835\n", ec);
     CHECK(sid == "2018-02-15-195835");
     CHECK(!ec);
-
+    
+    // not trimmed
     sid = tmutil_getsnapshot("com.apple.TimeMachine.2018-02-15-193329\ncom.apple.TimeMachine.2018-02-15-195835\n", sid, ec);
     CHECK(sid == "com.apple.TimeMachine.2018-02-15-195835");
     CHECK(!ec);
     CHECK(datestr(snapshot_id(sid)) == "2018-02-15-195835");
+    
+    // trimmed
+    const char* input = "com.apple.TimeMachine.2018-02-15-193329\ncom.apple.TimeMachine.2020-01-22-144343.local\ncom.apple.TimeMachine.2020-01-22-154343.local";
+    sid = tmutil_getsnapshot(input, "2018-02-15-193329", ec);
+    CHECK(sid == "com.apple.TimeMachine.2018-02-15-193329");
+    CHECK(!ec);
+    CHECK(datestr(snapshot_id(sid)) == "2018-02-15-193329");
+    
+    sid = tmutil_getsnapshot(input, "2020-01-22-144343", ec);
+    CHECK(sid == "com.apple.TimeMachine.2020-01-22-144343.local");
+    CHECK(!ec);
+    CHECK(datestr(snapshot_id(sid)) == "2020-01-22-144343");
+    
+    sid = tmutil_getsnapshot(input, "2020-01-22-154343", ec);
+    CHECK(sid == "com.apple.TimeMachine.2020-01-22-154343.local");
+    CHECK(!ec);
+    CHECK(datestr(snapshot_id(sid)) == "2020-01-22-154343");
 
     CHECK(mount_opts(snapshot(snapshot_id(""), 0)) == "rdonly");
     CHECK(mount_opts(snapshot(snapshot_id(""), snapshot_create_options::nobrowse)) == "rdonly,nobrowse");

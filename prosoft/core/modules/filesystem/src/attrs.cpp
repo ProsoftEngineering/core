@@ -1,4 +1,4 @@
-// Copyright © 2016-2017, Prosoft Engineering, Inc. (A.K.A "Prosoft")
+// Copyright © 2016-2020, Prosoft Engineering, Inc. (A.K.A "Prosoft")
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without
@@ -277,6 +277,17 @@ bool is_package(const path& p, error_code& ec) {
 #else
     (void)p;
     ec.clear(); // ENOTSUP?
+    return false;
+#endif
+}
+
+bool ifilesystem::is_mounted_readonly(const path& p, error_code& ec) {
+#if __APPLE__
+    auto value = get_property<CFBooleanRef>(p, kCFURLVolumeIsReadOnlyKey, ec);
+    return value && CFBooleanGetValue(value.get());
+#else
+    (void)p;
+    ec.assign(ENOTSUP, system::posix_category());
     return false;
 #endif
 }
