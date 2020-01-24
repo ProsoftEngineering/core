@@ -1,4 +1,4 @@
-# Copyright © 2015-2018, Prosoft Engineering, Inc. (A.K.A "Prosoft")
+# Copyright © 2015-2020, Prosoft Engineering, Inc. (A.K.A "Prosoft")
 # All rights reserved.
 # 
 # Redistribution and use in source and binary forms, with or without
@@ -72,7 +72,7 @@ end
  
 if which('xcrun')
   CMAKE_DEFAULT_GENERATOR = 'Xcode'
-elsif which('ninja')
+elsif which('ninja') && UNAME != 'MSVC' # AppVeyor has Ninja installed
   CMAKE_DEFAULT_GENERATOR = 'Ninja'
 elsif HAVE_VS2017
   CMAKE_DEFAULT_GENERATOR = VS2017_CMAKE_GENERATORS[0]
