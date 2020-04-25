@@ -38,9 +38,10 @@ def which(cmd)
 end
 
 # VS2017 breaks with previous install orginization leading to distinct install paths for each edition (Enterprise, Pro, etc).
+HAVE_VS2019 = File.exist? 'C:/Program Files (x86)/Microsoft Visual Studio/2019'
 HAVE_VS2017 = File.exist? 'C:/Program Files (x86)/Microsoft Visual Studio/2017' # /Professional/VC/Auxiliary/Build/vcvarsall.bat
 HAVE_VS2015 = File.exist? 'C:/Program Files (x86)/Microsoft Visual Studio 14.0/VC/vcvarsall.bat'
-if HAVE_VS2017 or HAVE_VS2015
+if HAVE_VS2019 or HAVE_VS2017 or HAVE_VS2015
   UNAME = 'MSVC'
 elsif which('uname')
   UNAME = `uname -s`.strip
@@ -62,6 +63,10 @@ RELEASE_CONFIG = 'RelWithDebInfo'
 
 # As of Cmake 3.1 the VS generator architecture does not need to be specified.
 # We continue doing so to allow distinct builds to be controlled by rake.
+if HAVE_VS2019 # VS 2019 requires the cmake -A arg to specify the architecture.
+  VS2019_CMAKE_GENERATORS = ['Visual Studio 16']
+end
+
 if HAVE_VS2017
   VS2017_CMAKE_GENERATORS = ['Visual Studio 15 Win64', 'Visual Studio 15']
 end
@@ -74,6 +79,8 @@ if which('xcrun')
   CMAKE_DEFAULT_GENERATOR = 'Xcode'
 elsif which('ninja') && UNAME != 'MSVC' # AppVeyor has Ninja installed
   CMAKE_DEFAULT_GENERATOR = 'Ninja'
+elsif HAVE_VS2019
+  CMAKE_DEFAULT_GENERATOR = VS2019_CMAKE_GENERATORS[0]
 elsif HAVE_VS2017
   CMAKE_DEFAULT_GENERATOR = VS2017_CMAKE_GENERATORS[0]
 elsif HAVE_VS2015
@@ -83,7 +90,9 @@ else
 end
 
 CMAKE_GENERATORS = [CMAKE_DEFAULT_GENERATOR]
-if HAVE_VS2017
+if HAVE_VS2019
+  CMAKE_GENERATORS.concat(VS2019_CMAKE_GENERATORS)
+elsif HAVE_VS2017
   CMAKE_GENERATORS.concat(VS2017_CMAKE_GENERATORS)
 elsif HAVE_VS2015
   CMAKE_GENERATORS.concat(VS2015_CMAKE_GENERATORS)
