@@ -1,4 +1,4 @@
-// Copyright © 2015-2017, Prosoft Engineering, Inc. (A.K.A "Prosoft")
+// Copyright © 2015-2020, Prosoft Engineering, Inc. (A.K.A "Prosoft")
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without
@@ -510,11 +510,16 @@ inline basic_path<String>& basic_path<String>::concat(InputIterator i1, InputIte
 // iteration //
 
 template <class String>
-class basic_path<String>::iterator : public std::iterator<std::bidirectional_iterator_tag, basic_path<String>> {
+class basic_path<String>::iterator {
     typedef typename String::const_iterator base_iterator;
     typedef typename String::const_reverse_iterator base_reverse_iterator;
 
 public:
+    using iterator_category = std::bidirectional_iterator_tag;
+    using value_type        = basic_path<String>;
+    using difference_type   = std::ptrdiff_t;
+    using pointer           = value_type*;
+    using reference         = value_type&;
     using path_type = basic_path<String>;
 
     iterator() {}
