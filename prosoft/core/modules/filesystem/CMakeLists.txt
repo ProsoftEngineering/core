@@ -62,6 +62,8 @@ if(APPLE)
         PROPERTIES COMPILE_FLAGS -fobjc-arc
     )
     target_link_libraries(${fs_lib} PUBLIC "-framework Foundation -framework CoreServices")
+    find_package(nlohmann_json REQUIRED)        # fsevents_monitor.cpp
+    target_link_libraries(${fs_lib} PRIVATE nlohmann_json::nlohmann_json)
 endif()
 
 if(WIN32)
