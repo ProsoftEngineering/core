@@ -43,7 +43,7 @@
 #include "unique_resource.hpp"
 #include "prosoft/core/config/config_analyzer.h"
 
-#include "nlohmann/json.hpp"
+#include <nlohmann/json.hpp>
 
 namespace {
 
