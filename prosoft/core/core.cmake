@@ -32,7 +32,6 @@ macro(ps_core_include TARGET_NAME)
     target_include_directories(${TARGET_NAME} PRIVATE
         "${PSCORE}/../.." # Allow unambigous includes. e.g. <prosoft/core/include/...>
         "${PSCORE}/include"
-        "${PSCORE}/include/vendor"
         "${PSCORE}/modules"
     )
 endmacro()
