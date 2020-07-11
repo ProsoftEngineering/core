@@ -1,0 +1,18 @@
+diff -ruN nlohmann_json-src.orig/single_include/nlohmann/json.hpp nlohmann_json-src/single_include/nlohmann/json.hpp
+--- nlohmann_json-src.orig/single_include/nlohmann/json.hpp	2020-07-11 18:46:38.713377689 +0700
++++ nlohmann_json-src/single_include/nlohmann/json.hpp	2020-07-11 18:47:06.141719975 +0700
+@@ -1061,6 +1061,14 @@
+ #if JSON_HEDLEY_MSVC_VERSION_CHECK(14,0,0)
+     #define JSON_HEDLEY_DEPRECATED(since) __declspec(deprecated("Since " # since))
+     #define JSON_HEDLEY_DEPRECATED_FOR(since, replacement) __declspec(deprecated("Since " #since "; use " #replacement))
++#elif defined(__clang__) && defined(__apple_build_version__) && (__apple_build_version__ < 8020000)
++    // Fix clang compile errors on [[deprecated("...")]] after __attribute__((...))
++    //   nlohmann/json.hpp:22424:5: error: an attribute list cannot appear here
++    //          JSON_HEDLEY_DEPRECATED_FOR(3.8.0, parse(ptr, ptr + len))
++    //          ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
++    // (confirmed in nlohmann/json v3.8.0 under Xcode 7.3 and Xcode 8.0)
++    #define JSON_HEDLEY_DEPRECATED(since) __attribute__((__deprecated__("Since " #since)))
++    #define JSON_HEDLEY_DEPRECATED_FOR(since, replacement) __attribute__((__deprecated__("Since " #since "; use " #replacement)))
+ #elif defined(__cplusplus) && (__cplusplus >= 201402L)
+     #define JSON_HEDLEY_DEPRECATED(since) JSON_HEDLEY_DIAGNOSTIC_DISABLE_CPP98_COMPAT_WRAP_([[deprecated("Since " #since)]])
+     #define JSON_HEDLEY_DEPRECATED_FOR(since, replacement) JSON_HEDLEY_DIAGNOSTIC_DISABLE_CPP98_COMPAT_WRAP_([[deprecated("Since " #since "; use " #replacement)]])
