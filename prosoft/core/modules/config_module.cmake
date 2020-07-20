@@ -33,7 +33,6 @@ include("${CMAKE_CURRENT_LIST_DIR}/../config/cmake/config_coverage.cmake")
 set(PS_CORE_MODULE_INCLUDE_DIRS
     "${CMAKE_CURRENT_LIST_DIR}/../../.."
 	"${CMAKE_CURRENT_LIST_DIR}/../include"
-	"${CMAKE_CURRENT_LIST_DIR}/../include/vendor"
 )
 
 if (DEFINED CORETESTS)
