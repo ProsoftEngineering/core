@@ -1,4 +1,4 @@
-// Copyright © 2014-2018, Prosoft Engineering, Inc. (A.K.A "Prosoft")
+// Copyright © 2014-2020, Prosoft Engineering, Inc. (A.K.A "Prosoft")
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without
@@ -182,7 +182,7 @@ public:
     basic_regex() PS_NOEXCEPT : mPattern(), mFlags(default_flags), mRx(nullptr) {}
     basic_regex(const basic_regex& other)
         : basic_regex() {
-        basic_regex tmp(other._pattern, other.flags());
+        basic_regex tmp(other.mPattern, other.flags());
         swap(tmp);
     }
     basic_regex(basic_regex&& other) PS_NOEXCEPT : basic_regex() {
