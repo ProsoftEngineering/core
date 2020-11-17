@@ -27,6 +27,23 @@ Supported character encodings:
 * doc/SYNTAX.md: contributed by seanofw
 
 
+Version 6.9.5 revised 1
+-----------------------
+
+* Fixed Issue #192
+
+
+Version 6.9.5
+-------------
+
+* POSIX API disabled by default for Unix (* Enabled by: configure --enable-posix-api=yes)
+* Update Unicode version 13.0.0
+* NEW: Code point sequence notation \x{HHHH HHHH ...}, \o{OOOO OOOO ...}
+* NEW API: retry limit in search functions
+* NEW API: maximum nesting level of subexp call
+* Fixed behavior of isolated options in Perl and Java syntaxes.  /...(?i).../
+
+
 Version 6.9.4
 -------------
 
@@ -132,45 +149,6 @@ Version 6.5.0
 * NEW: Absent stopper (?~|absent)     (*original)
 
 
-Version 6.4.0
--------------
-
-* Fix fatal problem of endless repeat on Windows
-* NEW: call zero (call the total regexp) \g<0>
-* NEW: relative backref/call by positive number \k<+n>, \g<+n>
-
-
-Version 6.3.0
--------------
-
-* NEW: octal codepoint \o{.....}
-* Fixed CVE-2017-9224
-* Fixed CVE-2017-9225
-* Fixed CVE-2017-9226
-* Fixed CVE-2017-9227
-* Fixed CVE-2017-9228
-* Fixed CVE-2017-9229
-
-
-Version 6.1.2
--------------
-
-* allow word bound, word begin and word end in look-behind.
-* NEW option: ONIG_OPTION_CHECK_VALIDITY_OF_STRING
-
-Version 6.1
------------
-
-* improved doc/RE
-* NEW API: onig_scan()
-
-Version 6.0
------------
-
-* Update Unicode 8.0 Property/Case-folding
-* NEW API: onig_unicode_define_user_property()
-
-
 License
 -------
 
@@ -216,7 +194,16 @@ Install
 
    (I have checked by Visual Studio Community 2015)
 
+Alternatively, you can build and install oniguruma using [vcpkg](https://github.com/microsoft/vcpkg/) dependency manager:
 
+   1. git clone https://github.com/Microsoft/vcpkg.git
+   2. cd vcpkg
+   3. ./bootstrap-vcpkg.bat
+   4. ./vcpkg integrate install
+   5. ./vcpkg install oniguruma
+
+The oniguruma port in vcpkg is kept up to date by microsoft team members and community contributors.
+If the version is out of date, please [create an issue or pull request](https://github.com/Microsoft/vcpkg) on the vcpkg repository.
 
 Regular Expressions
 -------------------
