@@ -223,6 +223,10 @@
 #else
 #define __builtin_debugger() __asm__ volatile(".inst 0xde01")
 #endif
+#elif __aarch64__ && __APPLE__
+#define __builtin_debugger() __builtin_trap()
+#elif __aarch64__
+#define __builtin_debugger() __asm__ volatile(".inst 0xd4200000")
 #else
 #warning "unknown architecture"
 #define __builtin_debugger() __builtin_trap()
