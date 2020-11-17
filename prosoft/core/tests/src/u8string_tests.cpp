@@ -1,4 +1,4 @@
-// Copyright © 2014-2018, Prosoft Engineering, Inc. (A.K.A "Prosoft")
+// Copyright © 2014-2020, Prosoft Engineering, Inc. (A.K.A "Prosoft")
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without
@@ -42,6 +42,7 @@ const u16string::value_type u16test[] = {0x212b, 0x1ea1, 0x0101, 0x2026, 0}; // 
 const u16string::value_type u32test[] = {0xD840, 0xDC0B, 0}; // 1 u32 codepoint (0x0002000B), u16 literal
 
 // See https://github.com/philsquared/Catch/issues/565 for why this is needed.
+CATCH_INTERNAL_START_WARNINGS_SUPPRESSION
 CATCH_INTERNAL_SUPPRESS_PARENTHESES_WARNINGS
 template <typename T>
 void test_ascii_compare() {
@@ -70,7 +71,7 @@ void test_ascii_compare() {
     CHECK(T("hello") == T("hello"));
     CHECK(T("hello") != T("world"));
 }
-CATCH_INTERNAL_UNSUPPRESS_PARENTHESES_WARNINGS
+CATCH_INTERNAL_STOP_WARNINGS_SUPPRESSION
 } // anon
 
 TEST_CASE("u8string") {
