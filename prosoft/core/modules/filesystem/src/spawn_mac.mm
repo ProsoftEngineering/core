@@ -1,4 +1,4 @@
-// Copyright © 2018, Prosoft Engineering, Inc. (A.K.A "Prosoft")
+// Copyright © 2018-2020, Prosoft Engineering, Inc. (A.K.A "Prosoft")
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without
@@ -70,13 +70,36 @@ void prosoft::spawn(const spawn_path& path, const spawn_args& args, spawn_cout& 
                 dispatch_semaphore_signal(sem);
             };
 
-            const auto waitfor = dispatch_now(timeout);
-
             [task launch];
             // if NSTask throws an exception it's likely this:
             // https://openradar.appspot.com/radar?id=1387401
             // Which is a bug in apps that leak pipe handles.
-
+            
+            // Pipe channels can fill with data and block the child until drained.
+            // This can lead to a deadlock while waiting on the semaphore, therefore we asynchronously read data as it becomes available.
+            // The readability handler is called from an internal NSFileHandle serial queue, so no need for locking.
+            // If the semaphore times out, cout and cerr can contain partial data.
+            if (outp) {
+                const auto coutp = &cout;
+                outp.readabilityHandler = ^(NSFileHandle* f) {
+                    NSData* d = f.availableData;
+                    if (d.length > 0) {
+                        coutp->append((const char*)d.bytes, d.length);
+                    }
+                };
+            }
+            
+            if (errp) {
+                const auto cerrp = &cerr;
+                errp.readabilityHandler = ^(NSFileHandle* f) {
+                    NSData* d = f.availableData;
+                    if (d.length > 0) {
+                        cerrp->append((const char*)d.bytes, d.length);
+                    }
+                };
+            }
+            
+            const auto waitfor = dispatch_now(timeout);
             const bool timedout = 0 != dispatch_semaphore_wait(sem, waitfor);
             if (timedout && task.running) {
                 [task terminate];
@@ -85,15 +108,8 @@ void prosoft::spawn(const spawn_path& path, const spawn_args& args, spawn_cout& 
                     kill(task.processIdentifier, SIGKILL);
                 }
                 err = std::system_error(EAGAIN, std::system_category());
-                // should we try to get availableData for out and err?
                 return;
             }
-
-            NSData* d = [outp readDataToEndOfFile];
-            cout.append((const char*)d.bytes, d.length);
-
-            d = [errp readDataToEndOfFile];
-            cerr.append((const char*)d.bytes, d.length);
 
             auto status = task.terminationStatus;
             if (status) {
