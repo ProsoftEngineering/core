@@ -50,13 +50,27 @@ task :release => [
 
 task :generate_debug do
   CMAKE_GENERATORS.each do |gen|
-    cmake_generate build_dir(DEBUG_CONFIG, gen), DEBUG_CONFIG, ROOT_DIR, gen
+    builddir = build_dir(DEBUG_CONFIG, gen)
+    conan_args = ['install', '--install-folder', builddir, '--settings', 'build_type=Debug']
+    if gen.start_with?('Visual Studio ') and not gen.end_with?(' Win64')
+        conan_args += ['--settings', 'arch=x86']
+    end
+    conan_args += ['--build=missing', ROOT_DIR]
+    sh 'conan', *conan_args
+    cmake_generate builddir, DEBUG_CONFIG, ROOT_DIR, gen
   end
 end
 
 task :generate_release do
   CMAKE_GENERATORS.each do |gen|
-    cmake_generate build_dir(RELEASE_CONFIG, gen), RELEASE_CONFIG, ROOT_DIR, gen
+    builddir = build_dir(RELEASE_CONFIG, gen)
+    conan_args = ['install', '--install-folder', builddir, '--settings', 'build_type=Release']
+    if gen.start_with?('Visual Studio ') and not gen.end_with?(' Win64')
+        conan_args += ['--settings', 'arch=x86']
+    end
+    conan_args += ['--build=missing', ROOT_DIR]
+    sh 'conan', *conan_args
+    cmake_generate builddir, RELEASE_CONFIG, ROOT_DIR, gen
   end
 end
 
