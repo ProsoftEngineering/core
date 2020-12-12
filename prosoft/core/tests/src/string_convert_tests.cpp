@@ -29,7 +29,7 @@
 
 #include <string/unicode_convert.hpp>
 
-#include "catch.hpp"
+#include <catch2/catch.hpp>
 
 TEST_CASE("string_convert") {
     SECTION("default") {

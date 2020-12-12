@@ -30,7 +30,7 @@
 #include <string/unicode_convert.hpp>
 #include <string/case_convert.hpp>
 
-#include "catch.hpp"
+#include <catch2/catch.hpp>
 
 using namespace prosoft;
 

@@ -31,7 +31,7 @@
 #include <regex/regex.hpp>
 #include <u8string/u8string.hpp>
 
-#include "catch.hpp"
+#include <catch2/catch.hpp>
 
 using namespace prosoft;
 

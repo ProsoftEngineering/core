@@ -36,7 +36,7 @@
 
 #if PS_HAVE_FILESYSTEM_CHANGE_MONITOR
 
-#include "catch.hpp"
+#include <catch2/catch.hpp>
 #include "fstestutils.hpp"
 
 using namespace prosoft;

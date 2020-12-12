@@ -413,7 +413,7 @@ void prosoft::filesystem::v1::delete_snapshot(snapshot& snap, std::error_code& e
 #if PSTEST_HARNESS
 // Internal tests.
 
-#include "catch.hpp"
+#include <catch2/catch.hpp>
 
 TEST_CASE("snapshot_internal") {
     using namespace prosoft::filesystem;

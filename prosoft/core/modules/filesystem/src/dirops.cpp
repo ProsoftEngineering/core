@@ -419,7 +419,7 @@ path unused_drive(error_code& ec) {
 
 #if PSTEST_HARNESS
 // Internal tests.
-#include "catch.hpp"
+#include <catch2/catch.hpp>
 
 TEST_CASE("dirops_internal") {
     using namespace prosoft::filesystem;
