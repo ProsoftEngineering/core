@@ -64,6 +64,9 @@ if(APPLE)
     target_link_libraries(${fs_lib} PUBLIC "-framework Foundation -framework CoreServices")
     find_package(nlohmann_json REQUIRED)        # fsevents_monitor.cpp
     target_link_libraries(${fs_lib} PRIVATE nlohmann_json::nlohmann_json)
+    if(DEFINED CORETESTS)
+        target_include_directories(${fs_lib} PRIVATE ${CORETESTS})      # fsevents_monitor.cpp: #include "src/fstestutils.hpp"
+    endif()
 endif()
 
 if(WIN32)
