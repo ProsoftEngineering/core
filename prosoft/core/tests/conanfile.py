@@ -6,3 +6,4 @@ class OSSCoreTestsConan(ConanFile):
 
     def requirements(self):
         self.requires("catch2/2.13.3")
+        self.requires("nlohmann_json/3.9.1")
