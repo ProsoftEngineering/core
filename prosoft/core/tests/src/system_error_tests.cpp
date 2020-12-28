@@ -25,7 +25,7 @@
 
 #include <system_error.hpp>
 
-#include "catch.hpp"
+#include <catch2/catch.hpp>
 
 void set_posix_error(int e) {
     errno = e;

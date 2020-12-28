@@ -33,7 +33,7 @@
 #include <filesystem/filesystem.hpp>
 #include <filesystem/src/filesystem_private.hpp>
 
-#include "catch.hpp"
+#include <catch2/catch.hpp>
 #include "fsdirent_catch_fix.hpp"
 
 using namespace prosoft;

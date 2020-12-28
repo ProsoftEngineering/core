@@ -34,7 +34,7 @@
 #include <identity.hpp>
 #include <unique_resource.hpp>
 
-#include "catch.hpp"
+#include <catch2/catch.hpp>
 
 TEST_CASE("system_identity") {
     using namespace prosoft;

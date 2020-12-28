@@ -28,7 +28,7 @@
 #include "winutils.hpp"
 #include "win_token_privs.hpp"
 
-#include "catch.hpp"
+#include <catch2/catch.hpp>
 
 using namespace prosoft::windows;
 

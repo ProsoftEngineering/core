@@ -664,7 +664,7 @@ std::wstring first_unused_drive_letter(error_code& ec) {
 
 #if PSTEST_HARNESS
 // Internal tests.
-#include "catch.hpp"
+#include <catch2/catch.hpp>
 
 TEST_CASE("filesystem_internal") {
     using namespace prosoft::filesystem;

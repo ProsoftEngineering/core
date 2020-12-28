@@ -657,7 +657,7 @@ void directory_entry::refresh(error_code& ec) {
 
 #if PSTEST_HARNESS
 // Internal tests.
-#include "catch.hpp"
+#include <catch2/catch.hpp>
 
 using namespace prosoft::filesystem;
 

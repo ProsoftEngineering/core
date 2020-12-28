@@ -30,7 +30,7 @@
 
 #include "stable_hash_wrapper.hpp"
 
-#include "catch.hpp"
+#include <catch2/catch.hpp>
 
 TEST_CASE("stable_hash_wrapper") {
     using namespace prosoft;

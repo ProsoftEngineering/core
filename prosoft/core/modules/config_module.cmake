@@ -56,7 +56,8 @@ macro(ps_core_module_config TARGET_NAME)
 	
 	if (DEFINED CORETESTS)
 	    # Allows modules to define internal tests
-	    target_include_directories(${TARGET_NAME} PRIVATE "${CMAKE_CURRENT_LIST_DIR}/../../tests") # for catch
+	    find_package(Catch2 REQUIRED)
+	    target_link_libraries(${TARGET_NAME} PRIVATE Catch2::Catch2)
 	    target_compile_definitions(${TARGET_NAME} PRIVATE PSTEST_HARNESS=1)
 	    ps_add_ctests_from_catch_tests_to_host(${TARGET_NAME} $<TARGET_FILE:coretests>)
 	endif()

@@ -31,7 +31,7 @@
 #include <uniform_access.hpp>
 #include <u8string.hpp>
 
-#include "catch.hpp"
+#include <catch2/catch.hpp>
 
 TEST_CASE("uniform_access") {
     using namespace prosoft;

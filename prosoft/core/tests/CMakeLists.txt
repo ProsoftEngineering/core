@@ -85,7 +85,8 @@ if(WIN32)
     )
 endif()
 
-target_include_directories(${PROJECT_NAME} PRIVATE ${CORETESTS})
+find_package(Catch2 REQUIRED)
+target_link_libraries(${PROJECT_NAME} PRIVATE Catch2::Catch2)
 
 if (UNIX AND NOT APPLE)
     target_link_libraries(${PROJECT_NAME} PUBLIC pthread) # required for std::thread

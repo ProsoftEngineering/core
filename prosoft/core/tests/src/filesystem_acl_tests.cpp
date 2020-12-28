@@ -25,7 +25,7 @@
 
 #include <filesystem/filesystem.hpp>
 
-#include "catch.hpp"
+#include <catch2/catch.hpp>
 
 using namespace prosoft;
 using namespace prosoft::filesystem;
