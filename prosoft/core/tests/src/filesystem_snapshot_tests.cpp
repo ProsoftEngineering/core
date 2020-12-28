@@ -115,7 +115,9 @@ TEST_CASE("filesystem_snapshot") {
         static const auto mount_path = PS_TEXT("S:\\");
         static const auto system_root = PS_TEXT("Windows");
 #else
-        static const auto root = "/";
+        // attach_snapshot in macOS uses mount_apfs, which on Big Sur requires explicit
+        // volume name ("/System/Volumes/Data" instead of "/"). It also works in 10.15.
+        const auto root = "/System/Volumes/Data";
         const auto mount_path = temp_directory_path() / path{std::string{"snap"}.append(std::to_string(getpid()))};
         static const auto system_root = "System";
 #endif
@@ -127,7 +129,8 @@ TEST_CASE("filesystem_snapshot") {
             const path mount{mount_path};
             REQUIRE_FALSE(exists(mount, ec));
             attach_snapshot(snap, mount, ec);
-            CHECK(!ec);
+            CHECK(!ec); // attach_snapshot() on macOS uses mount_apfs, which requires "Full Disk Access"
+                        // (error: "mount_apfs: volume could not be mounted: Operation not permitted")
             CHECK_THROWS(delete_snapshot(snap));
 
             CHECK(exists(mount / system_root, ec));
