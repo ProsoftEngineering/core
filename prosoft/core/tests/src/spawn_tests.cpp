@@ -40,7 +40,9 @@ TEST_CASE("spawn") {
     CHECK(err.code().value() == 1);
     prosoft::spawn("sw_vers", spawn_args{"-productName"}, cout, cerr, err);
     CHECK(err.code().value() == 0);
-    CHECK(trim(cout) == "Mac OS X");
+    const auto macos_product_name = trim(cout);
+    CHECK((macos_product_name == "macOS"        // macOS 11 Big Sur
+            || macos_product_name == "Mac OS X"));
     CHECK(cerr.empty());
     
     err = std::system_error{1, std::system_category()};
