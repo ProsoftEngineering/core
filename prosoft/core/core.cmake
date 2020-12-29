@@ -26,9 +26,6 @@
 set(PSCORE "${CMAKE_CURRENT_LIST_DIR}")
 get_filename_component(PSCORE ${PSCORE} REALPATH)
 
-# fallback to local versions of packages if not provided by upper level
-list(APPEND CMAKE_MODULE_PATH ${PSCORE}/config/cmake/packages)
-
 include("${PSCORE}/config/cmake/config.cmake")
 
 macro(ps_core_include TARGET_NAME)
