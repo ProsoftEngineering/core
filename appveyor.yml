@@ -7,6 +7,7 @@ deploy: off
 image:
   - Visual Studio 2015
   - Visual Studio 2017
+  - Visual Studio 2019
 
 install:
   # As of June 2018, TLS 1.2 is required to connect to rubygems.org. The default ruby is 1.9.3 and doesn't support TLS 1.2.
