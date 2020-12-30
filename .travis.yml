@@ -62,12 +62,17 @@ matrix:
         
 install:
     - |
-        INSTALL_DIR="${HOME}/depend"
-        mkdir -p "${INSTALL_DIR}" "${INSTALL_DIR}/bin" "${INSTALL_DIR}/man" "${INSTALL_DIR}/share"
-        if [ ! -x "${INSTALL_DIR}/bin/cmake" ]; then
-            ${TRAVIS_BUILD_DIR}/depend/get_cmake.sh --prefix ${INSTALL_DIR}
+        if [ "$TRAVIS_OSX_IMAGE" == "xcode9.2" ] || \
+           [ "$TRAVIS_DIST" == "xenial" ] || \
+           [ "$TRAVIS_DIST" == "bionic" ]
+        then
+            INSTALL_DIR="${HOME}/depend"
+            mkdir -p "${INSTALL_DIR}" "${INSTALL_DIR}/bin" "${INSTALL_DIR}/man" "${INSTALL_DIR}/share"
+            if [ ! -x "${INSTALL_DIR}/bin/cmake" ]; then
+                ${TRAVIS_BUILD_DIR}/depend/get_cmake.sh --prefix ${INSTALL_DIR}
+            fi
+            export PATH=${INSTALL_DIR}/bin:${PATH}
         fi
-        export PATH=${INSTALL_DIR}/bin:${PATH}
 
 before_script:
     - cd ${TRAVIS_BUILD_DIR}
