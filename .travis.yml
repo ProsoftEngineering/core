@@ -41,6 +41,9 @@ matrix:
             apt:
                 packages:
                     - libacl1-dev
+                    - python3-pip
+                    - python3-setuptools
+                    - python3-wheel
 
       # latest gcc for Ubuntu Bionic 18.04
       - os: linux
@@ -50,6 +53,9 @@ matrix:
             apt:
                 packages:
                     - libacl1-dev
+                    - python3-pip
+                    - python3-setuptools
+                    - python3-wheel
 
       # latest gcc for Ubuntu Focal 20.04
       - os: linux
@@ -62,17 +68,22 @@ matrix:
         
 install:
     - |
-        if [ "$TRAVIS_OSX_IMAGE" == "xcode9.2" ] || \
-           [ "$TRAVIS_DIST" == "xenial" ] || \
-           [ "$TRAVIS_DIST" == "bionic" ]
-        then
-            INSTALL_DIR="${HOME}/depend"
-            mkdir -p "${INSTALL_DIR}" "${INSTALL_DIR}/bin" "${INSTALL_DIR}/man" "${INSTALL_DIR}/share"
-            if [ ! -x "${INSTALL_DIR}/bin/cmake" ]; then
-                ${TRAVIS_BUILD_DIR}/depend/get_cmake.sh --prefix ${INSTALL_DIR}
-            fi
-            export PATH=${INSTALL_DIR}/bin:${PATH}
+        if [ "$TRAVIS_OSX_IMAGE" == "xcode9.2" ]; then
+            HOMEBREW_NO_AUTO_UPDATE=1 brew install python3
         fi
+    # Install conan
+    - python3 --version
+    - pip3 --version
+    - pip3 install --upgrade conan
+    - conan --version
+    - |
+        if [ "$TRAVIS_OS_NAME" == "linux" ]; then
+            conan profile new default --detect
+            conan profile update settings.compiler.libcxx=libstdc++11 default
+        fi
+    # Check versions
+    - cmake --version
+    - rake --version
 
 before_script:
     - cd ${TRAVIS_BUILD_DIR}

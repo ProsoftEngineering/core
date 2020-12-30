@@ -10,12 +10,18 @@ image:
   - Visual Studio 2019
 
 install:
-  # As of June 2018, TLS 1.2 is required to connect to rubygems.org. The default ruby is 1.9.3 and doesn't support TLS 1.2.
-  # https://github.com/rubygems/rubygems/issues/1912
-  # https://help.appveyor.com/discussions/problems/15052-unable-to-download-data-from-httpsrubygemsorg
-  - set PATH=C:\Ruby25\bin;%PATH%
-  - gem update --system
-  - gem install rake -f -q
+  - set PATH=C:\Ruby25-x64\bin;%PATH%
+  - ruby --version
+  # Install conan
+  - set PYTHON=C:\Python38-x64
+  - set PATH=%PYTHON%;%PYTHON%\Scripts;%PATH%
+  - python --version
+  - pip --version
+  - pip install --upgrade conan
+  - conan --version
+  # Check versions
+  - cmake --version
+  - rake --version
 
 build_script:
 - cmd: >-
