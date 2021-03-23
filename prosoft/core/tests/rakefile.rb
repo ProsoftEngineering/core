@@ -1,4 +1,4 @@
-# Copyright © 2015, Prosoft Engineering, Inc. (A.K.A "Prosoft")
+# Copyright © 2015-2021, Prosoft Engineering, Inc. (A.K.A "Prosoft")
 # All rights reserved.
 # 
 # Redistribution and use in source and binary forms, with or without
@@ -49,58 +49,54 @@ task :release => [
 ]
 
 task :generate_debug do
-  CMAKE_GENERATORS.each do |gen|
-    builddir = build_dir(DEBUG_CONFIG, gen)
+  CMAKE_CONFIGS.each do |cmakeConfig|
+    builddir = build_dir(DEBUG_CONFIG, cmakeConfig)
     conan_args = ['install', '--install-folder', builddir, '--settings', 'build_type=Debug']
-    if gen.start_with?('Visual Studio ') and not gen.end_with?(' Win64')
-        conan_args += ['--settings', 'arch=x86']
-    end
+    conan_args += cmakeConfig.conan_install_args
     conan_args += ['--build=missing', ROOT_DIR]
     sh 'conan', *conan_args
-    cmake_generate builddir, DEBUG_CONFIG, ROOT_DIR, gen
+    cmake_generate builddir, DEBUG_CONFIG, ROOT_DIR, cmakeConfig
   end
 end
 
 task :generate_release do
-  CMAKE_GENERATORS.each do |gen|
-    builddir = build_dir(RELEASE_CONFIG, gen)
+  CMAKE_CONFIGS.each do |cmakeConfig|
+    builddir = build_dir(RELEASE_CONFIG, cmakeConfig)
     conan_args = ['install', '--install-folder', builddir, '--settings', 'build_type=Release']
-    if gen.start_with?('Visual Studio ') and not gen.end_with?(' Win64')
-        conan_args += ['--settings', 'arch=x86']
-    end
+    conan_args += cmakeConfig.conan_install_args
     conan_args += ['--build=missing', ROOT_DIR]
     sh 'conan', *conan_args
-    cmake_generate builddir, RELEASE_CONFIG, ROOT_DIR, gen
+    cmake_generate builddir, RELEASE_CONFIG, ROOT_DIR, cmakeConfig
   end
 end
 
 task :build_debug do
-  CMAKE_GENERATORS.each do |gen|
-    cmake_build build_dir(DEBUG_CONFIG, gen), DEBUG_CONFIG
+  CMAKE_CONFIGS.each do |cmakeConfig|
+    cmake_build build_dir(DEBUG_CONFIG, cmakeConfig), DEBUG_CONFIG
   end
 end
 
 task :build_release do
-  CMAKE_GENERATORS.each do |gen|
-    cmake_build build_dir(RELEASE_CONFIG, gen), RELEASE_CONFIG
+  CMAKE_CONFIGS.each do |cmakeConfig|
+    cmake_build build_dir(RELEASE_CONFIG, cmakeConfig), RELEASE_CONFIG
   end
 end
 
 task :test_debug do
-  CMAKE_GENERATORS.each do |gen|
-    ctest build_dir(DEBUG_CONFIG, gen), DEBUG_CONFIG
+  CMAKE_CONFIGS.each do |cmakeConfig|
+    ctest build_dir(DEBUG_CONFIG, cmakeConfig), DEBUG_CONFIG
   end
 end
 
 task :test_release do
-  CMAKE_GENERATORS.each do |gen|
-    ctest build_dir(RELEASE_CONFIG, gen), RELEASE_CONFIG
+  CMAKE_CONFIGS.each do |cmakeConfig|
+    ctest build_dir(RELEASE_CONFIG, cmakeConfig), RELEASE_CONFIG
   end
 end
 
 task :ide do
-  dir = build_dir DEBUG_CONFIG, CMAKE_DEFAULT_GENERATOR
-  cmake_generate dir, DEBUG_CONFIG, ROOT_DIR, CMAKE_DEFAULT_GENERATOR
+  dir = build_dir DEBUG_CONFIG, CMAKE_CONFIGS[0]
+  cmake_generate dir, DEBUG_CONFIG, ROOT_DIR, CMAKE_CONFIGS[0]
   open_ide dir
 end
 task :xcode => [:ide]
