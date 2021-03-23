@@ -1,4 +1,4 @@
-# Copyright © 2015-2020, Prosoft Engineering, Inc. (A.K.A "Prosoft")
+# Copyright © 2015-2021, Prosoft Engineering, Inc. (A.K.A "Prosoft")
 # All rights reserved.
 # 
 # Redistribution and use in source and binary forms, with or without
@@ -61,53 +61,55 @@ ROOT_DIR = Dir.getwd
 DEBUG_CONFIG = 'Debug'
 RELEASE_CONFIG = 'RelWithDebInfo'
 
-# As of Cmake 3.1 the VS generator architecture does not need to be specified.
-# We continue doing so to allow distinct builds to be controlled by rake.
-if HAVE_VS2019 # VS 2019 requires the cmake -A arg to specify the architecture.
-  VS2019_CMAKE_GENERATORS = ['Visual Studio 16']
+class CMakeConfig
+  attr_reader :id, :cmake_configure_args, :conan_install_args
+
+  def initialize(id: '', cmake_configure_args: [], conan_install_args: [])
+    @id = id                                        # "VS2019x86"
+    @cmake_configure_args = cmake_configure_args    # '-G',  'Visual Studio 16 2019', '-A', 'Win32'
+    @conan_install_args = conan_install_args        # '-s', 'arch=x86'
+  end
 end
 
-if HAVE_VS2017
-  VS2017_CMAKE_GENERATORS = ['Visual Studio 15 Win64', 'Visual Studio 15']
-end
-
-if HAVE_VS2015
-  VS2015_CMAKE_GENERATORS = ['Visual Studio 14 Win64', 'Visual Studio 14']
-end
+CMAKE_CONFIGS = []
  
 if which('xcrun')
-  CMAKE_DEFAULT_GENERATOR = 'Xcode'
-elsif which('ninja') && UNAME != 'MSVC' # AppVeyor has Ninja installed
-  CMAKE_DEFAULT_GENERATOR = 'Ninja'
+  CMAKE_CONFIGS.push(CMakeConfig.new(:id => 'Xcode',
+                                     :cmake_configure_args => ['-G', 'Xcode']))
 elsif HAVE_VS2019
-  CMAKE_DEFAULT_GENERATOR = VS2019_CMAKE_GENERATORS[0]
+  CMAKE_CONFIGS.push(CMakeConfig.new(:id => 'VS2019',
+                                     :cmake_configure_args => ['-G', 'Visual Studio 16 2019']))
+  CMAKE_CONFIGS.push(CMakeConfig.new(:id => 'VS2019x86',
+                                     :cmake_configure_args => ['-G', 'Visual Studio 16 2019', '-A', 'Win32'],
+                                     :conan_install_args => ['-s', 'arch=x86']))
 elsif HAVE_VS2017
-  CMAKE_DEFAULT_GENERATOR = VS2017_CMAKE_GENERATORS[0]
+  CMAKE_CONFIGS.push(CMakeConfig.new(:id => 'VS2017',
+                                     :cmake_configure_args => ['-G', 'Visual Studio 15 2017 Win64']))
+  CMAKE_CONFIGS.push(CMakeConfig.new(:id => 'VS2017x86',
+                                     :cmake_configure_args => ['-G', 'Visual Studio 15 2017'],
+                                     :conan_install_args => ['-s', 'arch=x86']))
 elsif HAVE_VS2015
-  CMAKE_DEFAULT_GENERATOR = VS2015_CMAKE_GENERATORS[0]
+  CMAKE_CONFIGS.push(CMakeConfig.new(:id => 'VS2015',
+                                     :cmake_configure_args => ['-G', 'Visual Studio 14 2015 Win64']))
+  CMAKE_CONFIGS.push(CMakeConfig.new(:id => 'VS2015x86',
+                                     :cmake_configure_args => ['-G', 'Visual Studio 14 2015'],
+                                     :conan_install_args => ['-s', 'arch=x86']))
+elsif which('ninja')
+  CMAKE_CONFIGS.push(CMakeConfig.new(:id => 'Ninja',
+                                     :cmake_configure_args => ['-G', 'Ninja']))
 else
-  CMAKE_DEFAULT_GENERATOR = 'Unix Makefiles'
+  CMAKE_CONFIGS.push(CMakeConfig.new(:id => 'Makefiles',
+                                     :cmake_configure_args => ['-G', 'Unix Makefiles']))
 end
 
-CMAKE_GENERATORS = [CMAKE_DEFAULT_GENERATOR]
-if HAVE_VS2019
-  CMAKE_GENERATORS.concat(VS2019_CMAKE_GENERATORS)
-elsif HAVE_VS2017
-  CMAKE_GENERATORS.concat(VS2017_CMAKE_GENERATORS)
-elsif HAVE_VS2015
-  CMAKE_GENERATORS.concat(VS2015_CMAKE_GENERATORS)
-end
-CMAKE_GENERATORS.uniq!
-
-def build_dir(config, generator)
-  generator = generator.tr(' ', '')
-  return File.join(ROOT_DIR, "build_#{UNAME}_#{generator}_#{config}")
+def build_dir(config, cmakeConfig)
+  return File.join(ROOT_DIR, "build_#{cmakeConfig.id}_#{config}")
 end
 
-def cmake_generate(builddir, config, srcdir, generator=CMAKE_DEFAULT_GENERATOR)
+def cmake_generate(builddir, config, srcdir, cmakeConfig=CMAKE_CONFIGS[0])
   FileUtils.mkdir_p builddir
   Dir.chdir builddir do
-    sh 'cmake', '-G', generator, '-DCMAKE_POLICY_DEFAULT_CMP0063=NEW', '-DCMAKE_BUILD_TYPE=' + config, srcdir
+    sh 'cmake', *cmakeConfig.cmake_configure_args, '-DCMAKE_POLICY_DEFAULT_CMP0063=NEW', '-DCMAKE_BUILD_TYPE=' + config, srcdir
   end
 end
 
