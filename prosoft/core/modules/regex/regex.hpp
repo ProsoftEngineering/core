@@ -393,11 +393,16 @@ private:
 };
 
 template <class Traits>
-class basic_regex_iterator : public std::iterator<std::forward_iterator_tag, basic_match_results<Traits>> {
+class basic_regex_iterator {
     typedef typename Traits::string_iterator input_iterator;
 
 public:
-    typedef basic_match_results<Traits> value_type;
+    using iterator_category = std::forward_iterator_tag;
+    using value_type = basic_match_results<Traits>;
+    using difference_type = std::ptrdiff_t;
+    using pointer = basic_match_results<Traits>*;
+    using reference = basic_match_results<Traits>&;
+
     typedef basic_regex<Traits> regex_type;
 
     basic_regex_iterator() PS_NOEXCEPT : _first(), _last(), _flags(regex_constants::match_default), _rx(nullptr), _results() {}
