@@ -38,10 +38,11 @@ def which(cmd)
 end
 
 # VS2017 breaks with previous install orginization leading to distinct install paths for each edition (Enterprise, Pro, etc).
+HAVE_VS2022 = File.exist? 'C:/Program Files/Microsoft Visual Studio/2022'
 HAVE_VS2019 = File.exist? 'C:/Program Files (x86)/Microsoft Visual Studio/2019'
 HAVE_VS2017 = File.exist? 'C:/Program Files (x86)/Microsoft Visual Studio/2017' # /Professional/VC/Auxiliary/Build/vcvarsall.bat
 HAVE_VS2015 = File.exist? 'C:/Program Files (x86)/Microsoft Visual Studio 14.0/VC/vcvarsall.bat'
-if HAVE_VS2019 or HAVE_VS2017 or HAVE_VS2015
+if HAVE_VS2022 or HAVE_VS2019 or HAVE_VS2017 or HAVE_VS2015
   UNAME = 'MSVC'
 elsif which('uname')
   UNAME = `uname -s`.strip
@@ -76,6 +77,12 @@ CMAKE_CONFIGS = []
 if which('xcrun')
   CMAKE_CONFIGS.push(CMakeConfig.new(:id => 'Xcode',
                                      :cmake_configure_args => ['-G', 'Xcode']))
+elsif HAVE_VS2022
+  CMAKE_CONFIGS.push(CMakeConfig.new(:id => 'VS2022',
+                                     :cmake_configure_args => ['-G', 'Visual Studio 17 2022']))
+  CMAKE_CONFIGS.push(CMakeConfig.new(:id => 'VS2022x86',
+                                     :cmake_configure_args => ['-G', 'Visual Studio 17 2022', '-A', 'Win32'],
+                                     :conan_install_args => ['-s', 'arch=x86']))
 elsif HAVE_VS2019
   CMAKE_CONFIGS.push(CMakeConfig.new(:id => 'VS2019',
                                      :cmake_configure_args => ['-G', 'Visual Studio 16 2019']))
