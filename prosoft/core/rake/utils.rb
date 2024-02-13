@@ -116,7 +116,7 @@ end
 def cmake_generate(builddir, config, srcdir, cmakeConfig=CMAKE_CONFIGS[0])
   FileUtils.mkdir_p builddir
   Dir.chdir builddir do
-    sh 'cmake', *cmakeConfig.cmake_configure_args, '-DCMAKE_POLICY_DEFAULT_CMP0063=NEW', '-DCMAKE_BUILD_TYPE=' + config, srcdir
+    sh 'cmake', *cmakeConfig.cmake_configure_args, '-DCMAKE_BUILD_TYPE=' + config, srcdir
   end
 end
 
