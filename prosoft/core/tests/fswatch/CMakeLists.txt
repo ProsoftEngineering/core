@@ -26,7 +26,7 @@
 # XXX: DO NOT INCLUDE THIS AS A SUBDIR OF THE MAIN TESTS.
 # It will nullify internal module tests as the modules will be built without testing.
 
-cmake_minimum_required(VERSION 3.1)
+cmake_minimum_required(VERSION 3.15)
 project(fswatch)
 
 include("${CMAKE_CURRENT_LIST_DIR}/../../core.cmake")
