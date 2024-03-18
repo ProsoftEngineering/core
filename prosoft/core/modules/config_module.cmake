@@ -35,10 +35,6 @@ set(PS_CORE_MODULE_INCLUDE_DIRS
 	"${CMAKE_CURRENT_LIST_DIR}/../include"
 )
 
-if (DEFINED CORETESTS)
-    include("${CMAKE_CURRENT_LIST_DIR}/../tests/test_utils.cmake")
-endif()
-
 macro(ps_core_module_config TARGET_NAME)
 	if(DEBUG)
         target_compile_definitions(${TARGET_NAME} PRIVATE DEBUG=1)
@@ -59,7 +55,6 @@ macro(ps_core_module_config TARGET_NAME)
 	    find_package(Catch2 REQUIRED)
 	    target_link_libraries(${TARGET_NAME} PRIVATE Catch2::Catch2)
 	    target_compile_definitions(${TARGET_NAME} PRIVATE PSTEST_HARNESS=1)
-	    ps_add_ctests_from_catch_tests_to_host(${TARGET_NAME} $<TARGET_FILE:coretests>)
 	endif()
 endmacro()
 

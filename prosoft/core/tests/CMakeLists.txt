@@ -32,7 +32,6 @@ list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_BINARY_DIR})
 set(CORETESTS ${CMAKE_CURRENT_LIST_DIR})
 
 include("${CMAKE_CURRENT_LIST_DIR}/../core.cmake")
-include("${CORETESTS}/test_utils.cmake")
 
 if (PSGCC)
 # Coverage is not enabled for clang as Xcode 7.2 clang hangs compiling regex_tests.cpp.
@@ -106,4 +105,6 @@ ps_core_use_regex(${PROJECT_NAME})
 # We add all of our tests to coverage as they will produce the coverage for header-only implementations
 ps_core_enable_target_code_coverage(${PROJECT_NAME})
 
-ps_add_ctests_from_catch_tests(${PROJECT_NAME})
+include(CTest)
+include(Catch)
+catch_discover_tests(${PROJECT_NAME})
