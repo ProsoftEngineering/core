@@ -771,7 +771,7 @@ bool prosoft::system::exists(const prosoft::system::identity& i) {
 #if PSTEST_HARNESS
 
 // Internal tests.
-#include <catch2/catch.hpp>
+#include <catch2/catch_test_macros.hpp>
 
 TEST_CASE("system_identity internal") {
 #ifdef PS_USING_PASSWD_API

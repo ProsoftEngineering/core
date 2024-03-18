@@ -257,7 +257,7 @@ path system_complete(const path& p, error_code& ec) {
 #if PSTEST_HARNESS
 
 // Internal tests.
-#include <catch2/catch.hpp>
+#include <catch2/catch_test_macros.hpp>
 
 struct ErrorCwdProvider {
     using pointer = path::encoding_value_type*;

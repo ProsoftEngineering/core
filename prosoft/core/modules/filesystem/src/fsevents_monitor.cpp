@@ -819,7 +819,7 @@ void change_manager::process_renames(fs::change_notifications& notes) {
 
 #if PSTEST_HARNESS
 // Internal tests.
-#include <catch2/catch.hpp>
+#include <catch2/catch_test_macros.hpp>
 
 using namespace prosoft::filesystem;
 #include "src/fstestutils.hpp"

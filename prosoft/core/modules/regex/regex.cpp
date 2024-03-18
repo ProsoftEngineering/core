@@ -266,7 +266,7 @@ bool prosoft::iregex::rsearch(OnigRegex rx, const uchar* haystack, size_t length
 
 #if PSTEST_HARNESS
 // Internal tests.
-#include <catch2/catch.hpp>
+#include <catch2/catch_test_macros.hpp>
 
 TEST_CASE("regex internal") {
     using namespace prosoft;

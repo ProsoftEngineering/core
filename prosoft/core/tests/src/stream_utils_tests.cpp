@@ -27,7 +27,7 @@
 
 #include <stream_utils.hpp>
 
-#include <catch2/catch.hpp>
+#include <catch2/catch_test_macros.hpp>
 
 TEST_CASE("stream_utils") {
     WHEN("changing stream flags") {

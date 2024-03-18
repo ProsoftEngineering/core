@@ -882,7 +882,7 @@ void delete_snapshot(snapshot& snap, std::error_code& ec) {
 // Internal tests.
 #include <memory>
 
-#include <catch2/catch.hpp>
+#include <catch2/catch_test_macros.hpp>
 
 TEST_CASE("snapshot_internal") {
     WHEN("changing snapshot state") {

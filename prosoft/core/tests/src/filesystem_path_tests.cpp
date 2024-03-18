@@ -30,7 +30,7 @@
 
 #include <filesystem/filesystem.hpp>
 
-#include <catch2/catch.hpp>
+#include <catch2/catch_test_macros.hpp>
 
 // The spec does not define a global operator+ for path. Most likely because append ignores separators and it would be too easy
 // to make a mistake when building a path. We define one for testing simply to make odd construction patterns a bit easier.
