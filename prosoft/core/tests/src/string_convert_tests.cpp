@@ -39,14 +39,16 @@ TEST_CASE("string_convert") {
         string test{"test"};
         
         WHEN("default conversion is performed on an lvalue") {
-            auto&& result = to_string{}(test);
+            to_string to_string_converter;
+            auto&& result = to_string_converter(test);
             THEN("the result is an lvalue reference to the same string") {
                 CHECK(&result == &test);
             }
         }
         
         WHEN("default conversion is performed on an rvalue") {
-            auto&& result = to_string{}(std::move(test));
+            to_string to_string_converter;
+            auto&& result = to_string_converter(std::move(test));
             THEN("the result is an lvalue reference to a new string") {
                 CHECK(&result != &test);
                 CHECK_FALSE(result.empty());
