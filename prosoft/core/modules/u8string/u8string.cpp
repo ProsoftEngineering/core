@@ -204,14 +204,16 @@ inline void PS_U8_ASSERT_ITER__FWD_RANGE(const Iter& first, const Iter& last, co
 #endif
 
 // find predicates
-struct is_equal_pre_normalized : public std::unary_function<u8string::unicode_type, bool> {
+struct is_equal_pre_normalized {
+    using argument_type = u8string::unicode_type;
     // XXX: Assumes c1 and c2 are of the same normalization. u8string enforces normalization for all data, but external data does not.
     bool operator()(argument_type c1, argument_type c2) {
         return c1 == c2;
     }
 };
 
-struct is_equal_icase : public std::unary_function<u8string::unicode_type, bool> {
+struct is_equal_icase {
+    using argument_type = u8string::unicode_type;
     bool operator()(argument_type c1, argument_type c2) {
         return 0 == u8string::compare(c1, c2, true);
     }
