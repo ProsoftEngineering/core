@@ -28,8 +28,6 @@ project(regex)
 
 set(PSREGEX ${CMAKE_CURRENT_LIST_DIR})
 
-add_subdirectory(${PSREGEX}/vendor/onig)
-
 include("${CMAKE_CURRENT_LIST_DIR}/../config_module.cmake")
 
 set(regex_lib ${PROJECT_NAME})
@@ -41,15 +39,11 @@ ps_core_module_config(${regex_lib})
 
 target_include_directories(${regex_lib}
 	PRIVATE
-    ${PSREGEX}/vendor/onig/onig/src
     PUBLIC
     ${PSREGEX}
 )
 
-if(WIN32)
-    target_compile_definitions(${regex_lib} PRIVATE ONIG_EXTERN=extern)
-endif()
-
-target_link_libraries(${regex_lib} PRIVATE onig)
+find_package(oniguruma REQUIRED)
+target_link_libraries(${regex_lib} PRIVATE oniguruma::onig)
 
 ps_core_enable_code_coverage(${PSREGEX}/regex.cpp)
