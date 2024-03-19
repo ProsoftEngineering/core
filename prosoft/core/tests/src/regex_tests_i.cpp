@@ -154,7 +154,7 @@ SECTION("anchors") {
     rx.assign(rx.pattern(), regex_constants::syntax_option_type::noendl);
     // ^ now means "beginning of string"
     CHECK(regex_match(string("abcd"), rx));
-    CHECK(regex_match(string("abcd"), rx, regex_constants::match_flag_type::match_not_bol));
+    CHECK_FALSE(regex_match(string("abcd"), rx, regex_constants::match_flag_type::match_not_bol));
     // newlines are ignored so this now fails
     CHECK_FALSE(regex_search(string("dcba\nabcd"), rx, regex_constants::match_flag_type::match_not_bol));
     
