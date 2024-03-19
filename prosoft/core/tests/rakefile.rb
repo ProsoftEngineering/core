@@ -51,10 +51,17 @@ task :release => [
 task :generate_debug do
   CMAKE_CONFIGS.each do |cmakeConfig|
     builddir = build_dir(DEBUG_CONFIG, cmakeConfig)
-    conan_args = ['install', '--install-folder', builddir,
-                  '--profile:build=default',
+    conan_args = ['install',
                   '--settings', 'build_type=Debug'
     ]
+    conan_version = `conan --version`
+    if conan_version.start_with?('Conan version 2.')
+        conan_args += ['--output-folder', builddir]
+    else        # 'Conan version 1.'
+        conan_args += ['--install-folder', builddir,
+                       '--profile:build=default'
+        ]
+    end
     conan_args += cmakeConfig.conan_install_args
     conan_args += ['--build=missing', ROOT_DIR]
     sh 'conan', *conan_args
@@ -69,11 +76,18 @@ end
 task :generate_release do
   CMAKE_CONFIGS.each do |cmakeConfig|
     builddir = build_dir(RELEASE_CONFIG, cmakeConfig)
-    conan_args = ['install', '--install-folder', builddir,
-                  '--profile:build=default',
+    conan_args = ['install',
                   '--settings', 'build_type=Release',
                   '--settings', '&:build_type=RelWithDebInfo'   # consumer build_type (RELEASE_CONFIG)
     ]
+    conan_version = `conan --version`
+    if conan_version.start_with?('Conan version 2.')
+        conan_args += ['--output-folder', builddir]
+    else        # 'Conan version 1.'
+        conan_args += ['--install-folder', builddir,
+                       '--profile:build=default'
+        ]
+    end
     conan_args += cmakeConfig.conan_install_args
     conan_args += ['--build=missing', ROOT_DIR]
     sh 'conan', *conan_args
