@@ -51,22 +51,37 @@ task :release => [
 task :generate_debug do
   CMAKE_CONFIGS.each do |cmakeConfig|
     builddir = build_dir(DEBUG_CONFIG, cmakeConfig)
-    conan_args = ['install', '--install-folder', builddir, '--settings', 'build_type=Debug']
+    conan_args = ['install', '--install-folder', builddir,
+                  '--profile:build=default',
+                  '--settings', 'build_type=Debug'
+    ]
     conan_args += cmakeConfig.conan_install_args
     conan_args += ['--build=missing', ROOT_DIR]
     sh 'conan', *conan_args
-    cmake_generate builddir, DEBUG_CONFIG, ROOT_DIR, cmakeConfig
+    Dir.chdir builddir do
+        sh 'cmake', ROOT_DIR, *cmakeConfig.cmake_configure_args,
+                    '-DCMAKE_TOOLCHAIN_FILE=' + builddir + '/conan_toolchain.cmake',
+                    '-DCMAKE_BUILD_TYPE=' + DEBUG_CONFIG
+    end
   end
 end
 
 task :generate_release do
   CMAKE_CONFIGS.each do |cmakeConfig|
     builddir = build_dir(RELEASE_CONFIG, cmakeConfig)
-    conan_args = ['install', '--install-folder', builddir, '--settings', 'build_type=Release']
+    conan_args = ['install', '--install-folder', builddir,
+                  '--profile:build=default',
+                  '--settings', 'build_type=Release',
+                  '--settings', '&:build_type=RelWithDebInfo'   # consumer build_type (RELEASE_CONFIG)
+    ]
     conan_args += cmakeConfig.conan_install_args
     conan_args += ['--build=missing', ROOT_DIR]
     sh 'conan', *conan_args
-    cmake_generate builddir, RELEASE_CONFIG, ROOT_DIR, cmakeConfig
+    Dir.chdir builddir do
+        sh 'cmake', ROOT_DIR, *cmakeConfig.cmake_configure_args,
+                    '-DCMAKE_TOOLCHAIN_FILE=' + builddir + '/conan_toolchain.cmake',
+                    '-DCMAKE_BUILD_TYPE=' + RELEASE_CONFIG
+    end
   end
 end
 
