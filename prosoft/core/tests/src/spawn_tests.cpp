@@ -29,7 +29,7 @@
 #include <filesystem/src/spawn.hpp>
 #include <string/string_component.hpp>
 
-#include <catch2/catch.hpp>
+#include <catch2/catch_test_macros.hpp>
 
 TEST_CASE("spawn") {
     using namespace prosoft;

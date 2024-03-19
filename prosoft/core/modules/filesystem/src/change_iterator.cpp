@@ -284,7 +284,7 @@ ifilesystem::change_iterator_traits::serialize(const basic_iterator<change_itera
 
 #if PSTEST_HARNESS
 // Internal tests.
-#include <catch2/catch.hpp>
+#include <catch2/catch_test_macros.hpp>
 
 namespace {
 
