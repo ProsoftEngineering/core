@@ -820,6 +820,8 @@ void change_manager::process_renames(fs::change_notifications& notes) {
 #if PSTEST_HARNESS
 // Internal tests.
 #include <catch2/catch_test_macros.hpp>
+#include <catch2/matchers/catch_matchers_floating_point.hpp>
+using Catch::Matchers::WithinAbs;
 
 using namespace prosoft::filesystem;
 #include "src/fstestutils.hpp"
@@ -1267,15 +1269,15 @@ TEST_CASE("filesystem_monitor_internal") {
         WHEN("converting config latency to native time") {
             change_config::latency_type l{1000};
             auto cfl = std::chrono::duration_cast<cfduration>(l).count();
-            CHECK(cfl == Approx(1.0));
+            REQUIRE_THAT(cfl, WithinAbs(1.0, 0.01));
             
             l = change_config::latency_type{2500};
             cfl = std::chrono::duration_cast<cfduration>(l).count();
-            CHECK(cfl == Approx(2.5));
+            REQUIRE_THAT(cfl, WithinAbs(2.5, 0.01));
             
             l = change_config::latency_type{100};
             cfl = std::chrono::duration_cast<cfduration>(l).count();
-            CHECK(cfl == Approx(0.1));
+            REQUIRE_THAT(cfl, WithinAbs(0.1, 0.01));
         }
     
         WHEN("when a file is renamed") {
