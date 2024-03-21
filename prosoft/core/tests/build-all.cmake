@@ -1,49 +1,47 @@
 #
 # Usage:
 #   mkdir BUILD_DIR && cd BUILD_DIR && cmake [options] -P SOURCE_DIR/build-all.cmake
+#   Options:
+#     -DBUILDERS=MAKE,MSVC,NINJA,XCODE
 #
+cmake_minimum_required(VERSION 3.15)    # foreach(... IN LISTS ...)
 
-find_program(NINJA_PROGRAM ninja)
-if(NINJA_PROGRAM)
-    execute_process(
-        COMMAND cmake -E make_directory build_Ninja_RelWithDebInfo
-        COMMAND_ERROR_IS_FATAL ANY
-    )
-    execute_process(
-        COMMAND cmake -E chdir build_Ninja_RelWithDebInfo
-                         cmake -DGENERATOR=Ninja -DBUILD_TYPE=RelWithDebInfo
-                               -P "${CMAKE_CURRENT_LIST_DIR}/build.cmake"
-        COMMAND_ERROR_IS_FATAL ANY
-    )
-    execute_process(
-        COMMAND cmake -E make_directory build_Ninja_Debug
-        COMMAND_ERROR_IS_FATAL ANY
-    )
-    execute_process(
-        COMMAND cmake -E chdir build_Ninja_Debug
-                         cmake -DGENERATOR=Ninja -DBUILD_TYPE=Debug
-                               -P "${CMAKE_CURRENT_LIST_DIR}/build.cmake"
-        COMMAND_ERROR_IS_FATAL ANY
-    )
-else()  # "Unix Makefiles"
-    execute_process(
-        COMMAND cmake -E make_directory build_Makefiles_RelWithDebInfo
-        COMMAND_ERROR_IS_FATAL ANY
-    )
-    execute_process(
-        COMMAND cmake -E chdir build_Makefiles_RelWithDebInfo
-                         cmake "-DGENERATOR=Unix Makefiles" -DBUILD_TYPE=RelWithDebInfo
-                               -P "${CMAKE_CURRENT_LIST_DIR}/build.cmake"
-        COMMAND_ERROR_IS_FATAL ANY
-    )
-    execute_process(
-        COMMAND cmake -E make_directory build_Makefiles_Debug
-        COMMAND_ERROR_IS_FATAL ANY
-    )
-    execute_process(
-        COMMAND cmake -E chdir build_Makefiles_Debug
-                         cmake "-DGENERATOR=Unix Makefiles" -DBUILD_TYPE=Debug
-                               -P "${CMAKE_CURRENT_LIST_DIR}/build.cmake"
-        COMMAND_ERROR_IS_FATAL ANY
-    )
+if(NOT BUILDERS)
+    set(BUILDERS "MAKE")
 endif()
+
+string(REPLACE "," ";" BUILDERS_LIST "${BUILDERS}")
+
+function(run_build_cmake BUILD_DIR)
+    list(REMOVE_AT ARGV 0)
+    set(BUILD_ARGS ${ARGV})
+    execute_process(
+        COMMAND cmake -E make_directory ${BUILD_DIR}
+        COMMAND_ERROR_IS_FATAL ANY
+    )
+    execute_process(
+        COMMAND cmake -E chdir ${BUILD_DIR}
+                         cmake ${BUILD_ARGS} -P "${CMAKE_CURRENT_LIST_DIR}/build.cmake"
+        COMMAND_ERROR_IS_FATAL ANY
+    )
+endfunction()
+
+foreach(BUILDER IN LISTS BUILDERS_LIST)
+    if(BUILDER STREQUAL "MAKE")
+        run_build_cmake(build_Makefiles_RelWithDebInfo
+                        "-DGENERATOR=Unix Makefiles" -DBUILD_TYPE=RelWithDebInfo)
+        run_build_cmake(build_Makefiles_Debug
+                        "-DGENERATOR=Unix Makefiles" -DBUILD_TYPE=Debug)
+    elseif(BUILDER STREQUAL "MSVC")
+        message("MSVC")
+    elseif(BUILDER STREQUAL "NINJA")
+        run_build_cmake(build_Ninja_RelWithDebInfo
+                        -DGENERATOR=Ninja -DBUILD_TYPE=RelWithDebInfo)
+        run_build_cmake(build_Ninja_Debug
+                        -DGENERATOR=Ninja -DBUILD_TYPE=Debug)
+    elseif(BUILDER STREQUAL "XCODE")
+        message("XCODE")
+    else()
+        message(FATAL_ERROR "Unknown BUILDER (${BUILDER})")
+    endif()
+endforeach()
