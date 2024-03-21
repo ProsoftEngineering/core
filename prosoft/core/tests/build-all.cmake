@@ -40,7 +40,10 @@ foreach(BUILDER IN LISTS BUILDERS_LIST)
         run_build_cmake(build_Ninja_Debug
                         -DGENERATOR=Ninja -DBUILD_TYPE=Debug)
     elseif(BUILDER STREQUAL "XCODE")
-        message("XCODE")
+        run_build_cmake(build_Xcode_RelWithDebInfo
+                        -DGENERATOR=Xcode -DBUILD_TYPE=RelWithDebInfo)
+        run_build_cmake(build_Xcode_Debug
+                        -DGENERATOR=Xcode -DBUILD_TYPE=Debug)
     else()
         message(FATAL_ERROR "Unknown BUILDER (${BUILDER})")
     endif()
