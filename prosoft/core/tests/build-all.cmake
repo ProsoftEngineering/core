@@ -15,6 +15,9 @@ string(REPLACE "," ";" BUILDERS_LIST "${BUILDERS}")
 function(run_build_cmake BUILD_DIR)
     list(REMOVE_AT ARGV 0)
     set(BUILD_ARGS ${ARGV})
+    if(APPLE)
+        list(APPEND BUILD_ARGS "-DCONAN_PROFILE=${CMAKE_CURRENT_LIST_DIR}/conan/profiles/macos")
+    endif()
     execute_process(
         COMMAND cmake -E make_directory ${BUILD_DIR}
         COMMAND_ERROR_IS_FATAL ANY

@@ -1,0 +1,19 @@
+include(default)
+
+[settings]
+# settings.xml: add "psconfig" option in "compiler/apple-clang" section
+# ("psconfig: [None, ANY]" for conan v1 or "psconfig: [null, ANY]" for conan v2)
+
+# Rebuild all conan packages on this computer (don't use third-party binaries).
+compiler.psconfig = "pscore-240321"
+# ... or single package: catch2/*:compiler.psconfig = "pscore-240321"
+
+# Build all for same minimum version of macOS
+os.version = 10.12
+
+[conf]
+# Match CXX_VISIBILITY_PRESET in ps_core_config_symbols_hidden()
+# Fix catch2 static build ("ld: warning: direct access in function ... to global weak symbol
+# ... means the weak symbol cannot be overridden at runtime. This was likely caused by
+# different translation units being compiled with different visibility settings")
+catch2/*:tools.build:cxxflags = ["-fvisibility=hidden"]
