@@ -4,6 +4,7 @@
 # Options:
 #   -DGENERATOR=...
 #   -DBUILD_TYPE=...
+#   -DCONAN_PROFILE=...
 #
 if(NOT GENERATOR)
     set(GENERATOR "Unix Makefiles")
@@ -29,6 +30,9 @@ else()
     message(FATAL_ERROR "Unknown BUILD_TYPE (${BUILD_TYPE})")
 endif()
 set(COMMAND ${COMMAND} --output-folder=.)
+if(CONAN_PROFILE)
+    set(COMMAND ${COMMAND} --profile "${CONAN_PROFILE}")
+endif()
 execute_process(COMMAND conan --version OUTPUT_VARIABLE CONAN_VERSION)
 if(CONAN_VERSION MATCHES "^Conan version 2.")
 else()  # "^Conan version 1."
