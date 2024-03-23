@@ -1,0 +1,7 @@
+compiler:
+    apple-clang:
+        psconfig: [null, ANY]
+    gcc:
+        psconfig: [null, ANY]
+    msvc:
+        psconfig: [null, ANY]
