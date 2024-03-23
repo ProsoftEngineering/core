@@ -3,6 +3,8 @@
 #   mkdir BUILD_DIR && cd BUILD_DIR && cmake [options] -P SOURCE_DIR/build.cmake
 # Options:
 #   -DGENERATOR=...
+#   -DARCH=...
+#   -DPLATFORM=...
 #   -DBUILD_TYPE=...
 #   -DCONAN_PROFILE=...
 #
@@ -16,6 +18,9 @@ endif()
 # Initialize conan packages. Only single-config with CMAKE_BUILD_TYPE is supported.
 set(COMMAND conan install)
 set(COMMAND ${COMMAND} --conf "tools.cmake.cmaketoolchain:generator=${GENERATOR}")
+if(ARCH)
+    set(COMMAND ${COMMAND} --settings "arch=${ARCH}")
+endif()
 if(BUILD_TYPE STREQUAL "Release")
     set(COMMAND ${COMMAND} --settings build_type=Release)
     set(PRESET_NAME "release")
@@ -50,6 +55,9 @@ execute_process(
 # Don't use cmake presets because they are created in the source directory.
 set(COMMAND cmake "-DCMAKE_TOOLCHAIN_FILE=${CMAKE_CURRENT_BINARY_DIR}/conan_toolchain.cmake")
 set(COMMAND ${COMMAND} "-G${GENERATOR}")
+if(PLATFORM)
+    set(COMMAND ${COMMAND} "-A${PLATFORM}")
+endif()
 set(COMMAND ${COMMAND} "-DCMAKE_BUILD_TYPE=${BUILD_TYPE}")
 set(COMMAND ${COMMAND} "${CMAKE_CURRENT_LIST_DIR}")
 list(JOIN COMMAND " " COMMAND_STRING)
