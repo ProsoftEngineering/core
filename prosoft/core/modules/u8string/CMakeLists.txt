@@ -45,9 +45,11 @@ target_include_directories(${u8string_lib}
     PRIVATE
     ${U8STRING}/vendor/utf8proc
     PUBLIC
-    ${U8STRING}/vendor/utf8cpp/source
     ${U8STRING}
 )
+
+find_package(utf8cpp REQUIRED)
+target_link_libraries(${u8string_lib} PUBLIC utf8cpp)
 
 if(WIN32)
     target_compile_definitions(${u8string_lib} PRIVATE UTF8PROC_EXPORTS=)
