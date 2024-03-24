@@ -19,6 +19,8 @@ function(run_build_cmake BUILD_DIR)
         list(APPEND BUILD_ARGS "-DCONAN_PROFILE=${CMAKE_CURRENT_LIST_DIR}/conan/profiles/macos")
     elseif(WIN32)
         list(APPEND BUILD_ARGS "-DCONAN_PROFILE=${CMAKE_CURRENT_LIST_DIR}/conan/profiles/windows")
+    elseif(CMAKE_HOST_SYSTEM_NAME STREQUAL "Linux")
+        list(APPEND BUILD_ARGS "-DCONAN_PROFILE=${CMAKE_CURRENT_LIST_DIR}/conan/profiles/linux")
     endif()
     execute_process(
         COMMAND cmake -E make_directory ${BUILD_DIR}
