@@ -88,7 +88,7 @@ std::string normalize(const char* s, size_t nbytes = 0, int options = stable_nor
     }
 
     PSASSERT(UTF8PROC_ERROR_INVALIDUTF8 == result, "Broken assumption");
-    throw u8string::invalid_utf8(0);
+    throw u8string::invalid_utf8(char{0});
 }
 
 utf8proc_ssize_t normalize(u8string::unicode_type c, int32_t* buf, utf8proc_ssize_t len, int options = stable_normalization) {
