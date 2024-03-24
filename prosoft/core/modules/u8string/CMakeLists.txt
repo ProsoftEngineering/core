@@ -28,8 +28,6 @@ project(u8string)
 
 set(U8STRING ${CMAKE_CURRENT_LIST_DIR})
 
-add_subdirectory(${U8STRING}/vendor/utf8proc)
-
 include("${CMAKE_CURRENT_LIST_DIR}/../config_module.cmake")
 
 set(u8string_lib ${PROJECT_NAME})
@@ -42,8 +40,6 @@ add_library(${u8string_lib}
 ps_core_module_config(${u8string_lib})
 
 target_include_directories(${u8string_lib}
-    PRIVATE
-    ${U8STRING}/vendor/utf8proc
     PUBLIC
     ${U8STRING}
 )
@@ -51,10 +47,7 @@ target_include_directories(${u8string_lib}
 find_package(utf8cpp REQUIRED)
 target_link_libraries(${u8string_lib} PUBLIC utf8cpp)
 
-if(WIN32)
-    target_compile_definitions(${u8string_lib} PRIVATE UTF8PROC_EXPORTS=)
-endif()
-
-target_link_libraries(${u8string_lib} PRIVATE utf8proc)
+find_package(utf8proc REQUIRED)
+target_link_libraries(${u8string_lib} PRIVATE utf8proc::utf8proc)
 
 ps_core_enable_code_coverage(${U8STRING}/u8string.cpp)
