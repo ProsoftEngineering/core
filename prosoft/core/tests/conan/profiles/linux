@@ -1,0 +1,12 @@
+include(default)
+
+[settings]
+# settings.xml: add "psconfig" option in "compiler/apple-clang" section
+# ("psconfig: [None, ANY]" for conan v1 or "psconfig: [null, ANY]" for conan v2)
+
+# Rebuild all conan packages on this computer (don't use third-party binaries).
+compiler.psconfig = "pscore-240321"
+
+[conf]
+# Match CXX_VISIBILITY_PRESET in ps_core_config_symbols_hidden()
+catch2/*:tools.build:cxxflags = ["-fvisibility=hidden"]
