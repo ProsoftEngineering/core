@@ -30,7 +30,7 @@
 #include <cstring>
 #include <cstdlib>
 
-#include "utf8proc.h"
+#include <utf8proc.h>
 
 #include "u8string.hpp"
 
