@@ -36,17 +36,9 @@
 #include <prosoft/core/include/string/string_types.hpp>
 #include <prosoft/core/include/uniform_access.hpp>
 
-// "utf8.h" may conflict
-#ifndef _SILENCE_CXX17_ITERATOR_BASE_CLASS_DEPRECATION_WARNING
-#define _SILENCE_CXX17_ITERATOR_BASE_CLASS_DEPRECATION_WARNING
-#define PS__SILENCE_CXX17_ITERATOR_BASE_CLASS_DEPRECATION_WARNING
-#endif
-#include "utf8/checked.h"
-#include "utf8/unchecked.h"
-#ifdef PS__SILENCE_CXX17_ITERATOR_BASE_CLASS_DEPRECATION_WARNING
-#undef _SILENCE_CXX17_ITERATOR_BASE_CLASS_DEPRECATION_WARNING
-#undef PS__SILENCE_CXX17_ITERATOR_BASE_CLASS_DEPRECATION_WARNING
-#endif
+// <utf8.h> may conflict
+#include <utf8/checked.h>
+#include <utf8/unchecked.h>
 
 #include "u8string_iterator.hpp"
 

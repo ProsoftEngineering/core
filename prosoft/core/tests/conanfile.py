@@ -8,6 +8,7 @@ class OSSCoreTestsConan(ConanFile):
         self.requires("catch2/3.5.3")
         self.requires("nlohmann_json/3.11.3")
         self.requires("oniguruma/6.9.9")
+        self.requires("utfcpp/4.0.4")
 
     def generate(self):
         tc = CMakeToolchain(self)
