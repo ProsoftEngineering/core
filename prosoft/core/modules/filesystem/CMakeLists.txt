@@ -58,9 +58,6 @@ if(APPLE)
     target_link_libraries(${PROJECT_NAME} PRIVATE "-framework Foundation" "-framework CoreServices")
     find_package(nlohmann_json REQUIRED)        # fsevents_monitor.cpp
     target_link_libraries(${PROJECT_NAME} PRIVATE nlohmann_json::nlohmann_json)
-    if(DEFINED CORETESTS)
-        target_include_directories(${PROJECT_NAME} PRIVATE ${CORETESTS})      # fsevents_monitor.cpp: #include "src/fstestutils.hpp"
-    endif()
 endif()
 
 if(WIN32)
@@ -104,3 +101,7 @@ endif()
 ps_core_enable_target_code_coverage(${PROJECT_NAME})
 
 add_library(filesystem::filesystem ALIAS filesystem)
+
+add_library(filesystem_internal INTERFACE)
+target_include_directories(filesystem_internal INTERFACE src)   # fstestutils.hpp
+add_library(filesystem::filesystem_internal ALIAS filesystem_internal)
