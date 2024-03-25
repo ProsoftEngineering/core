@@ -41,4 +41,5 @@ endif()
 
 ps_core_configure(${PROJECT_NAME})
 
-ps_core_use_filesystem(${PROJECT_NAME})
+find_package(filesystem REQUIRED)
+target_link_libraries(${PROJECT_NAME} PRIVATE filesystem::filesystem)
