@@ -1,6 +1,6 @@
-# Copyright © 2013-2015, Prosoft Engineering, Inc. (A.K.A "Prosoft")
+# Copyright © 2013-2024, Prosoft Engineering, Inc. (A.K.A "Prosoft")
 # All rights reserved.
-# 
+#
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions are met:
 #     * Redistributions of source code must retain the above copyright
@@ -11,7 +11,7 @@
 #     * Neither the name of Prosoft nor the names of its contributors may be
 #       used to endorse or promote products derived from this software without
 #       specific prior written permission.
-# 
+#
 # THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
 # ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
 # WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
@@ -26,28 +26,22 @@
 cmake_minimum_required(VERSION 3.15)
 project(u8string)
 
-set(U8STRING ${CMAKE_CURRENT_LIST_DIR})
-
 include("${CMAKE_CURRENT_LIST_DIR}/../config_module.cmake")
 
-set(u8string_lib ${PROJECT_NAME})
-add_library(${u8string_lib}
-    ${U8STRING}/u8string.cpp
-    ${U8STRING}/u8string.hpp
-    ${U8STRING}/u8string_iterator.hpp
+add_library(${PROJECT_NAME}
+    src/u8string.cpp
 )
 
-ps_core_module_config(${u8string_lib})
+ps_core_module_config(${PROJECT_NAME})
 
-target_include_directories(${u8string_lib}
-    PUBLIC
-    ${U8STRING}
-)
+target_include_directories(${PROJECT_NAME} PUBLIC include)
 
 find_package(utf8cpp REQUIRED)
-target_link_libraries(${u8string_lib} PUBLIC utf8cpp)
+target_link_libraries(${PROJECT_NAME} PUBLIC utf8cpp)
 
 find_package(utf8proc REQUIRED)
-target_link_libraries(${u8string_lib} PRIVATE utf8proc::utf8proc)
+target_link_libraries(${PROJECT_NAME} PRIVATE utf8proc::utf8proc)
 
-ps_core_enable_code_coverage(${U8STRING}/u8string.cpp)
+ps_core_enable_target_code_coverage(${PROJECT_NAME})
+
+add_library(u8string::u8string ALIAS u8string)
