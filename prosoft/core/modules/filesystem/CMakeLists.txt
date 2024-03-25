@@ -74,7 +74,9 @@ if(WIN32)
         ${PSFS}/src/snapshot_win32.cpp
     )
     target_link_libraries(${fs_lib} PUBLIC "shell32" "vssapi")
-	ps_core_module_use_external_module(${fs_lib} winutils)
+
+    find_package(winutils REQUIRED)
+    target_link_libraries(${fs_lib} PRIVATE winutils::winutils)
 endif()
 
 if(PSLINUX)
