@@ -35,8 +35,8 @@
 #include <thread>
 #include <vector>
 
-#include "filesystem.hpp"
-#include "filesystem_change_monitor.hpp"
+#include <prosoft/core/modules/filesystem/filesystem.hpp>
+#include <prosoft/core/modules/filesystem/filesystem_change_monitor.hpp>
 #include "filesystem_private.hpp"
 #include "fsmonitor_private.hpp"
 #include "string/platform_convert.hpp"

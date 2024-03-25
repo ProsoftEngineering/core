@@ -32,7 +32,7 @@
 #include <windows.h>
 #endif
 
-#include "filesystem.hpp"
+#include <prosoft/core/modules/filesystem/filesystem.hpp>
 #include "filesystem_private.hpp"
 
 #include <string/string_component.hpp>

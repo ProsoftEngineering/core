@@ -28,11 +28,11 @@
 #include <algorithm>
 #include <thread>
 
-#include "filesystem.hpp"
+#include <prosoft/core/modules/filesystem/filesystem.hpp>
 
 #if PS_HAVE_FILESYSTEM_CHANGE_ITERATOR
 
-#include "filesystem_change_monitor.hpp"
+#include <prosoft/core/modules/filesystem/filesystem_change_monitor.hpp>
 
 #include <catch2/catch_test_macros.hpp>
 #include "fstestutils.hpp"

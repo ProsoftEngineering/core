@@ -24,7 +24,7 @@
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <prosoft/core/config/config_platform.h>
-#include <filesystem/path_utils.hpp>
+#include <prosoft/core/modules/filesystem//path_utils.hpp>
 #include <string/string_types.hpp>
 #include <prosoft/core/modules/u8string/u8string.hpp>
 

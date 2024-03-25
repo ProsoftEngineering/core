@@ -28,7 +28,7 @@
 #include <cstring>
 #include <sstream>
 
-#include <filesystem/filesystem.hpp>
+#include <prosoft/core/modules/filesystem/filesystem.hpp>
 
 #include <catch2/catch_test_macros.hpp>
 

@@ -51,7 +51,7 @@
 #include <unique_resource.hpp>
 #include <string/platform_convert.hpp>
 
-#include "filesystem.hpp"
+#include <prosoft/core/modules/filesystem/filesystem.hpp>
 #include "filesystem_private.hpp"
 
 namespace {

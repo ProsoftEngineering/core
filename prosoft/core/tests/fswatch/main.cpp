@@ -25,7 +25,7 @@
 
 #include <thread>
 
-#include <filesystem.hpp>
+#include <prosoft/core/modules/filesystem/filesystem.hpp>
 
 int main(int argc, char* argv[]) {
     #if PS_HAVE_FILESYSTEM_CHANGE_ITERATOR

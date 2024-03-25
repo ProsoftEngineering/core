@@ -40,8 +40,8 @@
 #include <prosoft/core/modules/winutils/win_token_privs.hpp>
 #endif
 
-#include "filesystem.hpp"
-#include "filesystem_snapshot.hpp"
+#include <prosoft/core/modules/filesystem/filesystem.hpp>
+#include <prosoft/core/modules/filesystem/filesystem_snapshot.hpp>
 
 #include "unique_resource.hpp"
 

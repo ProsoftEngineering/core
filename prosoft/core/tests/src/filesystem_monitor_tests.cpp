@@ -31,8 +31,8 @@
 
 #include <thread>
 
-#include "filesystem.hpp"
-#include "filesystem_change_monitor.hpp"
+#include <prosoft/core/modules/filesystem/filesystem.hpp>
+#include <prosoft/core/modules/filesystem/filesystem_change_monitor.hpp>
 
 #if PS_HAVE_FILESYSTEM_CHANGE_MONITOR
 

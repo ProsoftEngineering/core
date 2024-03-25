@@ -23,8 +23,8 @@
 // (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#include "filesystem.hpp"
-#include "filesystem_snapshot.hpp"
+#include <prosoft/core/modules/filesystem/filesystem.hpp>
+#include <prosoft/core/modules/filesystem/filesystem_snapshot.hpp>
 
 #if PS_HAVE_FILESYSTEM_SNAPSHOT
 

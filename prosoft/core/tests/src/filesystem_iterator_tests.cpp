@@ -23,7 +23,7 @@
 // (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#include <filesystem/filesystem.hpp>
+#include <prosoft/core/modules/filesystem//filesystem.hpp>
 
 #include <catch2/catch_test_macros.hpp>
 #include "fsdirent_catch_fix.hpp"

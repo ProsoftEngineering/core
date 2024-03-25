@@ -38,7 +38,7 @@
 #include <system_error.hpp>
 
 #include "fsconfig.h"
-#include "filesystem.hpp"
+#include <prosoft/core/modules/filesystem/filesystem.hpp>
 #include "filesystem_private.hpp"
 
 namespace fs = prosoft::filesystem::v1;
