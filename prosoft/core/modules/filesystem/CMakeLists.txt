@@ -26,71 +26,64 @@
 cmake_minimum_required(VERSION 3.15)
 project(filesystem)
 
-set(PSFS ${CMAKE_CURRENT_LIST_DIR})
-
 include("${CMAKE_CURRENT_LIST_DIR}/../config_module.cmake")
 
-set(fs_lib ${PROJECT_NAME})
-add_library(${fs_lib}
-    ${PSFS}/src/attrs.cpp
-    ${PSFS}/src/dirops.cpp
-    ${PSFS}/src/change_iterator.cpp
-    ${PSFS}/src/fsmonitor.cpp
-    ${PSFS}/src/iterator.cpp
-    ${PSFS}/src/pathops.cpp
-    ${PSFS}/src/filesystem.cpp
-    ${PSFS}/src/filesystem_acl.cpp
-    ${PSFS}/src/snapshot_all.cpp
-    ${PSFS}/src/standard_directory_path.cpp
+add_library(${PROJECT_NAME}
+    src/attrs.cpp
+    src/dirops.cpp
+    src/change_iterator.cpp
+    src/fsmonitor.cpp
+    src/iterator.cpp
+    src/pathops.cpp
+    src/filesystem.cpp
+    src/filesystem_acl.cpp
+    src/snapshot_all.cpp
+    src/standard_directory_path.cpp
 )
 
-ps_core_module_config(${fs_lib})
+ps_core_module_config(${PROJECT_NAME})
 
-target_include_directories(${fs_lib}
-    PUBLIC
-    ${PSFS}
-)
+target_include_directories(${PROJECT_NAME} PUBLIC include)
 
 if(APPLE)
-    target_sources(${fs_lib} PRIVATE
-        ${PSFS}/src/fsevents_monitor.cpp
-        ${PSFS}/src/snapshot_mac.cpp
-        ${PSFS}/src/spawn_mac.mm
+    target_sources(${PROJECT_NAME} PRIVATE
+        src/fsevents_monitor.cpp
+        src/snapshot_mac.cpp
+        src/spawn_mac.mm
     )
     set_source_files_properties(
-        ${PSFS}/src/spawn_mac.mm
+        src/spawn_mac.mm
         PROPERTIES COMPILE_FLAGS -fobjc-arc
     )
-    target_link_libraries(${fs_lib} PUBLIC "-framework Foundation -framework CoreServices")
+    target_link_libraries(${PROJECT_NAME} PRIVATE "-framework Foundation" "-framework CoreServices")
     find_package(nlohmann_json REQUIRED)        # fsevents_monitor.cpp
-    target_link_libraries(${fs_lib} PRIVATE nlohmann_json::nlohmann_json)
+    target_link_libraries(${PROJECT_NAME} PRIVATE nlohmann_json::nlohmann_json)
     if(DEFINED CORETESTS)
-        target_include_directories(${fs_lib} PRIVATE ${CORETESTS})      # fsevents_monitor.cpp: #include "src/fstestutils.hpp"
+        target_include_directories(${PROJECT_NAME} PRIVATE ${CORETESTS})      # fsevents_monitor.cpp: #include "src/fstestutils.hpp"
     endif()
 endif()
 
 if(WIN32)
-    target_sources(${fs_lib} PRIVATE
-        ${PSFS}/src/snapshot_win32.cpp
+    target_sources(${PROJECT_NAME} PRIVATE
+        src/snapshot_win32.cpp
     )
-    target_link_libraries(${fs_lib} PUBLIC "shell32" "vssapi")
-
+    target_link_libraries(${PROJECT_NAME} PRIVATE shell32 vssapi)
     find_package(winutils REQUIRED)
-    target_link_libraries(${fs_lib} PRIVATE winutils::winutils)
+    target_link_libraries(${PROJECT_NAME} PRIVATE winutils::winutils)
 endif()
 
 if(PSLINUX)
-    target_link_libraries(${fs_lib} PUBLIC acl)
+    target_link_libraries(${PROJECT_NAME} PUBLIC acl)
 endif()
 
 if (UNIX AND NOT APPLE)
-    target_sources(${fs_lib} PRIVATE
-        ${PSFS}/src/snapshot_nop.cpp
+    target_sources(${PROJECT_NAME} PRIVATE
+        src/snapshot_nop.cpp
     )
 endif()
 
 if(MSVC)
-    set_target_properties(${fs_lib} PROPERTIES STATIC_LIBRARY_FLAGS
+    set_target_properties(${PROJECT_NAME} PROPERTIES STATIC_LIBRARY_FLAGS
         "/ignore:4221"      # This object file does not define any previously undefined public symbols
     )
 endif()
@@ -101,4 +94,13 @@ target_link_libraries(${PROJECT_NAME} PUBLIC u8string::u8string)
 find_package(system_identity REQUIRED)
 target_link_libraries(${PROJECT_NAME} PUBLIC system_identity::system_identity)
 
-ps_core_enable_target_code_coverage(${fs_lib})
+if(PS_CORE_BUILD_PSTEST_HARNESS)
+    message("WARNING: ${PROJECT_NAME} is compiled with PSTEST_HARNESS. Don't use in production!")
+    target_compile_definitions(${PROJECT_NAME} PRIVATE PSTEST_HARNESS=1)
+    find_package(Catch2 REQUIRED)
+    target_link_libraries(${PROJECT_NAME} PRIVATE Catch2::Catch2)
+endif()
+
+ps_core_enable_target_code_coverage(${PROJECT_NAME})
+
+add_library(filesystem::filesystem ALIAS filesystem)
