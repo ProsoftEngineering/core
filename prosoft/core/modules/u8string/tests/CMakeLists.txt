@@ -1,4 +1,4 @@
-# Copyright © 2013-2024, Prosoft Engineering, Inc. (A.K.A "Prosoft")
+# Copyright © 2024, Prosoft Engineering, Inc. (A.K.A "Prosoft")
 # All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
@@ -24,29 +24,22 @@
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 cmake_minimum_required(VERSION 3.15)
-project(u8string)
+project(u8string_tests)
 
-include("${CMAKE_CURRENT_LIST_DIR}/../config_module.cmake")
+include("${CMAKE_CURRENT_LIST_DIR}/../../config_module.cmake")
 
-add_library(${PROJECT_NAME}
-    src/u8string.cpp
+add_executable(${PROJECT_NAME}
+    src/u8string_tests.cpp
 )
 
 ps_core_module_config(${PROJECT_NAME})
-
-target_include_directories(${PROJECT_NAME} PUBLIC include)
-
-find_package(utf8cpp REQUIRED)
-target_link_libraries(${PROJECT_NAME} PUBLIC utf8cpp)
-
-find_package(utf8proc REQUIRED)
-target_link_libraries(${PROJECT_NAME} PRIVATE utf8proc::utf8proc)
-
 ps_core_enable_target_code_coverage(${PROJECT_NAME})
 
-add_library(u8string::u8string ALIAS u8string)
+find_package(u8string REQUIRED)
+target_link_libraries(${PROJECT_NAME} PRIVATE u8string::u8string)
 
-if(PS_CORE_BUILD_TESTS)
-    enable_testing()
-    add_subdirectory(tests)
-endif()
+find_package(Catch2 REQUIRED)
+target_link_libraries(${PROJECT_NAME} PRIVATE Catch2::Catch2WithMain)
+
+include(Catch)
+catch_discover_tests(${PROJECT_NAME})

@@ -59,7 +59,6 @@ set(SRCTESTS
     ${CORETESTS}/src/system_identity_tests.cpp
     ${CORETESTS}/src/uniform_access_tests.cpp
     ${CORETESTS}/src/unique_resource_tests.cpp
-    ${CORETESTS}/src/u8string_tests.cpp
 )
 
 add_executable(${PROJECT_NAME}
