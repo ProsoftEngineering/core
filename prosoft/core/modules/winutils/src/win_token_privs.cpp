@@ -26,7 +26,7 @@
 #include <system_error.hpp>
 #include <unique_resource.hpp>
 
-#include "win_token_privs.hpp"
+#include <prosoft/core/modules/winutils/win_token_privs.hpp>
 
 bool prosoft::windows::modify_privilege(HANDLE token, privilege_name priv, privilege_action act, std::error_code& ec) {
     LUID luid;

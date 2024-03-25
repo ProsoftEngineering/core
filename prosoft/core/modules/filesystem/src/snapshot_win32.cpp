@@ -36,8 +36,8 @@
 #include <vsbackup.h>
 #include <atlbase.h>
 
-#include "winutils.hpp"
-#include "win_token_privs.hpp"
+#include <prosoft/core/modules/winutils/winutils.hpp>
+#include <prosoft/core/modules/winutils/win_token_privs.hpp>
 #endif
 
 #include "filesystem.hpp"

@@ -23,10 +23,8 @@
 // (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#if _WIN32
-
-#include "winutils.hpp"
-#include "win_token_privs.hpp"
+#include <prosoft/core/modules/winutils/winutils.hpp>
+#include <prosoft/core/modules/winutils/win_token_privs.hpp>
 
 #include <catch2/catch_test_macros.hpp>
 
@@ -107,5 +105,3 @@ TEST_CASE("winutils") {
         CHECK(guid_string(g) == "c4775ab0-fb84-11e6-9598-0800200c9a66");
     }
 }
-
-#endif // _WIN32
