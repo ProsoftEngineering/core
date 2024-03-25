@@ -32,7 +32,7 @@
 #include <sys/mount.h>
 #endif
 
-#include "identity.hpp"
+#include <prosoft/core/modules/system_identity/identity.hpp>
 
 #include <catch2/catch_test_macros.hpp>
 

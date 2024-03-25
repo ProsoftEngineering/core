@@ -31,7 +31,7 @@
 #include <sddl.h>
 #endif
 
-#include <identity.hpp>
+#include <prosoft/core/modules/system_identity/identity.hpp>
 #include <unique_resource.hpp>
 
 #include <catch2/catch_test_macros.hpp>

@@ -47,7 +47,7 @@
 #include <system_error.hpp>
 #include <system_utils.hpp>
 
-#include "identity.hpp"
+#include <prosoft/core/modules/system_identity/identity.hpp>
 
 namespace {
 using namespace prosoft::system;
