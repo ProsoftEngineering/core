@@ -30,7 +30,7 @@
 #include <stdexcept>
 
 #include <byteorder.h>
-#include <u8string/u8string.hpp>
+#include <prosoft/core/modules/u8string/u8string.hpp>
 
 #include <catch2/catch_test_macros.hpp>
 

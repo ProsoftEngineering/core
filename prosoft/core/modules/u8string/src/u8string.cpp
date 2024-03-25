@@ -32,7 +32,7 @@
 
 #include <utf8proc.h>
 
-#include "u8string.hpp"
+#include <prosoft/core/modules/u8string/u8string.hpp>
 
 enum class validate_flags {
     none,
