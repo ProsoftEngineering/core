@@ -1,4 +1,4 @@
-# Copyright © 2015-2018, Prosoft Engineering, Inc. (A.K.A "Prosoft")
+# Copyright © 2024, Prosoft Engineering, Inc. (A.K.A "Prosoft")
 # All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
@@ -24,63 +24,41 @@
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 cmake_minimum_required(VERSION 3.15)
-project(coretests)
+project(filesystem_tests)
 
-set(CORETESTS ${CMAKE_CURRENT_LIST_DIR})
-
-include("${CMAKE_CURRENT_LIST_DIR}/../core.cmake")
-
-if (PSGCC)
-# Coverage is not enabled for clang as Xcode 7.2 clang hangs compiling regex_tests.cpp.
-# I'm thinking it has something to do with the .cpp includes.
-set(PSCOVERAGE ${DEBUG})
-endif()
-
-include("${CORETESTS}/../config/cmake/config_coverage.cmake")
-
-set(SRCTESTS
-    ${CORETESTS}/src/byteorder_tests.cpp
-    ${CORETESTS}/src/case_convert_tests.cpp
-    ${CORETESTS}/src/semaphore_tests.cpp
-    ${CORETESTS}/src/stable_hash_wrapper_tests.cpp
-    ${CORETESTS}/src/stream_utils_tests.cpp
-    ${CORETESTS}/src/string_component_tests.cpp
-    ${CORETESTS}/src/string_convert_tests.cpp
-    ${CORETESTS}/src/system_error_tests.cpp
-    ${CORETESTS}/src/uniform_access_tests.cpp
-    ${CORETESTS}/src/unique_resource_tests.cpp
-)
+include("${CMAKE_CURRENT_LIST_DIR}/../../config_module.cmake")
 
 add_executable(${PROJECT_NAME}
-    ${CORETESTS}/src/test_main.cpp
-    ${SRCTESTS}
+    src/filesystem_acl_tests.cpp
+    src/filesystem_change_iterator_tests.cpp
+    src/filesystem_iterator_tests.cpp
+    src/filesystem_monitor_tests.cpp
+    src/filesystem_path_tests.cpp
+    src/filesystem_snapshot_tests.cpp
+    src/filesystem_tests.cpp
+    src/path_utils_tests.cpp
 )
-
 if(APPLE)
     target_sources(${PROJECT_NAME} PRIVATE
-        ${CORETESTS}/src/apple_convert_tests.mm
+        src/spawn_tests.cpp
     )
-    set_source_files_properties(
-        ${CORETESTS}/src/apple_convert_tests.mm
-        PROPERTIES COMPILE_FLAGS -fobjc-arc
-    )
+endif()
+
+ps_core_module_config(${PROJECT_NAME})
+ps_core_enable_target_code_coverage(${PROJECT_NAME})
+
+find_package(filesystem REQUIRED)
+target_link_libraries(${PROJECT_NAME} PRIVATE
+    filesystem::filesystem
+    filesystem::filesystem_internal
+)
+if(WIN32)
+    find_package(winutils REQUIRED)
+    target_link_libraries(${PROJECT_NAME} PRIVATE winutils::winutils)
 endif()
 
 find_package(Catch2 REQUIRED)
-target_link_libraries(${PROJECT_NAME} PRIVATE Catch2::Catch2)
+target_link_libraries(${PROJECT_NAME} PRIVATE Catch2::Catch2WithMain)
 
-if (UNIX AND NOT APPLE)
-    target_link_libraries(${PROJECT_NAME} PUBLIC pthread) # required for std::thread
-endif()
-
-ps_core_configure(${PROJECT_NAME})
-
-# This must be done before using modules so that the modules can setup their internal tests (if any)
-enable_testing()
-
-# We add all of our tests to coverage as they will produce the coverage for header-only implementations
-ps_core_enable_target_code_coverage(${PROJECT_NAME})
-
-include(CTest)
 include(Catch)
 catch_discover_tests(${PROJECT_NAME})

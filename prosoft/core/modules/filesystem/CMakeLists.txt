@@ -105,3 +105,8 @@ add_library(filesystem::filesystem ALIAS filesystem)
 add_library(filesystem_internal INTERFACE)
 target_include_directories(filesystem_internal INTERFACE src)   # fstestutils.hpp
 add_library(filesystem::filesystem_internal ALIAS filesystem_internal)
+
+if(PS_CORE_BUILD_TESTS)
+    enable_testing()
+    add_subdirectory(tests)
+endif()
