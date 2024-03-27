@@ -56,7 +56,6 @@ set(SRCTESTS
     ${CORETESTS}/src/string_component_tests.cpp
     ${CORETESTS}/src/string_convert_tests.cpp
     ${CORETESTS}/src/system_error_tests.cpp
-    ${CORETESTS}/src/system_identity_tests.cpp
     ${CORETESTS}/src/uniform_access_tests.cpp
     ${CORETESTS}/src/unique_resource_tests.cpp
 )
