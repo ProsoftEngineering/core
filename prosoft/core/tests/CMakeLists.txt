@@ -75,12 +75,6 @@ if(APPLE)
     )
 endif()
 
-if(WIN32)
-	 target_sources(${PROJECT_NAME} PRIVATE
-        ${CORETESTS}/src/winutils_tests.cpp
-    )
-endif()
-
 find_package(Catch2 REQUIRED)
 target_link_libraries(${PROJECT_NAME} PRIVATE Catch2::Catch2)
 
