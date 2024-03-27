@@ -1,4 +1,4 @@
-# Copyright © 2015, Prosoft Engineering, Inc. (A.K.A "Prosoft")
+# Copyright © 2024, Prosoft Engineering, Inc. (A.K.A "Prosoft")
 # All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
@@ -24,33 +24,27 @@
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 cmake_minimum_required(VERSION 3.15)
-project(regex)
+project(regex_tests)
 
-include("${CMAKE_CURRENT_LIST_DIR}/../config_module.cmake")
+include("${CMAKE_CURRENT_LIST_DIR}/../../config_module.cmake")
 
-add_library(${PROJECT_NAME}
-    src/regex.cpp
+add_executable(${PROJECT_NAME}
+    src/regex_tests.cpp
 )
 
 ps_core_module_config(${PROJECT_NAME})
-
-target_include_directories(${PROJECT_NAME} PUBLIC include)
-
-find_package(oniguruma REQUIRED)
-target_link_libraries(${PROJECT_NAME} PRIVATE oniguruma::onig)
-
 ps_core_enable_target_code_coverage(${PROJECT_NAME})
 
-if(PS_CORE_BUILD_PSTEST_HARNESS)
-    message("WARNING: ${PROJECT_NAME} is compiled with PSTEST_HARNESS. Don't use in production!")
-    target_compile_definitions(${PROJECT_NAME} PRIVATE PSTEST_HARNESS=1)
-    find_package(Catch2 REQUIRED)
-    target_link_libraries(${PROJECT_NAME} PRIVATE Catch2::Catch2)
-endif()
+find_package(regex REQUIRED)
+find_package(u8string REQUIRED)
+target_link_libraries(${PROJECT_NAME}
+    PRIVATE
+        regex::regex
+        u8string::u8string
+)
 
-add_library(regex::regex ALIAS regex)
+find_package(Catch2 REQUIRED)
+target_link_libraries(${PROJECT_NAME} PRIVATE Catch2::Catch2WithMain)
 
-if(PS_CORE_BUILD_TESTS)
-    enable_testing()
-    add_subdirectory(tests)
-endif()
+include(Catch)
+catch_discover_tests(${PROJECT_NAME})

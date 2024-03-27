@@ -49,7 +49,6 @@ set(SRCTESTS
     ${CORETESTS}/src/filesystem_path_tests.cpp
 	${CORETESTS}/src/filesystem_snapshot_tests.cpp
     ${CORETESTS}/src/path_utils_tests.cpp
-    ${CORETESTS}/src/regex_tests.cpp
     ${CORETESTS}/src/semaphore_tests.cpp
     ${CORETESTS}/src/stable_hash_wrapper_tests.cpp
 	${CORETESTS}/src/stream_utils_tests.cpp
@@ -95,7 +94,6 @@ ps_core_configure(${PROJECT_NAME})
 enable_testing()
 
 ps_core_use_filesystem(${PROJECT_NAME}) # brings in identity, u8string and winutils
-ps_core_use_regex(${PROJECT_NAME})
 
 # We add all of our tests to coverage as they will produce the coverage for header-only implementations
 ps_core_enable_target_code_coverage(${PROJECT_NAME})
