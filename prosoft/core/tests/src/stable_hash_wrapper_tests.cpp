@@ -28,7 +28,7 @@
 #include <string>
 #include <unordered_set>
 
-#include "stable_hash_wrapper.hpp"
+#include <prosoft/core/include/stable_hash_wrapper.hpp>
 
 #include <catch2/catch_test_macros.hpp>
 

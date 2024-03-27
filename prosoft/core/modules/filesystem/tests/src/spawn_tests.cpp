@@ -27,7 +27,7 @@
 // Currently, private to filesystem module for Mac only.
 
 #include <spawn.hpp>    // filesystem/src
-#include <string/string_component.hpp>
+#include <prosoft/core/include/string/string_component.hpp>
 
 #include <catch2/catch_test_macros.hpp>
 

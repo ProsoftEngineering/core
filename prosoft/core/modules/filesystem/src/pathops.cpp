@@ -35,8 +35,8 @@
 #include <prosoft/core/modules/filesystem/filesystem.hpp>
 #include "filesystem_private.hpp"
 
-#include <string/string_component.hpp>
-#include <unique_resource.hpp>
+#include <prosoft/core/include/string/string_component.hpp>
+#include <prosoft/core/include/unique_resource.hpp>
 
 namespace {
 

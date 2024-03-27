@@ -27,8 +27,8 @@
 
 #include <string>
 
-#include <string/unicode_convert.hpp>
-#include <string/case_convert.hpp>
+#include <prosoft/core/include/string/unicode_convert.hpp>
+#include <prosoft/core/include/string/case_convert.hpp>
 
 #include <catch2/catch_test_macros.hpp>
 

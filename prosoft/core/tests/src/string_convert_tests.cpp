@@ -27,7 +27,7 @@
 
 #include <string>
 
-#include <string/unicode_convert.hpp>
+#include <prosoft/core/include/string/unicode_convert.hpp>
 
 #include <catch2/catch_test_macros.hpp>
 

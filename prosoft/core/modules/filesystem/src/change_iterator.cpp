@@ -29,7 +29,7 @@
 #include <thread>
 #include <unordered_set>
 
-#include "stable_hash_wrapper.hpp"
+#include <prosoft/core/include/stable_hash_wrapper.hpp>
 
 #include <prosoft/core/modules/filesystem/filesystem.hpp>
 #include "filesystem_private.hpp"

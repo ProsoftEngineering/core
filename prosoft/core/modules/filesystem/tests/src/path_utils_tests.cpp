@@ -25,7 +25,7 @@
 
 #include <prosoft/core/config/config_platform.h>
 #include <prosoft/core/modules/filesystem//path_utils.hpp>
-#include <string/string_types.hpp>
+#include <prosoft/core/include/string/string_types.hpp>
 #include <prosoft/core/modules/u8string/u8string.hpp>
 
 #include <catch2/catch_test_macros.hpp>

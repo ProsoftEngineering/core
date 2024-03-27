@@ -39,9 +39,9 @@
 #include <prosoft/core/modules/filesystem/filesystem_change_monitor.hpp>
 #include "filesystem_private.hpp"
 #include "fsmonitor_private.hpp"
-#include "string/platform_convert.hpp"
-#include "unique_resource.hpp"
-#include "prosoft/core/config/config_analyzer.h"
+#include <prosoft/core/include/string/platform_convert.hpp>
+#include <prosoft/core/include/unique_resource.hpp>
+#include <prosoft/core/config/config_analyzer.h>
 
 #include <nlohmann/json.hpp>
 

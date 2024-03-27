@@ -23,7 +23,7 @@
 // (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#include <system_error.hpp>
+#include <prosoft/core/include/system_error.hpp>
 
 #include <catch2/catch_test_macros.hpp>
 

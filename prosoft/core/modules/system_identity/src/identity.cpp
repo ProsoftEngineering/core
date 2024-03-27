@@ -42,10 +42,10 @@
 #include <sddl.h>
 #endif
 
-#include <string/platform_convert.hpp>
-#include <string/unicode_convert.hpp>
-#include <system_error.hpp>
-#include <system_utils.hpp>
+#include <prosoft/core/include/string/platform_convert.hpp>
+#include <prosoft/core/include/string/unicode_convert.hpp>
+#include <prosoft/core/include/system_error.hpp>
+#include <prosoft/core/include/system_utils.hpp>
 
 #include <prosoft/core/modules/system_identity/identity.hpp>
 

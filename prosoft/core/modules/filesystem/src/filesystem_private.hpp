@@ -27,7 +27,7 @@
 #define PS_CORE_FILESYSTEM_PRIVATE_HPP
 
 #if _WIN32
-#include <unique_resource.hpp>
+#include <prosoft/core/include/unique_resource.hpp>
 #endif
 
 namespace fs = prosoft::filesystem::v1;

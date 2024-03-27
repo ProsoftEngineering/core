@@ -27,7 +27,7 @@
 
 #include <vector>
 
-#include <string/string_component.hpp>
+#include <prosoft/core/include/string/string_component.hpp>
 #include <prosoft/core/modules/u8string/u8string.hpp>
 
 #include <catch2/catch_test_macros.hpp>

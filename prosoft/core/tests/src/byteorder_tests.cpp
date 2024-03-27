@@ -27,7 +27,7 @@
 
 #include <string.h>
 
-#include <byteorder.h>
+#include <prosoft/core/include/byteorder.h>
 
 #include <catch2/catch_test_macros.hpp>
 

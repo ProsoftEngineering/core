@@ -27,7 +27,7 @@
 
 #include <thread>
 
-#include <semaphore.hpp>
+#include <prosoft/core/include/semaphore.hpp>
 
 #include <catch2/catch_test_macros.hpp>
 

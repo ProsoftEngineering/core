@@ -43,7 +43,7 @@
 #include <prosoft/core/modules/filesystem/filesystem.hpp>
 #include <prosoft/core/modules/filesystem/filesystem_snapshot.hpp>
 
-#include "unique_resource.hpp"
+#include <prosoft/core/include/unique_resource.hpp>
 
 #if PS_HAVE_FILESYSTEM_SNAPSHOT
 
