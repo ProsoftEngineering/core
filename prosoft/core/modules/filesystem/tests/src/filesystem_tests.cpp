@@ -39,7 +39,7 @@
 using namespace prosoft;
 using namespace prosoft::filesystem;
 
-#include "fstestutils.hpp"
+#include <fstestutils.hpp>
 
 TEST_CASE("filesystem") {
 

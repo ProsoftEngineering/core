@@ -31,7 +31,7 @@
 using namespace prosoft;
 using namespace prosoft::filesystem;
 
-#include "fstestutils.hpp"
+#include <fstestutils.hpp>
 
 TEST_CASE("filesystem_iterator") {
     WHEN("reserved options are set") {

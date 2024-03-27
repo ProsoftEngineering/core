@@ -37,7 +37,7 @@
 #if PS_HAVE_FILESYSTEM_CHANGE_MONITOR
 
 #include <catch2/catch_test_macros.hpp>
-#include "fstestutils.hpp"
+#include <fstestutils.hpp>
 
 using namespace prosoft;
 using namespace prosoft::filesystem;

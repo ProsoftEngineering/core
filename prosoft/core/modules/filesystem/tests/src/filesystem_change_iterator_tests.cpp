@@ -35,7 +35,7 @@
 #include <prosoft/core/modules/filesystem/filesystem_change_monitor.hpp>
 
 #include <catch2/catch_test_macros.hpp>
-#include "fstestutils.hpp"
+#include <fstestutils.hpp>
 
 using namespace prosoft;
 using namespace prosoft::filesystem;
