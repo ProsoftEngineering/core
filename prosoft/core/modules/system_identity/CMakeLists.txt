@@ -26,31 +26,32 @@
 cmake_minimum_required(VERSION 3.15)
 project(system_identity)
 
-set(PSSYSID ${CMAKE_CURRENT_LIST_DIR})
-
 include("${CMAKE_CURRENT_LIST_DIR}/../config_module.cmake")
 
-set(sys_id_lib ${PROJECT_NAME})
-add_library(${sys_id_lib}
-    ${PSSYSID}/identity.cpp
+add_library(${PROJECT_NAME}
+    src/identity.cpp
 )
 
-ps_core_module_config(${sys_id_lib})
+ps_core_module_config(${PROJECT_NAME})
 
-target_include_directories(${sys_id_lib}
-    PUBLIC
-    ${PSSYSID}
-)
+target_include_directories(${PROJECT_NAME} PUBLIC include)
 
 if(APPLE)
-    target_link_libraries(${sys_id_lib} PUBLIC "-framework CoreServices -framework SystemConfiguration")
-endif()
-
-if (WIN32)
-    target_link_libraries(${sys_id_lib} PUBLIC secur32.lib wtsapi32.lib)
+    target_link_libraries(${PROJECT_NAME} PRIVATE "-framework CoreServices" "-framework SystemConfiguration")
+elseif(WIN32)
+    target_link_libraries(${PROJECT_NAME} PRIVATE secur32 wtsapi32)
 endif()
 
 find_package(u8string REQUIRED)
 target_link_libraries(${PROJECT_NAME} PRIVATE u8string::u8string)
 
-ps_core_enable_target_code_coverage(${sys_id_lib})
+if(PS_CORE_BUILD_PSTEST_HARNESS)
+    message("WARNING: ${PROJECT_NAME} is compiled with PSTEST_HARNESS. Don't use in production!")
+    target_compile_definitions(${PROJECT_NAME} PRIVATE PSTEST_HARNESS=1)
+    find_package(Catch2 REQUIRED)
+    target_link_libraries(${PROJECT_NAME} PRIVATE Catch2::Catch2)
+endif()
+
+ps_core_enable_target_code_coverage(${PROJECT_NAME})
+
+add_library(system_identity::system_identity ALIAS system_identity)
