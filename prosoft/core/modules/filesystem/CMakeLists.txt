@@ -93,7 +93,9 @@ if(MSVC)
     )
 endif()
 
-ps_core_module_use_u8string_module(${fs_lib})
+find_package(u8string REQUIRED)
+target_link_libraries(${PROJECT_NAME} PUBLIC u8string::u8string)
+
 ps_core_module_use_external_module(${fs_lib} system_identity)
 
 ps_core_enable_target_code_coverage(${fs_lib})

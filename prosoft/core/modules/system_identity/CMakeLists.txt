@@ -50,6 +50,7 @@ if (WIN32)
     target_link_libraries(${sys_id_lib} PUBLIC secur32.lib wtsapi32.lib)
 endif()
 
-ps_core_module_use_u8string_module(${sys_id_lib})
+find_package(u8string REQUIRED)
+target_link_libraries(${PROJECT_NAME} PRIVATE u8string::u8string)
 
 ps_core_enable_target_code_coverage(${sys_id_lib})
