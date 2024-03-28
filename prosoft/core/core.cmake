@@ -79,13 +79,6 @@ macro(ps_core_use_filesystem TARGET_NAME)
     target_link_libraries(${TARGET_NAME} PUBLIC filesystem)
 endmacro()
 
-macro(ps_core_use_regex TARGET_NAME)
-    if(NOT TARGET regex)
-        add_subdirectory(${PSCORE}/modules/regex ${CMAKE_BINARY_DIR}/psregex)
-    endif()
-    target_link_libraries(${TARGET_NAME} PUBLIC regex)
-endmacro()
-
 macro(ps_core_use_winutils TARGET_NAME)
 	if(WIN32)
 		if (NOT TARGET winutils)
