@@ -38,33 +38,9 @@ endif()
 
 include("${CORETESTS}/../config/cmake/config_coverage.cmake")
 
-set(SRCTESTS
-    ${CORETESTS}/src/byteorder_tests.cpp
-    ${CORETESTS}/src/case_convert_tests.cpp
-    ${CORETESTS}/src/semaphore_tests.cpp
-    ${CORETESTS}/src/stable_hash_wrapper_tests.cpp
-    ${CORETESTS}/src/stream_utils_tests.cpp
-    ${CORETESTS}/src/string_component_tests.cpp
-    ${CORETESTS}/src/string_convert_tests.cpp
-    ${CORETESTS}/src/system_error_tests.cpp
-    ${CORETESTS}/src/uniform_access_tests.cpp
-    ${CORETESTS}/src/unique_resource_tests.cpp
-)
-
 add_executable(${PROJECT_NAME}
     ${CORETESTS}/src/test_main.cpp
-    ${SRCTESTS}
 )
-
-if(APPLE)
-    target_sources(${PROJECT_NAME} PRIVATE
-        ${CORETESTS}/src/apple_convert_tests.mm
-    )
-    set_source_files_properties(
-        ${CORETESTS}/src/apple_convert_tests.mm
-        PROPERTIES COMPILE_FLAGS -fobjc-arc
-    )
-endif()
 
 find_package(Catch2 REQUIRED)
 target_link_libraries(${PROJECT_NAME} PRIVATE Catch2::Catch2)

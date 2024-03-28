@@ -24,22 +24,40 @@
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 cmake_minimum_required(VERSION 3.15)
-project(ps_core)
+project(ps_core_tests)
 
-add_library(${PROJECT_NAME} INTERFACE)
+include("${CMAKE_CURRENT_LIST_DIR}/../../config_module.cmake")
 
-target_include_directories(${PROJECT_NAME} INTERFACE include)
-
+add_executable(${PROJECT_NAME}
+    src/byteorder_tests.cpp
+    src/case_convert_tests.cpp
+    src/semaphore_tests.cpp
+    src/stable_hash_wrapper_tests.cpp
+    src/stream_utils_tests.cpp
+    src/string_component_tests.cpp
+    src/string_convert_tests.cpp
+    src/system_error_tests.cpp
+    src/uniform_access_tests.cpp
+    src/unique_resource_tests.cpp
+)
 if(APPLE)
-    target_link_libraries(${PROJECT_NAME} INTERFACE "-framework Foundation")
+    target_sources(${PROJECT_NAME} PRIVATE
+        src/apple_convert_tests.mm
+    )
+    set_source_files_properties(
+        src/apple_convert_tests.mm
+        PROPERTIES COMPILE_FLAGS -fobjc-arc
+    )
 endif()
 
-find_package(u8string REQUIRED)
-target_link_libraries(${PROJECT_NAME} INTERFACE u8string::u8string)
+ps_core_module_config(${PROJECT_NAME})
+ps_core_enable_target_code_coverage(${PROJECT_NAME})
 
-add_library(ps::core ALIAS ps_core)
+find_package(ps_core REQUIRED)
+target_link_libraries(${PROJECT_NAME} PRIVATE ps::core)
 
-if(PS_CORE_BUILD_TESTS)
-    enable_testing()
-    add_subdirectory(tests)
-endif()
+find_package(Catch2 REQUIRED)
+target_link_libraries(${PROJECT_NAME} PRIVATE Catch2::Catch2WithMain)
+
+include(Catch)
+catch_discover_tests(${PROJECT_NAME})
