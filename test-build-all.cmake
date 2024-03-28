@@ -1,6 +1,13 @@
 #
+# Build and test all ps_core modules with given builders
+#
+# Tests these configurations with predefined conan profiles:
+#  * RelWithDebInfo | PSTEST_HARNESS=OFF
+#  * Debug | PSTEST_HARNESS=ON
+# MSVC builder tests x64 and x86 builds (4 configurations)
+#
 # Usage:
-#   mkdir BUILD_DIR && cd BUILD_DIR && cmake [options] -P SOURCE_DIR/build-all.cmake
+#   mkdir BUILD_DIR && cd BUILD_DIR && cmake [options] -P SOURCE_DIR/test-build-all.cmake
 #   Options:
 #     -DBUILDERS=MAKE,MSVC,NINJA,XCODE
 #
@@ -28,7 +35,7 @@ function(run_build_cmake BUILD_DIR)
     )
     execute_process(
         COMMAND cmake -E chdir ${BUILD_DIR}
-                         cmake ${BUILD_ARGS} -P "${CMAKE_CURRENT_LIST_DIR}/build.cmake"
+                         cmake ${BUILD_ARGS} -P "${CMAKE_CURRENT_LIST_DIR}/test-build.cmake"
         COMMAND_ERROR_IS_FATAL ANY
     )
 endfunction()
@@ -36,9 +43,11 @@ endfunction()
 foreach(BUILDER IN LISTS BUILDERS_LIST)
     if(BUILDER STREQUAL "MAKE")
         run_build_cmake(build_Makefiles_RelWithDebInfo
-                        "-DGENERATOR=Unix Makefiles" -DBUILD_TYPE=RelWithDebInfo)
+                        "-DGENERATOR=Unix Makefiles" -DBUILD_TYPE=RelWithDebInfo
+                        -DBUILD_TESTS=ON)
         run_build_cmake(build_Makefiles_Debug
-                        "-DGENERATOR=Unix Makefiles" -DBUILD_TYPE=Debug)
+                        "-DGENERATOR=Unix Makefiles" -DBUILD_TYPE=Debug
+                        -DBUILD_TESTS=ON -DBUILD_PSTEST_HARNESS=ON)
     elseif(BUILDER STREQUAL "MSVC")
         if(EXISTS "C:/Program Files/Microsoft Visual Studio/2022")
             set(GENERATOR "Visual Studio 17 2022")
@@ -56,25 +65,33 @@ foreach(BUILDER IN LISTS BUILDERS_LIST)
             message(FATAL_ERROR "Unknown MSVC version")
         endif()
         run_build_cmake(build_MSVC_RelWithDebInfo
-                        "-DGENERATOR=${GENERATOR}" -DBUILD_TYPE=RelWithDebInfo)
+                        "-DGENERATOR=${GENERATOR}" -DBUILD_TYPE=RelWithDebInfo
+                        -DBUILD_TESTS=ON)
         run_build_cmake(build_MSVC_Debug
-                        "-DGENERATOR=${GENERATOR}" -DBUILD_TYPE=Debug)
+                        "-DGENERATOR=${GENERATOR}" -DBUILD_TYPE=Debug
+                        -DBUILD_TESTS=ON -DBUILD_PSTEST_HARNESS=ON)
         run_build_cmake(build_MSVCx86_RelWithDebInfo
                         "-DGENERATOR=${GENERATORx86}" -DBUILD_TYPE=RelWithDebInfo
-                        ${ARGSx86})
+                        ${ARGSx86}
+                        -DBUILD_TESTS=ON)
         run_build_cmake(build_MSVCx86_Debug
                         "-DGENERATOR=${GENERATORx86}" -DBUILD_TYPE=Debug
-                        ${ARGSx86})
+                        ${ARGSx86}
+                        -DBUILD_TESTS=ON -DBUILD_PSTEST_HARNESS=ON)
     elseif(BUILDER STREQUAL "NINJA")
         run_build_cmake(build_Ninja_RelWithDebInfo
-                        -DGENERATOR=Ninja -DBUILD_TYPE=RelWithDebInfo)
+                        -DGENERATOR=Ninja -DBUILD_TYPE=RelWithDebInfo
+                        -DBUILD_TESTS=ON)
         run_build_cmake(build_Ninja_Debug
-                        -DGENERATOR=Ninja -DBUILD_TYPE=Debug)
+                        -DGENERATOR=Ninja -DBUILD_TYPE=Debug
+                        -DBUILD_TESTS=ON -DBUILD_PSTEST_HARNESS=ON)
     elseif(BUILDER STREQUAL "XCODE")
         run_build_cmake(build_Xcode_RelWithDebInfo
-                        -DGENERATOR=Xcode -DBUILD_TYPE=RelWithDebInfo)
+                        -DGENERATOR=Xcode -DBUILD_TYPE=RelWithDebInfo
+                        -DBUILD_TESTS=ON)
         run_build_cmake(build_Xcode_Debug
-                        -DGENERATOR=Xcode -DBUILD_TYPE=Debug)
+                        -DGENERATOR=Xcode -DBUILD_TYPE=Debug
+                        -DBUILD_TESTS=ON -DBUILD_PSTEST_HARNESS=ON)
     else()
         message(FATAL_ERROR "Unknown BUILDER (${BUILDER})")
     endif()
