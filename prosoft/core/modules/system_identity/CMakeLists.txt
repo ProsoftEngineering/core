@@ -42,6 +42,9 @@ elseif(WIN32)
     target_link_libraries(${PROJECT_NAME} PRIVATE secur32 wtsapi32)
 endif()
 
+find_package(ps_core REQUIRED)
+target_link_libraries(${PROJECT_NAME} PUBLIC ps::core)
+
 find_package(u8string REQUIRED)
 target_link_libraries(${PROJECT_NAME} PRIVATE u8string::u8string)
 

@@ -36,6 +36,9 @@ ps_core_module_config(${PROJECT_NAME})
 
 target_include_directories(${PROJECT_NAME} PUBLIC include)
 
+find_package(ps_core REQUIRED)
+target_link_libraries(${PROJECT_NAME} PUBLIC ps::core)
+
 find_package(utf8cpp REQUIRED)
 target_link_libraries(${PROJECT_NAME} PUBLIC utf8cpp)
 

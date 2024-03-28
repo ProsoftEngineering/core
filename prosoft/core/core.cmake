@@ -28,14 +28,6 @@ get_filename_component(PSCORE ${PSCORE} REALPATH)
 
 include("${PSCORE}/config/cmake/config.cmake")
 
-macro(ps_core_include TARGET_NAME)
-    target_include_directories(${TARGET_NAME} PRIVATE
-        "${PSCORE}/../.." # Allow unambigous includes. e.g. <prosoft/core/include/...>
-        "${PSCORE}/include"
-        "${PSCORE}/modules"
-    )
-endmacro()
-
 # This global will enable the sanitizer for any call to ps_core_configure_required() if true
 # For newer versions of clang ASAN is all or nothing due to the folloowing issue:
 # https://stackoverflow.com/questions/43389185/manual-poisoning-of-stdvector
@@ -44,7 +36,6 @@ if(NOT DEFINED PS_CORE_ENABLE_SANITIZER)
 endif()
 
 macro(ps_core_configure_required TARGET_NAME)
-    ps_core_include(${TARGET_NAME})
     # PS_BUILD_* are stable build type defines. They should never be set anywhere but here.
     # Unlike 'DEBUG' which can be set externally and even '=1' for release.
     if(PS_BUILD_DEBUG)

@@ -85,6 +85,9 @@ if(MSVC)
     )
 endif()
 
+find_package(ps_core REQUIRED)
+target_link_libraries(${PROJECT_NAME} PUBLIC ps::core)
+
 find_package(u8string REQUIRED)
 target_link_libraries(${PROJECT_NAME} PUBLIC u8string::u8string)
 
