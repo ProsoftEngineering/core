@@ -35,13 +35,13 @@
 #include <thread>
 #include <vector>
 
-#include "filesystem.hpp"
-#include "filesystem_change_monitor.hpp"
+#include <prosoft/core/modules/filesystem/filesystem.hpp>
+#include <prosoft/core/modules/filesystem/filesystem_change_monitor.hpp>
 #include "filesystem_private.hpp"
 #include "fsmonitor_private.hpp"
-#include "string/platform_convert.hpp"
-#include "unique_resource.hpp"
-#include "prosoft/core/config/config_analyzer.h"
+#include <prosoft/core/include/string/platform_convert.hpp>
+#include <prosoft/core/include/unique_resource.hpp>
+#include <prosoft/core/config/config_analyzer.h>
 
 #include <nlohmann/json.hpp>
 
@@ -824,7 +824,7 @@ void change_manager::process_renames(fs::change_notifications& notes) {
 using Catch::Matchers::WithinAbs;
 
 using namespace prosoft::filesystem;
-#include "src/fstestutils.hpp"
+#include "fstestutils.hpp"
 
 // Xcode 8.2.1: using a vector the following test will crash either with EXC_BAD_ACCESS or an ASAN violation in vector::emplace_back.
 // Which crash depends on how many events are present. I reduced the callback to an empty emplace and the crash still occurred.

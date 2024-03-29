@@ -26,8 +26,6 @@
 cmake_minimum_required(VERSION 3.15)
 project(winutils)
 
-if(WIN32)
-
 include("${CMAKE_CURRENT_LIST_DIR}/../config_module.cmake")
 
 add_library(${PROJECT_NAME}
@@ -36,11 +34,16 @@ add_library(${PROJECT_NAME}
 
 ps_core_module_config(${PROJECT_NAME})
 
-target_include_directories(${PROJECT_NAME}
-    PUBLIC
-    ${CMAKE_CURRENT_LIST_DIR}
-)
+target_include_directories(${PROJECT_NAME} PUBLIC include)
 
 ps_core_enable_target_code_coverage(${PROJECT_NAME})
 
-endif() #WIN32
+find_package(ps_core REQUIRED)
+target_link_libraries(${PROJECT_NAME} PUBLIC ps::core)
+
+add_library(winutils::winutils ALIAS winutils)
+
+if(PS_CORE_BUILD_TESTS)
+    enable_testing()
+    add_subdirectory(tests)
+endif()

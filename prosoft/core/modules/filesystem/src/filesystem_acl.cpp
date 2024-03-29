@@ -38,9 +38,9 @@ inline int acl_get_perm_np(acl_permset_t pset, acl_perm_t p) {
 
 #define PS_HAVE_ACL_DIR_DEFAULT (__linux__ || __FreeBSD__)
 
-#include <unique_resource.hpp>
+#include <prosoft/core/include/unique_resource.hpp>
 
-#include "filesystem.hpp"
+#include <prosoft/core/modules/filesystem/filesystem.hpp>
 #include "filesystem_private.hpp"
 
 // Notes: UNIX model includes mirrors of the owner/group/other perms and mask entry as well.

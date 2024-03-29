@@ -38,7 +38,7 @@
 #include <shlobj.h>
 #endif
 
-#include "filesystem.hpp"
+#include <prosoft/core/modules/filesystem/filesystem.hpp>
 #include "filesystem_private.hpp"
 
 // C++11 std did not support hash<> with enum classes. This was considered a defect and resolved in C++14.

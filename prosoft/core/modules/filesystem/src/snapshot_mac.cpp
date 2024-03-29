@@ -26,10 +26,10 @@
 #include <sys/mount.h>
 #include <sys/stat.h>
 
-#include "filesystem.hpp"
-#include "filesystem_snapshot.hpp"
+#include <prosoft/core/modules/filesystem/filesystem.hpp>
+#include <prosoft/core/modules/filesystem/filesystem_snapshot.hpp>
 #include "spawn.hpp"
-#include <string/string_component.hpp>
+#include <prosoft/core/include/string/string_component.hpp>
 
 #include "filesystem_private.hpp"
 

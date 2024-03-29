@@ -26,24 +26,34 @@
 cmake_minimum_required(VERSION 3.15)
 project(regex)
 
-set(PSREGEX ${CMAKE_CURRENT_LIST_DIR})
-
 include("${CMAKE_CURRENT_LIST_DIR}/../config_module.cmake")
 
-set(regex_lib ${PROJECT_NAME})
-add_library(${regex_lib}
-    ${PSREGEX}/regex.cpp
+add_library(${PROJECT_NAME}
+    src/regex.cpp
 )
 
-ps_core_module_config(${regex_lib})
+ps_core_module_config(${PROJECT_NAME})
 
-target_include_directories(${regex_lib}
-	PRIVATE
-    PUBLIC
-    ${PSREGEX}
-)
+target_include_directories(${PROJECT_NAME} PUBLIC include)
+
+find_package(ps_core REQUIRED)
+target_link_libraries(${PROJECT_NAME} PUBLIC ps::core)
 
 find_package(oniguruma REQUIRED)
-target_link_libraries(${regex_lib} PRIVATE oniguruma::onig)
+target_link_libraries(${PROJECT_NAME} PRIVATE oniguruma::onig)
 
-ps_core_enable_code_coverage(${PSREGEX}/regex.cpp)
+ps_core_enable_target_code_coverage(${PROJECT_NAME})
+
+if(PS_CORE_BUILD_PSTEST_HARNESS)
+    message("WARNING: ${PROJECT_NAME} is compiled with PSTEST_HARNESS. Don't use in production!")
+    target_compile_definitions(${PROJECT_NAME} PRIVATE PSTEST_HARNESS=1)
+    find_package(Catch2 REQUIRED)
+    target_link_libraries(${PROJECT_NAME} PRIVATE Catch2::Catch2)
+endif()
+
+add_library(regex::regex ALIAS regex)
+
+if(PS_CORE_BUILD_TESTS)
+    enable_testing()
+    add_subdirectory(tests)
+endif()

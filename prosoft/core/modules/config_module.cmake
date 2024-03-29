@@ -30,11 +30,6 @@ cmake_minimum_required(VERSION 3.15)
 include("${CMAKE_CURRENT_LIST_DIR}/../config/cmake/config.cmake")
 include("${CMAKE_CURRENT_LIST_DIR}/../config/cmake/config_coverage.cmake")
 
-set(PS_CORE_MODULE_INCLUDE_DIRS
-    "${CMAKE_CURRENT_LIST_DIR}/../../.."
-	"${CMAKE_CURRENT_LIST_DIR}/../include"
-)
-
 macro(ps_core_module_config TARGET_NAME)
 	if(DEBUG)
         target_compile_definitions(${TARGET_NAME} PRIVATE DEBUG=1)
@@ -42,7 +37,6 @@ macro(ps_core_module_config TARGET_NAME)
 	if(WIN32 AND BUILD_SHARED_LIBS)
 		target_compile_definitions(${TARGET_NAME} PRIVATE PS_LIB_EXPORTS=1)
 	endif()
-	target_include_directories(${TARGET_NAME} PRIVATE ${PS_CORE_MODULE_INCLUDE_DIRS})
 	ps_core_config_cpp_version(${TARGET_NAME})
 	ps_core_config_platform_required(${TARGET_NAME})
 	ps_core_config_symbols_hidden(${TARGET_NAME})
@@ -63,9 +57,3 @@ macro(ps_core_module_use_external_module TARGET_NAME MODULE_NAME)
     target_include_directories(${TARGET_NAME} PRIVATE "${CMAKE_CURRENT_LIST_DIR}/../${MODULE_NAME}")
     target_link_libraries(${TARGET_NAME} PUBLIC ${MODULE_NAME})
 endmacro()
-
-macro(ps_core_module_use_u8string_module TARGET_NAME)
-    ps_core_module_use_external_module(${TARGET_NAME} u8string)
-    target_include_directories(${TARGET_NAME} PRIVATE "${CMAKE_CURRENT_LIST_DIR}/../u8string/vendor/utf8cpp/source")
-endmacro()
-

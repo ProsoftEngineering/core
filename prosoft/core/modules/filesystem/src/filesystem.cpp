@@ -39,9 +39,9 @@
 
 #include <cstring>
 
-#include <unique_resource.hpp>
+#include <prosoft/core/include/unique_resource.hpp>
 
-#include "filesystem.hpp"
+#include <prosoft/core/modules/filesystem/filesystem.hpp>
 #include "filesystem_private.hpp"
 
 namespace {
