@@ -45,7 +45,6 @@ if(APPLE)
 endif()
 
 ps_core_module_config(${PROJECT_NAME})
-ps_core_enable_target_code_coverage(${PROJECT_NAME})
 
 find_package(filesystem REQUIRED)
 target_link_libraries(${PROJECT_NAME} PRIVATE

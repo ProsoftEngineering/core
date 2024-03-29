@@ -101,8 +101,6 @@ if(PS_CORE_BUILD_PSTEST_HARNESS)
     target_link_libraries(${PROJECT_NAME} PRIVATE Catch2::Catch2)
 endif()
 
-ps_core_enable_target_code_coverage(${PROJECT_NAME})
-
 add_library(filesystem::filesystem ALIAS filesystem)
 
 add_library(filesystem_internal INTERFACE)

@@ -45,8 +45,6 @@ target_link_libraries(${PROJECT_NAME} PUBLIC utf8cpp)
 find_package(utf8proc REQUIRED)
 target_link_libraries(${PROJECT_NAME} PRIVATE utf8proc::utf8proc)
 
-ps_core_enable_target_code_coverage(${PROJECT_NAME})
-
 add_library(u8string::u8string ALIAS u8string)
 
 if(PS_CORE_BUILD_TESTS)
