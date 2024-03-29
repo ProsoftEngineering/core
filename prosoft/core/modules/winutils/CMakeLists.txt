@@ -36,8 +36,6 @@ ps_core_module_config(${PROJECT_NAME})
 
 target_include_directories(${PROJECT_NAME} PUBLIC include)
 
-ps_core_enable_target_code_coverage(${PROJECT_NAME})
-
 find_package(ps_core REQUIRED)
 target_link_libraries(${PROJECT_NAME} PUBLIC ps::core)
 

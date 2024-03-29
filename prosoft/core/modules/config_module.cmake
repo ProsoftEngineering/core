@@ -28,7 +28,6 @@ cmake_minimum_required(VERSION 3.15)
 # Private module config
 
 include("${CMAKE_CURRENT_LIST_DIR}/../config/cmake/config.cmake")
-include("${CMAKE_CURRENT_LIST_DIR}/../config/cmake/config_coverage.cmake")
 
 macro(ps_core_module_config TARGET_NAME)
 	if(DEBUG)

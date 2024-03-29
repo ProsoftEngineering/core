@@ -33,7 +33,6 @@ add_executable(${PROJECT_NAME}
 )
 
 ps_core_module_config(${PROJECT_NAME})
-ps_core_enable_target_code_coverage(${PROJECT_NAME})
 
 find_package(u8string REQUIRED)
 target_link_libraries(${PROJECT_NAME} PRIVATE u8string::u8string)

@@ -1,0 +1,18 @@
+Code coverage files are generated with compiler options in conan/profiles/linux_debug
+(test-build-all.cmake script uses this conan profile for Linux Debug build).
+
+How to generate html report to analyze code coverage:
+  $ lcov -o coverage.info -c -d $BUILD_DIR
+  $ genhtml --include $SOURCE_DIR --filter brace --flat -o coverage coverage.info
+            # "--filter brace" - fix false "no coverage on }" (for example, in string/case_convert.hpp)
+            # "--flat" - show all files on html webpage
+
+---
+
+Note: previously coverage options were activated in prosoft/core/tests/CMakeLists.txt
+also only for Linux Debug build. For details, see commit 01ad3b4 by Brian Bergstrand:
+  if (PSGCC)
+  # Coverage is not enabled for clang as Xcode 7.2 clang hangs compiling regex_tests.cpp.
+  # I'm thinking it has something to do with the .cpp includes.
+  set(PSCOVERAGE ${DEBUG})
+  endif()

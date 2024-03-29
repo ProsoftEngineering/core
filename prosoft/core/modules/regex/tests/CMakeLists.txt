@@ -33,7 +33,6 @@ add_executable(${PROJECT_NAME}
 )
 
 ps_core_module_config(${PROJECT_NAME})
-ps_core_enable_target_code_coverage(${PROJECT_NAME})
 
 find_package(regex REQUIRED)
 find_package(u8string REQUIRED)
