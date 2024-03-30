@@ -28,13 +28,6 @@ get_filename_component(PSCORE ${PSCORE} REALPATH)
 
 include("${PSCORE}/config/cmake/config.cmake")
 
-# This global will enable the sanitizer for any call to ps_core_configure_required() if true
-# For newer versions of clang ASAN is all or nothing due to the folloowing issue:
-# https://stackoverflow.com/questions/43389185/manual-poisoning-of-stdvector
-if(NOT DEFINED PS_CORE_ENABLE_SANITIZER)
-    set(PS_CORE_ENABLE_SANITIZER ${PS_BUILD_DEBUG})
-endif()
-
 macro(ps_core_configure_required TARGET_NAME)
     # PS_BUILD_* are stable build type defines. They should never be set anywhere but here.
     # Unlike 'DEBUG' which can be set externally and even '=1' for release.
@@ -49,9 +42,6 @@ macro(ps_core_configure_required TARGET_NAME)
         if(${TGTYPE} STREQUAL "EXECUTABLE")
             target_compile_definitions(${TARGET_NAME} PRIVATE PS_LIB_IMPORTS=1)
         endif()
-    endif()
-    if(PS_CORE_ENABLE_SANITIZER)
-        ps_core_config_sanitizer(${TARGET_NAME})
     endif()
 endmacro()
 
