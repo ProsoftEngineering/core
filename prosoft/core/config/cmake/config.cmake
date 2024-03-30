@@ -51,6 +51,5 @@ if(NOT DEFINED DEBUG)
 endif()
 
 include("${PSCONFIG}/cmake/config_compiler.cmake")
-include("${PSCONFIG}/cmake/config_sanitizer.cmake")
 include("${PSCONFIG}/cmake/config_cpp.cmake")
 include("${PSCONFIG}/cmake/config_platform.cmake")

@@ -1,4 +1,4 @@
-include(linux)
+include(macos)
 
 [conf]
 # Generate code coverage files
