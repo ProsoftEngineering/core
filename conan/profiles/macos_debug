@@ -1,0 +1,15 @@
+include(macos)
+
+[conf]
+# Generate code coverage files
+&:tools.build:cflags += ["--coverage"]
+&:tools.build:cxxflags += ["--coverage"]
+&:tools.build:exelinkflags += ["--coverage"]
+
+# Enable sanitizers
+&:tools.build:cflags += ["-fsanitize=address", "-fsanitize=undefined", "-fno-omit-frame-pointer"]
+&:tools.build:cxxflags += ["-fsanitize=address", "-fsanitize=undefined", "-fno-omit-frame-pointer"]
+&:tools.build:exelinkflags += ["-fsanitize=address", "-fsanitize=undefined"]
+# ... PS_HAVE_LSAN_INTERFACE_H is used in core/config/config_analyzer.h
+&:tools.build:cflags += ["-DPS_HAVE_LSAN_INTERFACE_H=1"]
+&:tools.build:cxxflags += ["-DPS_HAVE_LSAN_INTERFACE_H=1"]
