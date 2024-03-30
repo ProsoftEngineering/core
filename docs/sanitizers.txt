@@ -1,0 +1,51 @@
+Sanitizer options are activated with with compiler options in linux_debug and macos_debug conan profiles
+(test-build-all.cmake script uses these conan profiles for macOS and Linux Debug builds).
+
+---
+
+Note: previously sanitizer options were activated in prosoft/core/core.cmake and
+prosoft/core/config/cmake/config_sanitizer.cmake also only for Debug builds.
+There were exceptions for older systems that we no longer use. For details,
+see commit 912cc829 by Brian Bergstrand and later changes in these files:
+    # This global will enable the sanitizer for any call to ps_core_configure_required() if true
+    # For newer versions of clang ASAN is all or nothing due to the folloowing issue:
+    # https://stackoverflow.com/questions/43389185/manual-poisoning-of-stdvector
+    if(NOT DEFINED PS_CORE_ENABLE_SANITIZER)
+        set(PS_CORE_ENABLE_SANITIZER ${PS_BUILD_DEBUG})
+    endif()
+...
+    --- ps_core_config_xcode_asan ---
+    # The normal compile flag check does not work with the Xcode generator as CMAKE_REQUIRED_FLAGS are not set in the Xcode file for the linker.
+    # This hack works around that by checking if the Xcode generator is enabled and if Apple's clang version is correct (Xcode 7 has Apple clang version 7.0.0).
+...
+    --- ps_core_config_asan ---
+    # Xcode exposes the setting through schemes only and will copy the ASan library to bundled apps.
+    # xcodebuild has a separate arg to explicitly enable/disable ASan.
+...
+    # WARNING: For bundled Apple apps this will not copy the ASAN lib to the bundle as Xcode schemes do.
+    # So the app will only run on machines where Xcode is installed.
+...
+    --- ps_core_config_ubsan ---
+    # AS of Xcode 7 ubsan is not supported.
+
+    # FreeBSD 10.x passes the compiler check but then fails to link. It appears to be missing the actual support lib.
+    # Not sure why the test is passing then.
+    # Also not sure about 11.x. May need to expand check to a version.
+    #
+    # GCC 5.x UBSAN has internal crashes.
+...
+    --- ps_core_config_sanitizer ---
+    # Clang (3.1+) and GCC (4.8+) support these. For Apple, Xcode 7 is required. (See notes above.)
+    # The leak sanitizer is part of ASAN in recent versions.
+    # The general advice to get decent runtime performance with ASan is to use at least -O1.
+    # But these should probably only be enabled for debug builds.
+    #
+    # break on __asan_report_error to catch ASan asserts in the debugger.
+
+    # ASan on PPC is broken (internal crash) as of GCC 4.8.1. It may be fixed in 4.8.2 or 4.9.
+    # HOST_SYSTEM_PROCESSOR may technically not be the same as the target CPU, but it's the best we have.
+...
+    # Xcode 8.0 supports the ubsan compiler flags but does not have the support lib
+    # This results in link errors. When asked, Apple said "behaves as expected". 
+...
+    # tsan is not currently enabled
