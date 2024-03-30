@@ -42,13 +42,6 @@ macro(ps_core_module_config TARGET_NAME)
 	if(PS_CORE_ENABLE_SANITIZER)
         ps_core_config_sanitizer(${TARGET_NAME})
     endif()
-	
-	if (DEFINED CORETESTS)
-	    # Allows modules to define internal tests
-	    find_package(Catch2 REQUIRED)
-	    target_link_libraries(${TARGET_NAME} PRIVATE Catch2::Catch2)
-	    target_compile_definitions(${TARGET_NAME} PRIVATE PSTEST_HARNESS=1)
-	endif()
 endmacro()
 
 macro(ps_core_module_use_external_module TARGET_NAME MODULE_NAME)
