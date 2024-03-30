@@ -727,10 +727,12 @@ struct test_ops {
 
 struct test_nopen : test_ops {
     virtual native_dir* open(const fs::path& p) override {
+        (void)p;    // unused
         return (native_dir*)0x55UL;
     }
     
     virtual int close(native_dir* d) override {
+        (void)d;    // unused
         return 0;
     }
 };
