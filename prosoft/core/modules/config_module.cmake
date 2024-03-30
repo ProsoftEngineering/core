@@ -40,9 +40,3 @@ macro(ps_core_module_config TARGET_NAME)
 	ps_core_config_platform_required(${TARGET_NAME})
 	ps_core_config_symbols_hidden(${TARGET_NAME})
 endmacro()
-
-macro(ps_core_module_use_external_module TARGET_NAME MODULE_NAME)
-    # This will not bring in the headers of the module
-    target_include_directories(${TARGET_NAME} PRIVATE "${CMAKE_CURRENT_LIST_DIR}/../${MODULE_NAME}")
-    target_link_libraries(${TARGET_NAME} PUBLIC ${MODULE_NAME})
-endmacro()
