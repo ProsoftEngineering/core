@@ -55,6 +55,12 @@ ps_core_module_config(${PROJECT_NAME})
 find_package(ps_core REQUIRED)
 target_link_libraries(${PROJECT_NAME} PRIVATE ps::core)
 
+if(CMAKE_HOST_SYSTEM_NAME STREQUAL "Linux")
+    # For std::thread in semaphore_tests.cpp
+    find_package(Threads REQUIRED)
+    target_link_libraries(${PROJECT_NAME} PRIVATE Threads::Threads)
+endif()
+
 find_package(Catch2 REQUIRED)
 target_link_libraries(${PROJECT_NAME} PRIVATE Catch2::Catch2WithMain)
 
