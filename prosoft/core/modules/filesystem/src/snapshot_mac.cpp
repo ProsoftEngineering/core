@@ -189,6 +189,7 @@ std::string tmutil_getsnapshot(const std::string& cout, std::error_code& ec) { /
 }
 
 std::string tmutil_snapshot(const prosoft::filesystem::path& path, std::error_code& ec) {
+    (void)path; // unused
     using namespace prosoft;
     spawn_cout cout;
     spawn_cerr cerr;

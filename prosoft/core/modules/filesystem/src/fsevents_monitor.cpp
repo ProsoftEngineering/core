@@ -708,6 +708,7 @@ change_state::token_type change_state::serialize_token(const path& p) {
 }
 
 std::string change_state::serialize(const token_type& token, error_code& ec) {
+    (void)ec;   // unused
     if (token) {
         json j {
             {json_key_uuid, token->m_uuid},
