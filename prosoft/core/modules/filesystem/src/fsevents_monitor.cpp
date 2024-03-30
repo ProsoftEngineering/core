@@ -468,8 +468,8 @@ platform_state::platform_state(const std::string& s, fs::change_thaw_options opt
     auto j = !s.empty() ? json::parse(s) : json{};
     auto i = j.find(json_key_uuid);
     if (i != j.end()) {
-        if (auto s = prosoft::CF::unique_string{CFStringCreateWithCStringNoCopy(kCFAllocatorDefault, i->get_ref<const std::string&>().c_str(), kCFStringEncodingASCII, kCFAllocatorNull)}) {
-            m_uuid.reset(CFUUIDCreateFromString(kCFAllocatorDefault, s.get()));
+        if (auto ss = prosoft::CF::unique_string{CFStringCreateWithCStringNoCopy(kCFAllocatorDefault, i->get_ref<const std::string&>().c_str(), kCFStringEncodingASCII, kCFAllocatorNull)}) {
+            m_uuid.reset(CFUUIDCreateFromString(kCFAllocatorDefault, ss.get()));
             m_uuid_str = *i;
         }
     }
@@ -1033,9 +1033,9 @@ TEST_CASE("filesystem_monitor_internal") {
         std::vector<FSEventStreamEventId> ids;
         
         const auto root = canonical(temp_directory_path()) / PS_TEXT("fs17test");
-        error_code ec;
-        remove(root, ec);
-        REQUIRE_FALSE(exists(root, ec));
+        error_code root_ec;
+        remove(root, root_ec);
+        REQUIRE_FALSE(exists(root, root_ec));
         notes.clear();
         lastID = 0;
         
