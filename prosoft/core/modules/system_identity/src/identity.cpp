@@ -407,7 +407,13 @@ public:
     }
 
     PS_DISABLE_COPY(SIDProperties);
-    PS_DEFAULT_MOVE(SIDProperties);
+
+    SIDProperties(SIDProperties&& other) {
+        m_ptr = other.m_ptr;    // union with m_ptr, m_pwd, m_grp
+        m_type = other.m_type;
+        other.m_ptr = nullptr;
+        other.m_type = identity_type::unknown;
+    }
 
     explicit operator bool() const {
         if (const auto u = user()) {
