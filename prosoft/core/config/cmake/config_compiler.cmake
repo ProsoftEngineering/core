@@ -113,13 +113,7 @@ macro(ps_core_config_compiler_maximum_warnings TARGET_NAME)
     endif()
 endmacro()
 
-function(ps_core_config_symbols_hidden TARGET_NAME)
-    set_target_properties(${TARGET_NAME} PROPERTIES CXX_VISIBILITY_PRESET hidden)
-    set_target_properties(${TARGET_NAME} PROPERTIES C_VISIBILITY_PRESET hidden)
-endfunction()
-
 macro(ps_core_config_compiler_defaults TARGET_NAME)
     ps_core_config_compiler_default_flags(${TARGET_NAME})
     ps_core_config_compiler_maximum_warnings(${TARGET_NAME})
-    ps_core_config_symbols_hidden(${TARGET_NAME})
 endmacro()
