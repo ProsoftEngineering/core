@@ -5,8 +5,16 @@ include(default)
 # ("psconfig: [None, ANY]" for conan v1 or "psconfig: [null, ANY]" for conan v2)
 
 # Rebuild all conan packages on this computer (don't use third-party binaries).
-compiler.psconfig = "pscore-240321"
+compiler.psconfig = "pscore-240331"
 
 [conf]
 # Match CXX_VISIBILITY_PRESET in ps_core_config_symbols_hidden()
-catch2/*:tools.build:cxxflags = ["-fvisibility=hidden"]
+tools.build:cflags += ["-fvisibility=hidden"]
+tools.build:cxxflags += ["-fvisibility=hidden"]
+catch2/*:tools.build:cxxflags += ["-fvisibility=hidden"]
+
+#
+# FIXME: restore "&:tools.build:..." after a complete transition to conan v2.
+# "&" support was added in conan commit 1527b3f2d "Unify reference pattern matching (#10587)"
+# but not backported to conan v1
+#
