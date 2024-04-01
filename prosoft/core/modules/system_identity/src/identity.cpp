@@ -33,6 +33,7 @@
 #include <stdlib.h>
 #include <stdlib.h>
 #include <sys/types.h>
+#include <array>
 #include <cstring>
 #include <vector>
 #else
@@ -313,24 +314,49 @@ public:
     }
 };
 
-class passwd_entry : public system_entry<struct passwd> {
+class passwd_entry {
 public:
-    explicit passwd_entry(const char* uname)
-        : system_entry() {
-        init(uname, ::getpwnam_r);
+    passwd_entry() = default;   // no-op
+
+    bool init_from_uname(const char* uname) {
+        passwd* result;
+        if (getpwnam_r(uname, &m_entry, m_buffer.data(), m_buffer.size(), &result) != 0
+            || result == nullptr)   // user not found
+        {
+            return false;
+        }
+        return true;
     }
 
-    explicit passwd_entry(uid_t uid)
-        : system_entry() {
-        init(uid, ::getpwuid_r);
+    bool init_from_uid(uid_t uid) {
+        passwd* result;
+        if (getpwuid_r(uid, &m_entry, m_buffer.data(), m_buffer.size(), &result) != 0
+            || result == nullptr)   // user not found
+        {
+            return false;
+        }
+        return true;
     }
 
-    passwd_entry()
-        : passwd_entry(::getenv("LOGNAME")) {}
+    bool init_from_console_user() {
+        const auto uname = getenv("LOGNAME");
+        if (uname == nullptr) {     // no login (for example, running in docker)
+            return false;
+        }
+        return init_from_uname(uname);
+    }
 
-    virtual PS_DEFAULT_DESTRUCTOR(passwd_entry);
-    PS_DISABLE_COPY(passwd_entry);
-    PS_DEFAULT_MOVE(passwd_entry);
+    const passwd& entry() const {
+        return m_entry;
+    }
+
+private:
+    passwd m_entry;
+    std::array<char, 1024> m_buffer;
+
+    // Disable copy and move for heavy object
+    passwd_entry(const passwd_entry& ) = delete;
+    passwd_entry(passwd_entry&& ) = delete;
 };
 
 class group_entry : public system_entry<struct group> {
