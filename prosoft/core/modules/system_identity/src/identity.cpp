@@ -359,22 +359,41 @@ private:
     passwd_entry(passwd_entry&& ) = delete;
 };
 
-class group_entry : public system_entry<struct group> {
+class group_entry {
 public:
-    explicit group_entry(const char* gname)
-        : system_entry() {
-        init(gname, ::getgrnam_r);
+    group_entry() = default;    // no-op
+
+    bool init_from_gname(const char* gname) {
+        group* result;
+        if (getgrnam_r(gname, &m_entry, m_buffer.data(), m_buffer.size(), &result) != 0
+            || result == nullptr)   // group not found
+        {
+            return false;
+        }
+        return true;
     }
 
-    explicit group_entry(gid_t gid)
-        : system_entry() {
-        init(gid, ::getgrgid_r);
+    bool init_from_gid(gid_t gid) {
+        group* result;
+        if (getgrgid_r(gid, &m_entry, m_buffer.data(), m_buffer.size(), &result) != 0
+            || result == nullptr)   // group not found
+        {
+            return false;
+        }
+        return true;
     }
 
-    PS_DISABLE_DEFAULT_CONSTRUCTOR(group_entry);
-    virtual PS_DEFAULT_DESTRUCTOR(group_entry);
-    PS_DISABLE_COPY(group_entry);
-    PS_DEFAULT_MOVE(group_entry);
+    const group& entry() const {
+        return m_entry;
+    }
+
+private:
+    group m_entry;
+    std::array<char, 1024> m_buffer;
+
+    // Disable copy and move for heavy object
+    group_entry(const group_entry& ) = delete;
+    group_entry(group_entry&& ) = delete;
 };
 
 prosoft::native_string_type gecos_name(const char* gecos) {
