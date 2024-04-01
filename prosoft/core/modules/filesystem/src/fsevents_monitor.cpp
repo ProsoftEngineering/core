@@ -901,7 +901,57 @@ public:
 
 TEST_CASE("filesystem_monitor_internal") {
     SECTION("common") {
-    #include "fsmonitor_tests_i.cpp"
+        SECTION("notification") {
+            auto state = std::make_shared<platform_state>();
+            auto reg = change_manager::make_registration(state);
+            CHECK(reg);
+            auto note = change_manager::make_notification(PS_TEXT("test"), PS_TEXT(""), state.get(), change_event::created);
+            CHECK(note.path() == path{PS_TEXT("test")});
+            CHECK(note.renamed_to_path().empty());
+            CHECK(note.event() == change_event::created);
+            CHECK(note == reg);
+            CHECK_FALSE(type_known(note));
+
+            auto p = note.extract_path();
+            CHECK(p.native() == PS_TEXT("test"));
+            CHECK(note.path().empty());
+            CHECK(note.event() == change_event::none);
+            CHECK_FALSE(note == reg);
+
+            note = change_manager::make_notification(PS_TEXT(""), PS_TEXT(""), nullptr, change_event::created, file_type::regular);
+            CHECK(type_known(note));
+            CHECK(created(note));
+
+            note = change_manager::make_notification(PS_TEXT(""), PS_TEXT(""), nullptr, change_event::removed);
+            CHECK(removed(note));
+
+            note = change_manager::make_notification(PS_TEXT(""), PS_TEXT(""), nullptr, change_event::renamed);
+            CHECK(renamed(note));
+
+            note = change_manager::make_notification(PS_TEXT(""), PS_TEXT(""), nullptr, change_event::content_modified);
+            CHECK(content_modified(note));
+            CHECK(modified(note));
+
+            note = change_manager::make_notification(PS_TEXT(""), PS_TEXT(""), nullptr, change_event::metadata_modified);
+            CHECK(metadata_modified(note));
+            CHECK(modified(note));
+
+            note = change_manager::make_notification(PS_TEXT(""), PS_TEXT(""), nullptr, change_event::rescan_required);
+            CHECK(rescan(note));
+            CHECK(canceled(note));
+
+            // test copy/move into vector
+            change_notifications notes;
+// Xcode 7&8 ASAN both fire "heap buffer overflow" for change_manager default copy and move if we use reserve.
+// The output seems to point to some memory allocated by Catch, it may be the trigger as I cannot reproduce the problem with a simple test binary.
+#if 0
+            notes.reserve(2);
+#endif
+            note = change_manager::make_notification(PS_TEXT("test"), path{}, nullptr, change_event::rescan_required);
+            notes.push_back(note);
+            notes.emplace_back(change_manager::make_notification(PS_TEXT("test"), path{}, nullptr, change_event::rescan_required));
+            CHECK(notes.size() == 2);
+        }
     }
     
     WHEN("state is created with an invalid path") {

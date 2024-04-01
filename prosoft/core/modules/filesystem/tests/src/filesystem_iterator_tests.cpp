@@ -25,6 +25,7 @@
 
 #include <prosoft/core/modules/filesystem//filesystem.hpp>
 
+#include <catch2/catch_template_test_macros.hpp>
 #include <catch2/catch_test_macros.hpp>
 #include "fsdirent_catch_fix.hpp"
 
@@ -40,16 +41,6 @@ TEST_CASE("filesystem_iterator") {
 
     static const directory_entry empty;
 
-    SECTION("iterator common") {
-        using iterator_type = directory_iterator;
-        #include "filesystem_iterator_common_tests_i.cpp"
-    }
-    
-    SECTION("recursive iterator common") {
-        using iterator_type = recursive_directory_iterator;
-        #include "filesystem_iterator_common_tests_i.cpp"
-    }
-    
     SECTION("iterator") {
         SECTION("recurse option is always disabled") {
             const auto p = create_file(temp_directory_path() / process_name("fs17test"));
@@ -413,5 +404,44 @@ TEST_CASE("filesystem_iterator") {
             }
 #endif // __APPLE__
         }
+    }
+}
+
+TEMPLATE_TEST_CASE("iterator common", "", directory_iterator, recursive_directory_iterator) {
+    using iterator_type = TestType;
+
+    static const directory_entry empty;
+
+    WHEN("creating a default iterator") {
+        iterator_type i;
+        CHECK(i.options() == directory_options::none);
+        CHECK(empty == *i);
+        CHECK(i->path().empty());
+        CHECK(i == end(i));
+        CHECK(i++ == end(i));
+        CHECK(i++ == end(i));
+    }
+
+    WHEN("creating an iterator with an invalid path") {
+        CHECK_THROWS(iterator_type(PS_TEXT("")));
+        error_code ec;
+        iterator_type i{PS_TEXT(""), ec};
+        CHECK(i == end(i));
+
+        const auto p = create_file(temp_directory_path() / PS_TEXT("fs17test"));
+        REQUIRE(exists(p));
+        CHECK_THROWS((void)iterator_type(p));
+        REQUIRE(remove(p));
+    }
+
+    WHEN("creating an iterator with a valid path") {
+        iterator_type i{home_directory_path()};
+        CHECK(i.options() == i.default_options());
+        CHECK(i != end(i));
+    }
+
+    WHEN("creating an iterator with reserved options") {
+        iterator_type i{home_directory_path(), directory_options::follow_directory_symlink|directory_options::reserved_state_mask};
+        CHECK_FALSE(is_set(i.options() & directory_options::reserved_state_mask));
     }
 }

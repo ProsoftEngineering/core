@@ -496,7 +496,94 @@ TEST_CASE("filesystem") {
     }
 
     SECTION("attribute extensions") {
-        #include "filesystem_attr_tests_i.cpp"
+        WHEN("getting the mount path for an empty path") {
+            CHECK_THROWS(mount_path(""_p));
+            CHECK_THROWS(is_mountpoint(""_p));
+        }
+
+        WHEN("getting the mount path for a non-existant path") {
+            auto p = temp_directory_path() / uniqueName;
+            error_code ec;
+            REQUIRE_FALSE(exists(p, ec));
+            CHECK_THROWS(mount_path(p));
+            CHECK_THROWS(is_mountpoint(p));
+
+            p = ".."_p / uniqueName;
+            REQUIRE_FALSE(exists(p, ec));
+            CHECK_THROWS(mount_path(p));
+            CHECK_THROWS(is_mountpoint(p));
+        }
+
+        WHEN("getting the mount path for a path") {
+            const auto p = temp_directory_path();
+            error_code ec;
+            REQUIRE(exists(p, ec));
+
+            const auto mp = mount_path(p, ec);
+            CHECK(ec.value() == 0);
+            REQUIRE_FALSE(mp.empty());
+            CHECK(is_directory(mp));
+            CHECK(is_mountpoint(mp));
+
+            // Relative path check
+            const auto fp = p / uniqueName;
+            REQUIRE_FALSE(exists(fp, ec));
+            {
+                create_file(fp);
+            }
+            CHECK_FALSE(is_mountpoint(fp));
+
+            current_path(temp_directory_path());
+            const auto rp = fp.filename();
+            REQUIRE(equivalent(canonical(rp), fp));
+            CHECK(mount_path(rp, ec) == mp);
+
+            REQUIRE(remove(fp));
+        }
+
+        WHEN("getting the mount path for a mount path") {
+            error_code ec;
+            const auto mp = mount_path(temp_directory_path(), ec);
+            REQUIRE_FALSE(mp.empty());
+            CHECK(mount_path(mp, ec) == mp);
+        }
+
+        WHEN("getting the hidden attribute") {
+            error_code ec;
+            CHECK_FALSE(is_hidden(home_directory_path(), ec));
+            CHECK_FALSE(is_hidden(temp_directory_path() / PS_TEXT("abcdefghij"), ec)); // non-existent path
+#if !_WIN32
+            CHECK(is_hidden(temp_directory_path() / ".abcdefghij", ec)); // all dot files are considered hidden, even non-existent ones
+            CHECK(is_hidden(".abcdefghij", ec));
+            auto p = home_directory_path() / ".ssh";
+            if (exists(p, ec)) {
+                CHECK(is_hidden(p, ec));
+            }
+            p = home_directory_path() / ".profile";
+            if (exists(p, ec)) {
+                CHECK(is_hidden(p, ec));
+            }
+#else
+            path p{PS_TEXT("C:\\Windows\\Installer")};
+            if (exists(p, ec)) {
+                CHECK(is_hidden(p, ec));
+            }
+#endif
+
+#if __APPLE__
+            CHECK(is_hidden("/Volumes", ec));
+#endif
+        }
+
+        WHEN("getting the package attribute") {
+            error_code ec;
+            CHECK_FALSE(is_package(temp_directory_path(), ec));
+            CHECK_FALSE(is_package(home_directory_path(), ec));
+            CHECK_FALSE(is_package(temp_directory_path() / PS_TEXT("abcdefghij"), ec)); // non-existent path
+#ifdef MAC_OS_X_VERSION_MIN_REQUIRED
+            CHECK(is_package("/System/Library/CoreServices/Finder.app", ec));
+#endif
+        }
     }
 
     WHEN("getting the cache dir") {

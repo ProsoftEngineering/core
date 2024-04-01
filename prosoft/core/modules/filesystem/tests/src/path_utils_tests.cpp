@@ -28,16 +28,106 @@
 #include <prosoft/core/include/string/string_types.hpp>
 #include <prosoft/core/modules/u8string/u8string.hpp>
 
+#include <catch2/catch_template_test_macros.hpp>
 #include <catch2/catch_test_macros.hpp>
 
 using namespace prosoft::filesystem;
 
-TEST_CASE("path_utils-string") {
-    using path_t = std::string;
-    #include "path_utils_tests_i.cpp"
-}
+TEMPLATE_TEST_CASE("path_utils", "", std::string, prosoft::u8string) {
+    using path_t = TestType;
 
-TEST_CASE("path_utils-u8string") {
-    using path_t = prosoft::u8string;
-    #include "path_utils_tests_i.cpp"
+    SECTION("private") {
+        using namespace prosoft::filesystem::ifilesystem;
+
+        WHEN("a full path begins with a drive letter") {
+            THEN("starts_with_drive_letter is true") {
+                CHECK(starts_with_drive_letter(path_t{R"(C:\test)"}));
+            }
+        }
+
+        WHEN("a relative path begins with a drive letter") {
+            THEN("starts_with_drive_letter is true") {
+                CHECK(starts_with_drive_letter(path_t{R"(Z:test)"}));
+            }
+        }
+
+        WHEN("a path does not begin with a drive letter") {
+            THEN("starts_with_drive_letter is false") {
+                CHECK_FALSE(starts_with_drive_letter(path_t{"test"}));
+            }
+        }
+
+        WHEN("a path begins with a drive UNC drive letter") {
+            THEN("starts_with_drive_letter is false") {
+                CHECK_FALSE(starts_with_drive_letter(path_t{R"(\\server\C:\test)"}));
+            }
+        }
+
+        WHEN("a path contains an embedded drive letter") {
+            AND_WHEN("the position is specified") {
+                THEN("starts_with_drive_letter is true") {
+                    CHECK_FALSE(starts_with_drive_letter(path_t{R"(\\a\C:\test)", 4}));
+                }
+            }
+        }
+
+        WHEN("a path is empty") {
+            THEN("starts_with_drive_letter is false") {
+                CHECK_FALSE(starts_with_drive_letter(path_t{}));
+            }
+        }
+    }
+
+    WHEN("appending to a path with no separator") {
+        path_t p{"1"};
+        auto pw = p;
+
+        append(p, path_t{"2"}, path_style::posix);
+        append(pw, path_t{"2"}, path_style::windows);
+        THEN("a separator is added") {
+            CHECK(p == path_t{"1/2"});
+            CHECK(pw == path_t{"1\\2"});
+        }
+    }
+
+    WHEN("appending to a path with a separator") {
+        path_t p{"1/"};
+        path_t pw{"1\\"};
+
+        append(p, path_t{"2"}, path_style::posix);
+        append(pw, path_t{"2"}, path_style::windows);
+        THEN("a separator is not added") {
+            CHECK(p == path_t{"1/2"});
+            CHECK(pw == path_t{"1\\2"});
+        }
+    }
+
+    WHEN("appending a path component with a separator") {
+        path_t p{"1"};
+        auto pw = p;
+
+        append(p, path_t{"/2"}, path_style::posix);
+        append(pw, path_t{"\\2"}, path_style::windows);
+        THEN("a separator is not added") {
+            CHECK(p == path_t{"1/2"});
+            CHECK(pw == path_t{"1\\2"});
+        }
+    }
+
+    WHEN("appending an empty path component") {
+        path_t p{"/a/b/c"};
+        const auto expected = p;
+        append(p, path_t{});
+        THEN("the path is not changed") {
+            CHECK(p == expected);
+        }
+    }
+
+    SECTION("sanitize") {
+        CHECK(sanitize(path_t{"C:////Users\\Prosoft/Desktop\\file.txt"}, path_style::windows) == path_t{"C:\\Users\\Prosoft\\Desktop\\file.txt"});
+        CHECK(sanitize(path_t{"\\\\?\\C:/Users/prosoft\\Desktop\\\\\\file.txt"}, path_style::windows) == path_t{"\\\\?\\C:\\Users\\prosoft\\Desktop\\file.txt"});
+        CHECK(sanitize(path_t{"C:/"}, path_style::windows) == path_t{"C:\\"});
+        CHECK(sanitize(path_t{"//?/C:\\Users"}, path_style::windows) == path_t{"\\\\?\\C:\\Users"});
+        CHECK(sanitize(path_t{"///Users////Prosoft/Desktop"}, path_style::posix) == path_t{"/Users/Prosoft/Desktop"});
+    }
 }
