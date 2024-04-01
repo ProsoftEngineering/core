@@ -24,7 +24,7 @@
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 cmake_minimum_required(VERSION 3.15)
-project(regex)
+project(ps_regex)
 
 include("${CMAKE_CURRENT_LIST_DIR}/../config_module.cmake")
 
@@ -49,7 +49,7 @@ if(PS_CORE_BUILD_PSTEST_HARNESS)
     target_link_libraries(${PROJECT_NAME} PRIVATE Catch2::Catch2)
 endif()
 
-add_library(regex::regex ALIAS regex)
+add_library(ps::regex ALIAS ps_regex)
 
 if(PS_CORE_BUILD_TESTS)
     enable_testing()

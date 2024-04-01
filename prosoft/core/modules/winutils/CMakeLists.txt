@@ -24,7 +24,7 @@
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 cmake_minimum_required(VERSION 3.15)
-project(winutils)
+project(ps_winutils)
 
 include("${CMAKE_CURRENT_LIST_DIR}/../config_module.cmake")
 
@@ -39,7 +39,7 @@ target_include_directories(${PROJECT_NAME} PUBLIC include)
 find_package(ps_core REQUIRED)
 target_link_libraries(${PROJECT_NAME} PUBLIC ps::core)
 
-add_library(winutils::winutils ALIAS winutils)
+add_library(ps::winutils ALIAS ps_winutils)
 
 if(PS_CORE_BUILD_TESTS)
     enable_testing()

@@ -24,7 +24,7 @@
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 cmake_minimum_required(VERSION 3.15)
-project(winutils_tests)
+project(ps_winutils_tests)
 
 include("${CMAKE_CURRENT_LIST_DIR}/../../config_module.cmake")
 
@@ -34,8 +34,8 @@ add_executable(${PROJECT_NAME}
 
 ps_core_module_config(${PROJECT_NAME})
 
-find_package(winutils REQUIRED)
-target_link_libraries(${PROJECT_NAME} PRIVATE winutils::winutils)
+find_package(ps_winutils REQUIRED)
+target_link_libraries(${PROJECT_NAME} PRIVATE ps::winutils)
 
 find_package(Catch2 REQUIRED)
 target_link_libraries(${PROJECT_NAME} PRIVATE Catch2::Catch2WithMain)

@@ -24,7 +24,7 @@
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 cmake_minimum_required(VERSION 3.15)
-project(filesystem)
+project(ps_filesystem)
 
 include("${CMAKE_CURRENT_LIST_DIR}/../config_module.cmake")
 
@@ -65,8 +65,8 @@ if(WIN32)
         src/snapshot_win32.cpp
     )
     target_link_libraries(${PROJECT_NAME} PRIVATE shell32 vssapi)
-    find_package(winutils REQUIRED)
-    target_link_libraries(${PROJECT_NAME} PRIVATE winutils::winutils)
+    find_package(ps_winutils REQUIRED)
+    target_link_libraries(${PROJECT_NAME} PRIVATE ps::winutils)
 endif()
 
 if(PSLINUX)
@@ -88,11 +88,11 @@ endif()
 find_package(ps_core REQUIRED)
 target_link_libraries(${PROJECT_NAME} PUBLIC ps::core)
 
-find_package(u8string REQUIRED)
-target_link_libraries(${PROJECT_NAME} PUBLIC u8string::u8string)
+find_package(ps_u8string REQUIRED)
+target_link_libraries(${PROJECT_NAME} PUBLIC ps::u8string)
 
-find_package(system_identity REQUIRED)
-target_link_libraries(${PROJECT_NAME} PUBLIC system_identity::system_identity)
+find_package(ps_system_identity REQUIRED)
+target_link_libraries(${PROJECT_NAME} PUBLIC ps::system_identity)
 
 if(PS_CORE_BUILD_PSTEST_HARNESS)
     message("WARNING: ${PROJECT_NAME} is compiled with PSTEST_HARNESS. Don't use in production!")
@@ -101,11 +101,11 @@ if(PS_CORE_BUILD_PSTEST_HARNESS)
     target_link_libraries(${PROJECT_NAME} PRIVATE Catch2::Catch2)
 endif()
 
-add_library(filesystem::filesystem ALIAS filesystem)
+add_library(ps::filesystem ALIAS ps_filesystem)
 
-add_library(filesystem_internal INTERFACE)
-target_include_directories(filesystem_internal INTERFACE src)   # fstestutils.hpp
-add_library(filesystem::filesystem_internal ALIAS filesystem_internal)
+add_library(ps_filesystem_internal INTERFACE)
+target_include_directories(ps_filesystem_internal INTERFACE src)   # fstestutils.hpp
+add_library(ps::filesystem_internal ALIAS ps_filesystem_internal)
 
 if(PS_CORE_BUILD_TESTS)
     enable_testing()
