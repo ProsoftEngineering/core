@@ -254,66 +254,6 @@ gid_t make_admin_group_sid() {
 #else
 #define PS_USING_PASSWD_API
 
-template <class Entry>
-class system_entry {
-    typedef Entry entry_t;
-    entry_t m_entry;
-    std::vector<char> m_buf;
-    static constexpr const size_t k_buf_size = 1024;
-
-    void zero_entry() {
-        static_assert(sizeof(m_entry) >= sizeof(uintptr_t), "Broken type assumption");
-        std::memset(reinterpret_cast<char*>(&m_entry), 0, sizeof(uintptr_t)); // XXX: zero user/group name
-    }
-
-    void reserve() {
-        m_buf.reserve(k_buf_size);
-    }
-
-    void clear() {
-        m_buf = decltype(m_buf){};
-    }
-
-protected:
-    template <class Syscall>
-    void init(const char* uname, Syscall scall) {
-        zero_entry();
-        if (uname) {
-            entry_t* result;
-            reserve();
-            if (0 != scall(uname, &m_entry, m_buf.data(), k_buf_size, &result) || !result) {
-                clear();
-                zero_entry();
-            }
-        }
-    }
-
-    template <class Syscall>
-    void init(uid_t uid, Syscall scall) {
-        zero_entry();
-        reserve();
-        entry_t* result;
-        if (0 != scall(uid, &m_entry, m_buf.data(), k_buf_size, &result) || !result) {
-            clear();
-            zero_entry();
-        }
-    }
-
-public:
-    system_entry() {}
-    virtual ~system_entry() {}
-    PS_DISABLE_COPY(system_entry);
-    PS_DEFAULT_MOVE(system_entry);
-
-    explicit operator bool() const {
-        return *(reinterpret_cast<const uintptr_t*>(&m_entry)) != 0;
-    }
-
-    const entry_t* operator->() const {
-        return &m_entry;
-    }
-};
-
 class passwd_entry {
 public:
     passwd_entry() = default;   // no-op
