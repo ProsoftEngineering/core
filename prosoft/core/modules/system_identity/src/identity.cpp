@@ -356,83 +356,77 @@ prosoft::native_string_type gecos_name(const char* gecos) {
 }
 
 class SIDProperties {
-    union {
-        void* m_ptr;
-        passwd_entry* m_pwd;
-        group_entry* m_grp;
-    };
-    identity_type m_type;
-
-    passwd_entry* user() const {
-        return m_type == identity_type::user ? m_pwd : nullptr;
-    }
-
-    group_entry* group() const {
-        return m_type == identity_type::group ? m_grp : nullptr;
-    }
-
 public:
-    SIDProperties(const identity& i)
-        : m_ptr(nullptr) {
-        const auto sid = i.system_identity();
-        m_type = i.type();
+    explicit SIDProperties(const identity& i) {
         if (is_user(i)) {
-            m_ptr = new passwd_entry{sid};
+            m_type = identity_type::user;
+            auto pe = std::make_unique<passwd_entry>();
+            if (pe->init_from_uid(i.system_identity())) {
+                m_passwd_entry.swap(pe);
+            }
         } else if (is_group(i)) {
-            m_ptr = new group_entry{sid};
-        }
-    }
-
-    ~SIDProperties() {
-        if (user()) {
-            delete m_pwd;
+            m_type = identity_type::group;
+            auto ge = std::make_unique<group_entry>();
+            if (ge->init_from_gid(i.system_identity())) {
+                m_group_entry.swap(ge);
+            }
         } else {
-            delete m_grp;
+            m_type = identity_type::unknown;
         }
-    }
-
-    PS_DISABLE_COPY(SIDProperties);
-
-    SIDProperties(SIDProperties&& other) {
-        m_ptr = other.m_ptr;    // union with m_ptr, m_pwd, m_grp
-        m_type = other.m_type;
-        other.m_ptr = nullptr;
-        other.m_type = identity_type::unknown;
     }
 
     explicit operator bool() const {
-        if (const auto u = user()) {
-            return u->operator bool();
-        } else if (const auto g = group()) {
-            return g->operator bool();
-        } else {
-            return false;
+        if (m_type == identity_type::user) {
+            return m_passwd_entry.get() != nullptr;
+        } else if (m_type == identity_type::group) {
+            return m_group_entry.get() != nullptr;
         }
+        return false;
     }
 
     prosoft::native_string_type name() const {
-        if (user()) {
-            return gecos_name((*m_pwd)->pw_gecos);
-        } else {
-            return (*group())->gr_name;
+        if (m_type == identity_type::user) {
+            if (m_passwd_entry) {
+                return gecos_name(m_passwd_entry->entry().pw_gecos);
+            }
+        } else if (m_type == identity_type::group) {
+            if (m_group_entry) {
+                return m_group_entry->entry().gr_name;
+            }
         }
+        return {};
     }
 
     prosoft::native_string_type account_name() const {
-        if (user()) {
-            return prosoft::native_string_type{(*m_pwd)->pw_name};
-        } else {
-            return (*group())->gr_name;
+        if (m_type == identity_type::user) {
+            if (m_passwd_entry) {
+                return m_passwd_entry->entry().pw_name;
+            }
+        } else if (m_type == identity_type::group) {
+            if (m_group_entry) {
+                return m_group_entry->entry().gr_name;
+            }
         }
+        return {};
     }
-    
+
     identity::system_identity_type primary_group() const {
-        if (user()) {
-            return (*m_pwd)->pw_gid;
-        } else {
-            return (*group())->gr_gid;
+        if (m_type == identity_type::user) {
+            if (m_passwd_entry) {
+                return m_passwd_entry->entry().pw_gid;
+            }
+        } else if (m_type == identity_type::group) {
+            if (m_group_entry) {
+                return m_group_entry->entry().gr_gid;
+            }
         }
+        return identity::invalid_system_identity;
     }
+
+private:
+    identity_type m_type;
+    std::unique_ptr<passwd_entry> m_passwd_entry;
+    std::unique_ptr<group_entry> m_group_entry;
 };
 
 inline constexpr gid_t make_admin_group_sid() { return 0; } // wheel for *BSD, root for modern linux (of which root user is the only member)
@@ -644,8 +638,9 @@ prosoft::system::identity prosoft::system::identity::console_user() {
         return identity{identity_type::user, sid};
     }
 #elif !_WIN32
-    if (auto pwd = passwd_entry()) {
-        return identity(identity_type::user, pwd->pw_uid);
+    auto pe = std::make_unique<passwd_entry>();
+    if (pe->init_from_console_user()) {
+        return identity(identity_type::user, pe->entry().pw_uid);
     }
 #else
     // Other potential options:
@@ -798,11 +793,10 @@ TEST_CASE("system_identity internal") {
 
     SECTION("passwd lookup") {
         WHEN("known id is used") {
-            auto p = passwd_entry("root");
-            auto p2 = passwd_entry{uid_t{0}};
             THEN("entry is valid") {
-                CHECK(p);
-                CHECK(p2);
+                auto pe = std::make_unique<passwd_entry>();
+                CHECK(pe->init_from_uname("root"));
+                CHECK(pe->init_from_uid(uid_t{0}));
             }
         }
     }
