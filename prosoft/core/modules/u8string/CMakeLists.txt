@@ -24,7 +24,7 @@
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 cmake_minimum_required(VERSION 3.15)
-project(u8string)
+project(ps_u8string)
 
 include("${CMAKE_CURRENT_LIST_DIR}/../config_module.cmake")
 
@@ -45,7 +45,7 @@ target_link_libraries(${PROJECT_NAME} PUBLIC utf8cpp)
 find_package(utf8proc REQUIRED)
 target_link_libraries(${PROJECT_NAME} PRIVATE utf8proc::utf8proc)
 
-add_library(u8string::u8string ALIAS u8string)
+add_library(ps::u8string ALIAS ps_u8string)
 
 if(PS_CORE_BUILD_TESTS)
     enable_testing()

@@ -34,8 +34,8 @@ if(APPLE)
     target_link_libraries(${PROJECT_NAME} INTERFACE "-framework Foundation")
 endif()
 
-find_package(u8string REQUIRED)
-target_link_libraries(${PROJECT_NAME} INTERFACE u8string::u8string)
+find_package(ps_u8string REQUIRED)
+target_link_libraries(${PROJECT_NAME} INTERFACE ps::u8string)
 
 add_library(ps::core ALIAS ps_core)
 

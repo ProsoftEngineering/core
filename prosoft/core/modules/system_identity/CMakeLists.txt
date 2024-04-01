@@ -24,7 +24,7 @@
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 cmake_minimum_required(VERSION 3.15)
-project(system_identity)
+project(ps_system_identity)
 
 include("${CMAKE_CURRENT_LIST_DIR}/../config_module.cmake")
 
@@ -45,8 +45,8 @@ endif()
 find_package(ps_core REQUIRED)
 target_link_libraries(${PROJECT_NAME} PUBLIC ps::core)
 
-find_package(u8string REQUIRED)
-target_link_libraries(${PROJECT_NAME} PRIVATE u8string::u8string)
+find_package(ps_u8string REQUIRED)
+target_link_libraries(${PROJECT_NAME} PRIVATE ps::u8string)
 
 if(PS_CORE_BUILD_PSTEST_HARNESS)
     message("WARNING: ${PROJECT_NAME} is compiled with PSTEST_HARNESS. Don't use in production!")
@@ -55,7 +55,7 @@ if(PS_CORE_BUILD_PSTEST_HARNESS)
     target_link_libraries(${PROJECT_NAME} PRIVATE Catch2::Catch2)
 endif()
 
-add_library(system_identity::system_identity ALIAS system_identity)
+add_library(ps::system_identity ALIAS ps_system_identity)
 
 if(PS_CORE_BUILD_TESTS)
     enable_testing()

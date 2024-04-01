@@ -38,12 +38,12 @@ list(APPEND CMAKE_PREFIX_PATH ${CMAKE_CURRENT_LIST_DIR}/cmake/packages)
 
 # Include all packages
 find_package(ps_core REQUIRED)
-find_package(filesystem REQUIRED)
-find_package(regex REQUIRED)
-find_package(system_identity REQUIRED)
-find_package(u8string REQUIRED)
+find_package(ps_filesystem REQUIRED)
+find_package(ps_regex REQUIRED)
+find_package(ps_system_identity REQUIRED)
+find_package(ps_u8string REQUIRED)
 if(WIN32)
-    find_package(winutils REQUIRED)
+    find_package(ps_winutils REQUIRED)
 endif()
 
 if(PS_CORE_BUILD_TESTS)

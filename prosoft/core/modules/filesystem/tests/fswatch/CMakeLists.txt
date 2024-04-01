@@ -27,7 +27,7 @@
 # It will nullify internal module tests as the modules will be built without testing.
 
 cmake_minimum_required(VERSION 3.15)
-project(fswatch)
+project(ps_fswatch)
 
 include("${CMAKE_CURRENT_LIST_DIR}/../../core.cmake")
 
@@ -41,5 +41,5 @@ endif()
 
 ps_core_configure(${PROJECT_NAME})
 
-find_package(filesystem REQUIRED)
-target_link_libraries(${PROJECT_NAME} PRIVATE filesystem::filesystem)
+find_package(ps_filesystem REQUIRED)
+target_link_libraries(${PROJECT_NAME} PRIVATE ps::filesystem)

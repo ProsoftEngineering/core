@@ -24,7 +24,7 @@
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 cmake_minimum_required(VERSION 3.15)
-project(filesystem_tests)
+project(ps_filesystem_tests)
 
 include("${CMAKE_CURRENT_LIST_DIR}/../../config_module.cmake")
 
@@ -46,14 +46,14 @@ endif()
 
 ps_core_module_config(${PROJECT_NAME})
 
-find_package(filesystem REQUIRED)
+find_package(ps_filesystem REQUIRED)
 target_link_libraries(${PROJECT_NAME} PRIVATE
-    filesystem::filesystem
-    filesystem::filesystem_internal
+    ps::filesystem
+    ps::filesystem_internal
 )
 if(WIN32)
-    find_package(winutils REQUIRED)
-    target_link_libraries(${PROJECT_NAME} PRIVATE winutils::winutils)
+    find_package(ps_winutils REQUIRED)
+    target_link_libraries(${PROJECT_NAME} PRIVATE ps::winutils)
 endif()
 
 find_package(Catch2 REQUIRED)
