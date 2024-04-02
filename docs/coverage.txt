@@ -2,9 +2,12 @@ Code coverage files are generated with compiler options in conan/profiles/linux_
 (test-build-all.cmake script uses this conan profile for Linux Debug build).
 
 How to generate html report to analyze code coverage:
-  $ lcov -o coverage.info -c -d $BUILD_DIR
-  $ genhtml --include $SOURCE_DIR --filter brace --flat -o coverage coverage.info
+  $ lcov -o coverage.info -c -d $BUILD_DIR --base-directory $SOURCE_DIR --no-external --demangle-cpp --keep-going
+            # "--base-directory $SOURCE_DIR --no-external" - exclude external includes
+            # "--keep-going" - continue after lcov errors (https://github.com/linux-test-project/lcov/issues/238)
+  $ genhtml -o coverage --filter brace -no-function-coverage --flat coverage.info
             # "--filter brace" - fix false "no coverage on }" (for example, in string/case_convert.hpp)
+            # "--no-function-coverage" - remove false info (CATCH2_INTERNAL_TEMPLATE_TEST_... are always < 100%)
             # "--flat" - show all files on html webpage
 
 ---
