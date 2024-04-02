@@ -28,7 +28,7 @@ if(NOT PSCONFIG)
 endif()
 
 if(WIN32)
-    include("${PSCONFIG}/cmake/config_windows.cmake")
+    include("${PSCONFIG}/config_windows.cmake")
 endif()
 
 # Define missing CMake platform vars

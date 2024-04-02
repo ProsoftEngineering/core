@@ -27,7 +27,7 @@ cmake_minimum_required(VERSION 3.15)
 
 # Private module config
 
-include("${CMAKE_CURRENT_LIST_DIR}/../config/cmake/config.cmake")
+include("${CMAKE_CURRENT_LIST_DIR}/../cmake/config/config.cmake")
 
 macro(ps_core_module_config TARGET_NAME)
     # Differs from ps_core_configure() only in compile definitions

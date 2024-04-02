@@ -25,7 +25,7 @@
 
 cmake_minimum_required(VERSION 3.15)
 
-set(PSCONFIG "${CMAKE_CURRENT_LIST_DIR}/..")
+set(PSCONFIG "${CMAKE_CURRENT_LIST_DIR}")
 get_filename_component(PSCONFIG ${PSCONFIG} REALPATH)
 
 if(NOT CMAKE_BUILD_TYPE)
@@ -50,6 +50,6 @@ if(NOT DEFINED DEBUG)
     set(DEBUG ${PS_BUILD_DEBUG})
 endif()
 
-include("${PSCONFIG}/cmake/config_compiler.cmake")
-include("${PSCONFIG}/cmake/config_cpp.cmake")
-include("${PSCONFIG}/cmake/config_platform.cmake")
+include("${PSCONFIG}/config_compiler.cmake")
+include("${PSCONFIG}/config_cpp.cmake")
+include("${PSCONFIG}/config_platform.cmake")
