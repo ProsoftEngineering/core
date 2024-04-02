@@ -1,4 +1,4 @@
-# Copyright © 2013-2018, Prosoft Engineering, Inc. (A.K.A "Prosoft")
+# Copyright © 2013-2019, Prosoft Engineering, Inc. (A.K.A "Prosoft")
 # All rights reserved.
 # 
 # Redistribution and use in source and binary forms, with or without
@@ -25,31 +25,20 @@
 
 cmake_minimum_required(VERSION 3.15)
 
-set(PSCONFIG "${CMAKE_CURRENT_LIST_DIR}/..")
-get_filename_component(PSCONFIG ${PSCONFIG} REALPATH)
+# Private module config
 
-if(NOT CMAKE_BUILD_TYPE)
-    message(FATAL_ERROR, "CMake build type not set!")
-endif()
+include("${CMAKE_CURRENT_LIST_DIR}/../cmake/config/config.cmake")
 
-# PS_BUILD_* are stable build type identifiers. They should never be set anywhere but here.
-# This is not true of 'DEBUG'.
-if(NOT DEFINED PS_BUILD_DEBUG)
-    # CMake doesn't have a case-insensitive string compare
-    string(TOLOWER "${CMAKE_BUILD_TYPE}" CMAKE_BUILD_TYPE_TOLOWER)
-    if(CMAKE_BUILD_TYPE_TOLOWER STREQUAL "release" OR CMAKE_BUILD_TYPE_TOLOWER STREQUAL "relwithdebinfo")
-        set(PS_BUILD_DEBUG false)
-        set(PS_BUILD_RELEASE true)
-    else()
-        set(PS_BUILD_DEBUG true)
-        set(PS_BUILD_RELEASE false)
+macro(ps_core_module_config TARGET_NAME)
+    # Differs from ps_core_configure() only in compile definitions
+    # (for details see ps_core_configure_required() in core.cmake)
+    if(DEBUG)
+        target_compile_definitions(${TARGET_NAME} PRIVATE DEBUG=1)
     endif()
-endif()
-
-if(NOT DEFINED DEBUG)
-    set(DEBUG ${PS_BUILD_DEBUG})
-endif()
-
-include("${PSCONFIG}/cmake/config_compiler.cmake")
-include("${PSCONFIG}/cmake/config_cpp.cmake")
-include("${PSCONFIG}/cmake/config_platform.cmake")
+    if(WIN32 AND BUILD_SHARED_LIBS)
+        target_compile_definitions(${TARGET_NAME} PRIVATE PS_LIB_EXPORTS=1)
+    endif()
+    ps_core_config_compiler_defaults(${TARGET_NAME})
+    ps_core_config_cpp_version(${TARGET_NAME})
+    ps_core_config_platform_required(${TARGET_NAME})
+endmacro()

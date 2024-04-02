@@ -1,4 +1,4 @@
-# Copyright © 2015-2019, Prosoft Engineering, Inc. (A.K.A "Prosoft")
+# Copyright © 2013-2015, Prosoft Engineering, Inc. (A.K.A "Prosoft")
 # All rights reserved.
 # 
 # Redistribution and use in source and binary forms, with or without
@@ -23,31 +23,30 @@
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-set(PSCORE "${CMAKE_CURRENT_LIST_DIR}")
-get_filename_component(PSCORE ${PSCORE} REALPATH)
+if(NOT PSCONFIG)
+    message(FATAL_ERROR, "PSCONFIG is missing!")
+endif()
 
-include("${PSCORE}/config/cmake/config.cmake")
+if(WIN32)
+    include("${PSCONFIG}/config_windows.cmake")
+endif()
 
-macro(ps_core_configure_required TARGET_NAME)
-    # PS_BUILD_* are stable build type defines. They should never be set anywhere but here.
-    # Unlike 'DEBUG' which can be set externally and even '=1' for release.
-    if(PS_BUILD_DEBUG)
-        target_compile_definitions(${TARGET_NAME} PRIVATE DEBUG=1 PS_BUILD_DEBUG=1 PS_BUILD_RELEASE=0)
-    else()
-        # For legacy reasons (#ifdef instead of #if) DEBUG should not be defined in release builds.
-        target_compile_definitions(${TARGET_NAME} PRIVATE PS_BUILD_DEBUG=0 PS_BUILD_RELEASE=1)
+# Define missing CMake platform vars
+if(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
+    set(PSLINUX true)
+elseif(${CMAKE_SYSTEM_NAME} MATCHES "FreeBSD")
+    set(PSFREEBSD true)
+    set(PSBSD true)
+elseif(${CMAKE_SYSTEM_NAME} MATCHES "OpenBSD")
+    set(PSOPENBSD true)
+    set(PSBSD true)
+endif()
+if(APPLE)
+    set(PSBSD true)
+endif()
+
+macro(ps_core_config_platform_required TARGET_NAME)
+    if(WIN32)
+        ps_core_config_windows_required(${TARGET_NAME})
     endif()
-    if(WIN32 AND BUILD_SHARED_LIBS)
-        get_target_property(TGTYPE ${TARGET_NAME} TYPE)
-        if(${TGTYPE} STREQUAL "EXECUTABLE")
-            target_compile_definitions(${TARGET_NAME} PRIVATE PS_LIB_IMPORTS=1)
-        endif()
-    endif()
-endmacro()
-
-macro(ps_core_configure TARGET_NAME)
-    ps_core_configure_required(${TARGET_NAME})
-    ps_core_config_compiler_defaults(${TARGET_NAME})
-    ps_core_config_cpp_version(${TARGET_NAME})
-    ps_core_config_platform_required(${TARGET_NAME})
 endmacro()

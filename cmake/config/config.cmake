@@ -1,4 +1,4 @@
-# Copyright © 2013-2015, Prosoft Engineering, Inc. (A.K.A "Prosoft")
+# Copyright © 2013-2018, Prosoft Engineering, Inc. (A.K.A "Prosoft")
 # All rights reserved.
 # 
 # Redistribution and use in source and binary forms, with or without
@@ -23,30 +23,33 @@
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-if(NOT PSCONFIG)
-    message(FATAL_ERROR, "PSCONFIG is missing!")
+cmake_minimum_required(VERSION 3.15)
+
+set(PSCONFIG "${CMAKE_CURRENT_LIST_DIR}")
+get_filename_component(PSCONFIG ${PSCONFIG} REALPATH)
+
+if(NOT CMAKE_BUILD_TYPE)
+    message(FATAL_ERROR, "CMake build type not set!")
 endif()
 
-if(WIN32)
-    include("${PSCONFIG}/cmake/config_windows.cmake")
-endif()
-
-# Define missing CMake platform vars
-if(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
-    set(PSLINUX true)
-elseif(${CMAKE_SYSTEM_NAME} MATCHES "FreeBSD")
-    set(PSFREEBSD true)
-    set(PSBSD true)
-elseif(${CMAKE_SYSTEM_NAME} MATCHES "OpenBSD")
-    set(PSOPENBSD true)
-    set(PSBSD true)
-endif()
-if(APPLE)
-    set(PSBSD true)
-endif()
-
-macro(ps_core_config_platform_required TARGET_NAME)
-    if(WIN32)
-        ps_core_config_windows_required(${TARGET_NAME})
+# PS_BUILD_* are stable build type identifiers. They should never be set anywhere but here.
+# This is not true of 'DEBUG'.
+if(NOT DEFINED PS_BUILD_DEBUG)
+    # CMake doesn't have a case-insensitive string compare
+    string(TOLOWER "${CMAKE_BUILD_TYPE}" CMAKE_BUILD_TYPE_TOLOWER)
+    if(CMAKE_BUILD_TYPE_TOLOWER STREQUAL "release" OR CMAKE_BUILD_TYPE_TOLOWER STREQUAL "relwithdebinfo")
+        set(PS_BUILD_DEBUG false)
+        set(PS_BUILD_RELEASE true)
+    else()
+        set(PS_BUILD_DEBUG true)
+        set(PS_BUILD_RELEASE false)
     endif()
-endmacro()
+endif()
+
+if(NOT DEFINED DEBUG)
+    set(DEBUG ${PS_BUILD_DEBUG})
+endif()
+
+include("${PSCONFIG}/config_compiler.cmake")
+include("${PSCONFIG}/config_cpp.cmake")
+include("${PSCONFIG}/config_platform.cmake")
