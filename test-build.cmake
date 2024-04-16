@@ -1,5 +1,5 @@
 #
-# Build and test all ps_core modules with given options
+# Build and test all modules with given options
 #
 # Usage:
 #   mkdir BUILD_DIR && cd BUILD_DIR && cmake [options] -P SOURCE_DIR/test-build.cmake
@@ -8,8 +8,8 @@
 #   -DARCH=...
 #   -DPLATFORM=...
 #   -DBUILD_TYPE=...
-#   -DBUILD_TESTS=...
-#   -DBUILD_PSTEST_HARNESS=...
+#   -DPS_CORE_BUILD_TESTS=...
+#   -DPS_CORE_BUILD_PSTEST_HARNESS=...
 #
 if(NOT GENERATOR)
     set(GENERATOR "Unix Makefiles")
@@ -66,11 +66,11 @@ if(PLATFORM)
 endif()
 set(COMMAND ${COMMAND} "-DCMAKE_BUILD_TYPE=${BUILD_TYPE}")
 set(COMMAND ${COMMAND} "${CMAKE_CURRENT_LIST_DIR}")
-if(BUILD_TESTS)
-    set(COMMAND ${COMMAND} "-DPS_CORE_BUILD_TESTS=${BUILD_TESTS}")
+if(PS_CORE_BUILD_TESTS)
+    set(COMMAND ${COMMAND} "-DPS_CORE_BUILD_TESTS=${PS_CORE_BUILD_TESTS}")
 endif()
-if(BUILD_PSTEST_HARNESS)
-    set(COMMAND ${COMMAND} "-DPS_CORE_BUILD_PSTEST_HARNESS=${BUILD_PSTEST_HARNESS}")
+if(PS_CORE_BUILD_PSTEST_HARNESS)
+    set(COMMAND ${COMMAND} "-DPS_CORE_BUILD_PSTEST_HARNESS=${PS_CORE_BUILD_PSTEST_HARNESS}")
 endif()
 list(JOIN COMMAND " " COMMAND_STRING)
 message(STATUS "COMMAND: ${COMMAND_STRING}")
