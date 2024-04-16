@@ -1,0 +1,66 @@
+name: Build and test in all configurations
+on: [push]
+jobs:
+  macos-latest:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Check requirements
+        run: |
+          python --version
+          pip --version
+          pip install --upgrade conan
+          conan --version
+          cmake --version
+      - name: Configure conan
+        run: |
+          conan profile detect
+          conan config install conan/settings_user.yml
+      - name: Build and test (RelWithDebInfo and Debug configurations)
+        run: |
+          mkdir build
+          cd build
+          cmake -P ../test-build-all.cmake
+
+  ubuntu-latest:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Check requirements
+        run: |
+          python --version
+          pip --version
+          pip install --upgrade conan
+          conan --version
+          cmake --version
+          sudo apt-get install libacl1-dev
+      - name: Configure conan
+        run: |
+          conan profile detect
+          conan config install conan/settings_user.yml
+      - name: Build and test (RelWithDebInfo and Debug configurations; MSVC and MSVCx86 builders)
+        run: |
+          mkdir build
+          cd build
+          cmake -P ../test-build-all.cmake
+
+  windows-latest:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Check requirements
+        run: |
+          python --version
+          pip --version
+          pip install --upgrade conan
+          conan --version
+          cmake --version
+      - name: Configure conan
+        run: |
+          conan profile detect
+          conan config install conan/settings_user.yml
+      - name: Build and test (RelWithDebInfo and Debug configurations)
+        run: |
+          mkdir build
+          cd build
+          cmake -P ../test-build-all.cmake
