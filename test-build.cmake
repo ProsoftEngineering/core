@@ -8,7 +8,6 @@
 #   -DARCH=...
 #   -DPLATFORM=...
 #   -DBUILD_TYPE=...
-#   -DCONAN_PROFILE=...
 #   -DBUILD_TESTS=...
 #   -DBUILD_PSTEST_HARNESS=...
 #
@@ -26,27 +25,30 @@ if(ARCH)
     set(COMMAND ${COMMAND} --settings "arch=${ARCH}")
 endif()
 if(BUILD_TYPE STREQUAL "Release")
-    set(COMMAND ${COMMAND} --settings build_type=Release)
-    set(PRESET_NAME "release")
+    set(CONAN_BUILD_TYPE "release")
 elseif(BUILD_TYPE STREQUAL "RelWithDebInfo")
-    set(COMMAND ${COMMAND} --settings build_type=Release)
-    set(COMMAND ${COMMAND} --settings &:build_type=RelWithDebInfo)      # consumer build_type
-    set(PRESET_NAME "relwithdebinfo")
+    set(CONAN_BUILD_TYPE "relwithdebinfo")
 elseif(BUILD_TYPE STREQUAL "Debug")
-    set(COMMAND ${COMMAND} --settings build_type=Debug)
-    set(PRESET_NAME "debug")
+    set(CONAN_BUILD_TYPE "debug")
 else()
     message(FATAL_ERROR "Unknown BUILD_TYPE (${BUILD_TYPE})")
 endif()
-set(COMMAND ${COMMAND} --output-folder=.)
-if(CONAN_PROFILE)
-    set(COMMAND ${COMMAND} --profile "${CONAN_PROFILE}")
+if(CMAKE_HOST_SYSTEM_NAME STREQUAL "Darwin")
+    set(CONAN_PROFILE "macos_${CONAN_BUILD_TYPE}")
+elseif(CMAKE_HOST_SYSTEM_NAME STREQUAL "Windows")
+    set(CONAN_PROFILE "windows_${CONAN_BUILD_TYPE}")
+elseif(CMAKE_HOST_SYSTEM_NAME STREQUAL "Linux")
+    set(CONAN_PROFILE "linux_${CONAN_BUILD_TYPE}")
+else()
+    message(FATAL_ERROR "Unknown CMAKE_HOST_SYSTEM_NAME (${CMAKE_HOST_SYSTEM_NAME})")
 endif()
+set(COMMAND ${COMMAND} --profile "${CMAKE_CURRENT_LIST_DIR}/conan/profiles/${CONAN_PROFILE}")
 execute_process(COMMAND conan --version OUTPUT_VARIABLE CONAN_VERSION OUTPUT_STRIP_TRAILING_WHITESPACE)
 string(REGEX REPLACE "^Conan version ([0-9]+\\.[0-9]+\\.[0-9]+)$" "\\1" CONAN_VERSION ${CONAN_VERSION})
 if(NOT (CONAN_VERSION MATCHES "^[0-9]+\\.[0-9]+\\.[0-9]+$" AND CONAN_VERSION VERSION_GREATER_EQUAL "2.2.2"))
     message(FATAL_ERROR "Conan version 2.2.2 and greater required (CONAN_VERSION: \"${CONAN_VERSION}\")")
 endif()
+set(COMMAND ${COMMAND} --output-folder=.)
 set(COMMAND ${COMMAND} --build=missing "${CMAKE_CURRENT_LIST_DIR}")
 list(JOIN COMMAND " " COMMAND_STRING)
 message(STATUS "COMMAND: ${COMMAND_STRING}")
