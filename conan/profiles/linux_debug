@@ -2,24 +2,18 @@ include(linux)
 
 [conf]
 # Generate code coverage files
-tools.build:cflags += ["--coverage"]
-tools.build:cxxflags += ["--coverage"]
-tools.build:exelinkflags += ["--coverage"]
+&:tools.build:cflags += ["--coverage"]
+&:tools.build:cxxflags += ["--coverage"]
+&:tools.build:exelinkflags += ["--coverage"]
 
 # Enable sanitizers
-tools.build:cflags += ["-fsanitize=address", "-fsanitize=undefined", "-fno-omit-frame-pointer"]
-tools.build:cxxflags += ["-fsanitize=address", "-fsanitize=undefined", "-fno-omit-frame-pointer"]
-tools.build:exelinkflags += ["-fsanitize=address", "-fsanitize=undefined"]
+&:tools.build:cflags += ["-fsanitize=address", "-fsanitize=undefined", "-fno-omit-frame-pointer"]
+&:tools.build:cxxflags += ["-fsanitize=address", "-fsanitize=undefined", "-fno-omit-frame-pointer"]
+&:tools.build:exelinkflags += ["-fsanitize=address", "-fsanitize=undefined"]
 # ... PS_HAVE_LSAN_INTERFACE_H is used in core/config/config_analyzer.h
 # As of conan v2.2.2 "tools.build:defines" is broken for multiconfig generators (see below)
-tools.build:cflags += ["-DPS_HAVE_LSAN_INTERFACE_H=1"]
-tools.build:cxxflags += ["-DPS_HAVE_LSAN_INTERFACE_H=1"]
-
-#
-# FIXME: restore "&:tools.build:..." after a complete transition to conan v2.
-# "&" support was added in conan commit 1527b3f2d "Unify reference pattern matching (#10587)"
-# but not backported to conan v1
-#
+&:tools.build:cflags += ["-DPS_HAVE_LSAN_INTERFACE_H=1"]
+&:tools.build:cxxflags += ["-DPS_HAVE_LSAN_INTERFACE_H=1"]
 
 #
 # FIXME: restore "tools.build:defines += ["PS_HAVE_LSAN_INTERFACE_H=1"]" when
