@@ -21,7 +21,7 @@ endif()
 
 # Initialize conan packages. Only single-config with CMAKE_BUILD_TYPE is supported.
 set(COMMAND conan install)
-set(COMMAND ${COMMAND} --conf "tools.cmake.cmaketoolchain:generator=${GENERATOR}")
+set(COMMAND ${COMMAND} --conf "&:tools.cmake.cmaketoolchain:generator=${GENERATOR}")
 if(ARCH)
     set(COMMAND ${COMMAND} --settings "arch=${ARCH}")
 endif()
