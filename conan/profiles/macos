@@ -1,12 +1,9 @@
 include(default)
 
 [settings]
-# settings.xml: add "psconfig" option in "compiler/apple-clang" section
-# ("psconfig: [None, ANY]" for conan v1 or "psconfig: [null, ANY]" for conan v2)
-
 # Rebuild all conan packages on this computer (don't use third-party binaries).
-compiler.psconfig = "pscore-240331"
-# ... or single package: catch2/*:compiler.psconfig = "pscore-240321"
+# (install settings_user.xml with compiler.psconfig)
+compiler.psconfig = "pscore-240416"
 
 # Build all for same minimum version of macOS
 os.version = 10.12

@@ -1,9 +1,7 @@
 include(default)
 
 [settings]
-# settings.xml: add "psconfig" option in "compiler/apple-clang" section
-# ("psconfig: [None, ANY]" for conan v1 or "psconfig: [null, ANY]" for conan v2)
-
-# Rebuild all conan packages on this computer (don't use third-party binaries)
+# Rebuild all conan packages on this computer (don't use third-party binaries).
+# (install settings_user.xml with compiler.psconfig)
 # Fix catch2 static build ("error LNK2019: unresolved external symbol ...")
-compiler.psconfig = "pscore-240321"
+compiler.psconfig = "pscore-240416"
