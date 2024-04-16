@@ -1,5 +1,8 @@
 include(linux)
 
+[settings]
+build_type=Debug
+
 [conf]
 # Generate code coverage files
 &:tools.build:cflags += ["--coverage"]

@@ -1,0 +1,6 @@
+include(macos)
+
+[settings]
+# Build all external packages as Release and current build as RelWithDebInfo
+build_type=Release
+&:build_type=RelWithDebInfo

@@ -1,0 +1,4 @@
+include(windows)
+
+[settings]
+build_type=Debug
