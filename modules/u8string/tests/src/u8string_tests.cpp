@@ -1,4 +1,4 @@
-// Copyright © 2014-2020, Prosoft Engineering, Inc. (A.K.A "Prosoft")
+// Copyright © 2014-2024, Prosoft Engineering, Inc. (A.K.A "Prosoft")
 // All rights reserved.
 //
 // Redistribution and use in source and binary forms, with or without
