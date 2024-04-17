@@ -2,8 +2,6 @@
 
 <https://github.com/ProsoftEngineering/core>
 
-[![Travis Status](https://travis-ci.org/ProsoftEngineering/core.svg?branch=master)](https://travis-ci.org/ProsoftEngineering/core) [![Appveyor Status](https://ci.appveyor.com/api/projects/status/pjmfq9eqmtiywxh4?branch=master&svg=true)](https://ci.appveyor.com/project/bdb/core) [![Codecov Status](https://codecov.io/github/ProsoftEngineering/core/coverage.svg?branch=master)](https://codecov.io/github/ProsoftEngineering/core)
-
 Core is a library of cross platform C++11/14/17 modules and headers that adds core functionality to the standard library.
 
 This core set of extensions powers all of Prosoft's applications.
