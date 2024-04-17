@@ -28,6 +28,8 @@
 #ifndef PS_CONFIG_ANALYZER_H
 #define PS_CONFIG_ANALYZER_H
 
+#include <stddef.h> // size_t
+
 // https://github.com/llvm-mirror/compiler-rt/blob/master/include/sanitizer/lsan_interface.h
 #if PS_HAVE_LSAN_INTERFACE_H
 #include <sanitizer/lsan_interface.h>
