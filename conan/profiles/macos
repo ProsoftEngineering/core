@@ -6,7 +6,7 @@ include(default)
 compiler.psconfig = "pscore-240416"
 
 # Build all for same minimum version of macOS
-os.version = 10.12
+os.version = 10.13
 
 [conf]
 &:tools.build:cflags += ["-fvisibility=hidden"]
