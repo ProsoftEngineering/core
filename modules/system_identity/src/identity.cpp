@@ -27,16 +27,7 @@
 #include <CoreServices/CoreServices.h>
 #include <SystemConfiguration/SystemConfiguration.h>
 #include <membership.h>
-#elif !_WIN32
-#include <grp.h>
-#include <pwd.h>
-#include <stdlib.h>
-#include <stdlib.h>
-#include <sys/types.h>
-#include <array>
-#include <cstring>
-#include <vector>
-#else
+#elif _WIN32
 #include <prosoft/core/config/config_windows.h>
 #include <windows.h>
 #include <wtsapi32.h>
@@ -49,6 +40,7 @@
 #include <prosoft/core/include/system_utils.hpp>
 
 #include <prosoft/core/modules/system_identity/identity.hpp>
+#include "identity_internal.hpp"
 
 namespace {
 using namespace prosoft::system;
@@ -251,90 +243,13 @@ gid_t make_admin_group_sid() {
         return 0; // wheel, by default root is the only member
     }
 }
-#else
-#define PS_USING_PASSWD_API
+#endif
+} // namespace
 
-class passwd_entry {
-public:
-    passwd_entry() = default;   // no-op
+#ifdef PS_USING_PASSWD_API
 
-    bool init_from_uname(const char* uname) {
-        passwd* result;
-        if (getpwnam_r(uname, &m_entry, m_buffer.data(), m_buffer.size(), &result) != 0
-            || result == nullptr)   // user not found
-        {
-            return false;
-        }
-        return true;
-    }
-
-    bool init_from_uid(uid_t uid) {
-        passwd* result;
-        if (getpwuid_r(uid, &m_entry, m_buffer.data(), m_buffer.size(), &result) != 0
-            || result == nullptr)   // user not found
-        {
-            return false;
-        }
-        return true;
-    }
-
-    bool init_from_console_user() {
-        const auto uname = getenv("LOGNAME");
-        if (uname == nullptr) {     // no login (for example, running in docker)
-            return false;
-        }
-        return init_from_uname(uname);
-    }
-
-    const passwd& entry() const {
-        return m_entry;
-    }
-
-private:
-    passwd m_entry;
-    std::array<char, 1024> m_buffer;
-
-    // Disable copy and move for heavy object
-    passwd_entry(const passwd_entry& ) = delete;
-    passwd_entry(passwd_entry&& ) = delete;
-};
-
-class group_entry {
-public:
-    group_entry() = default;    // no-op
-
-    bool init_from_gname(const char* gname) {
-        group* result;
-        if (getgrnam_r(gname, &m_entry, m_buffer.data(), m_buffer.size(), &result) != 0
-            || result == nullptr)   // group not found
-        {
-            return false;
-        }
-        return true;
-    }
-
-    bool init_from_gid(gid_t gid) {
-        group* result;
-        if (getgrgid_r(gid, &m_entry, m_buffer.data(), m_buffer.size(), &result) != 0
-            || result == nullptr)   // group not found
-        {
-            return false;
-        }
-        return true;
-    }
-
-    const group& entry() const {
-        return m_entry;
-    }
-
-private:
-    group m_entry;
-    std::array<char, 1024> m_buffer;
-
-    // Disable copy and move for heavy object
-    group_entry(const group_entry& ) = delete;
-    group_entry(group_entry&& ) = delete;
-};
+namespace prosoft {
+namespace system {
 
 prosoft::native_string_type gecos_name(const char* gecos) {
     const char* p = gecos;
@@ -354,6 +269,11 @@ prosoft::native_string_type gecos_name(const char* gecos) {
 
     return {};
 }
+
+} // namespace system
+} // namespace prosoft
+
+namespace {
 
 class SIDProperties {
 public:
@@ -430,9 +350,10 @@ private:
 };
 
 inline constexpr gid_t make_admin_group_sid() { return 0; } // wheel for *BSD, root for modern linux (of which root user is the only member)
-#endif // _WIN32
 
-} // anon
+} // namespace
+
+#endif // PS_USE_PASSRD_API
 
 namespace prosoft {
 inline namespace conversion {
