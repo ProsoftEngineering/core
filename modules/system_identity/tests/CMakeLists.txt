@@ -30,12 +30,14 @@ include("${CMAKE_CURRENT_LIST_DIR}/../../config_module.cmake")
 
 add_executable(${PROJECT_NAME}
     src/system_identity_tests.cpp
+    src/system_identity_internal_tests.cpp
 )
 
 ps_core_module_config(${PROJECT_NAME})
 
 find_package(ps_system_identity REQUIRED)
 target_link_libraries(${PROJECT_NAME} PRIVATE ps::system_identity)
+target_link_libraries(${PROJECT_NAME} PRIVATE ps::system_identity_internal)
 
 find_package(Catch2 REQUIRED)
 target_link_libraries(${PROJECT_NAME} PRIVATE Catch2::Catch2WithMain)
