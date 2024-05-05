@@ -24,14 +24,9 @@
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <prosoft/core/modules/regex/regex.hpp>
-
-#include "oniguruma.h"
+#include "regex_internal.hpp"
 
 namespace prosoft {
-
-namespace {
-
-void throw_onig_error(int oerr);
 
 OnigOptionType options(prosoft::regex_constants::syntax_option_type flags) {
     using namespace prosoft::regex_constants;
@@ -56,12 +51,10 @@ OnigOptionType options(prosoft::regex_constants::syntax_option_type flags) {
     return opt;
 }
 
-using OnigSyntaxPtr = OnigSyntaxType*;
-
 OnigOptionType options(prosoft::regex_constants::syntax_option_type flags, OnigSyntaxPtr& syntax) {
     static PS_CONSTEXPR auto syntax_mask = regex_constants::syntax_option_type::basic | regex_constants::syntax_option_type::extended | regex_constants::syntax_option_type::grep | regex_constants::syntax_option_type::egrep;
 
-    auto opt = options(flags);
+    auto opt = prosoft::options(flags);
     syntax = ONIG_SYNTAX_RUBY;
     if (PS_UNEXPECTED(0 != (flags & syntax_mask))) {
         if (0 != (flags & regex_constants::syntax_option_type::basic)) {
@@ -105,8 +98,6 @@ OnigEncoding onig_encoding(prosoft::iregex::encoding enc) {
     PS_THROW_IF(nullptr == oenc, std::invalid_argument{"regex encoding is not supported"});
     return oenc;
 }
-
-} // anon
 
 regex_error::regex_error(regex_constants::error_type err, int onigErr)
     : std::runtime_error("regex error")
@@ -185,6 +176,8 @@ inline void _rxparse_results(Region& region, prosoft::iregex::match_handler call
     }
 }
 
+} // namespace
+
 void throw_onig_error(int oerr) {
     PSASSERT(ONIG_NORMAL != oerr, "BUG");
     regex_constants::error_type rerr;
@@ -241,8 +234,6 @@ void throw_onig_error(int oerr) {
     };
     throw regex_error(rerr, oerr);
 }
-
-} // anon
 
 bool prosoft::iregex::rsearch(OnigRegex rx, const uchar* haystack, size_t length, regex_constants::match_flag_type flags, match_handler callback, bool exact) {
     OnigOptionType opt = match_flags_to_onig(flags);
