@@ -32,6 +32,7 @@ add_executable(${PROJECT_NAME}
     src/dirops_internal_tests.cpp
     src/filesystem_acl_tests.cpp
     src/filesystem_change_iterator_tests.cpp
+    src/filesystem_internal_tests.cpp
     src/filesystem_iterator_tests.cpp
     src/filesystem_monitor_tests.cpp
     src/filesystem_path_tests.cpp
