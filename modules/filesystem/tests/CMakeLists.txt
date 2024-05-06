@@ -29,6 +29,7 @@ project(ps_filesystem_tests)
 include("${CMAKE_CURRENT_LIST_DIR}/../../config_module.cmake")
 
 add_executable(${PROJECT_NAME}
+    src/dirops_internal_tests.cpp
     src/filesystem_acl_tests.cpp
     src/filesystem_change_iterator_tests.cpp
     src/filesystem_iterator_tests.cpp
