@@ -328,11 +328,10 @@ bool start_events_monitor(platform_state* state, fs::change_callback&& cb) {
         }
     };
     
-#if PSTEST_HARNESS // tests may use null
+    // tests may use null
     if (!monitor_thread_run_loop || CFRunLoopGetCurrent() == monitor_thread_run_loop) {
         return do_start(state);
     }
-#endif
     
     PSASSERT_NOTNULL(monitor_thread_run_loop);
     PSASSERT(CFRunLoopGetCurrent() != monitor_thread_run_loop, "BUG");
@@ -362,12 +361,11 @@ void stop_events_monitor(shared_state& ss) {
         FSEventStreamInvalidate(*s);
     };
     
-#if PSTEST_HARNESS // tests may use null
+    // tests may use null
     if (!monitor_thread_run_loop || CFRunLoopGetCurrent() == monitor_thread_run_loop) {
         do_stop(ss.get());
         return;
     }
-#endif
     
     PSASSERT_NOTNULL(monitor_thread_run_loop);
     PSASSERT(CFRunLoopGetCurrent() != monitor_thread_run_loop, "BUG");

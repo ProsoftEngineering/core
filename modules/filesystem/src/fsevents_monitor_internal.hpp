@@ -265,7 +265,7 @@ void fsevents_callback(ConstFSEventStreamRef, void* info, size_t nevents, void* 
             if (!historyDone) {
                 lastID = evids[i];
                 fs::change_manager::emplace_back(*notes, fs::path{paths[i]}, fs::path{}, state, evids[i], to_event(flags & ~negated_flags), to_type(flags));
-#if 0 && PSTEST_HARNESS
+#if 0
                 std::cout << evids[i] << "," << paths[i] << "," << flags << "," << (flags & ~negated_flags) << "\n";
 #endif
             }
