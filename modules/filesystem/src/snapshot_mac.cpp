@@ -23,14 +23,8 @@
 // (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#include <sys/mount.h>
-#include <sys/stat.h>
-
-#include <prosoft/core/modules/filesystem/filesystem.hpp>
-#include <prosoft/core/modules/filesystem/filesystem_snapshot.hpp>
 #include "spawn.hpp"
-#include <prosoft/core/include/string/string_component.hpp>
-
+#include "snapshot_mac_internal.hpp"
 #include "filesystem_private.hpp"
 
 namespace {
@@ -79,6 +73,12 @@ const std::error_category& tmutil_category() {
     static const tmutil_error_category cat;
     return cat;
 }
+
+} // namespace
+
+namespace prosoft {
+namespace filesystem {
+inline namespace v1 {
 
 std::string datestr(const prosoft::filesystem::snapshot_id& sid) {
     using namespace prosoft;
@@ -228,6 +228,12 @@ void mount_snapshot(const prosoft::filesystem::snapshot& snap, const prosoft::fi
     ec = err.code();
 }
 
+} // namespace v1
+} // namespace filesystem
+} // namespace prosoft
+
+namespace {
+
 struct force_unmount {
     bool value{false};
 };
@@ -246,6 +252,12 @@ void unmount_snapshot(const prosoft::filesystem::snapshot& snap, std::error_code
     spawn("diskutil", args, cout, cerr, err);
     ec = err.code();
 }
+
+} // namespace
+
+namespace prosoft {
+namespace filesystem {
+inline namespace v1 {
 
 bool can_snapshot(const struct statfs& sb, std::error_code& ec) {
     static const std::string apfs{"apfs"};
@@ -280,6 +292,12 @@ bool can_snapshot(const prosoft::filesystem::path& path, std::error_code& ec) {
     }
     return false;
 }
+
+} // namespace v1
+} // namespace filesystem
+} // namespace prosoft
+
+namespace {
 
 enum delete_flags : unsigned {
     detach_force = 0xf0f0f0f0U,
