@@ -45,6 +45,7 @@ add_executable(${PROJECT_NAME}
 if(APPLE)
     target_sources(${PROJECT_NAME} PRIVATE
         src/change_iterator_internal_tests.cpp
+        src/fsevents_monitor_internal_tests.cpp
         src/spawn_tests.cpp
     )
 endif()
