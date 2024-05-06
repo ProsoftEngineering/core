@@ -37,6 +37,7 @@ add_executable(${PROJECT_NAME}
     src/filesystem_snapshot_tests.cpp
     src/filesystem_tests.cpp
     src/path_utils_tests.cpp
+    src/pathops_internal_tests.cpp
 )
 if(APPLE)
     target_sources(${PROJECT_NAME} PRIVATE
