@@ -43,11 +43,12 @@
 #include <prosoft/core/include/string/platform_convert.hpp>
 
 #include <prosoft/core/modules/filesystem/filesystem.hpp>
+#include "dirops_internal.hpp"
 #include "filesystem_private.hpp"
 
-namespace {
-using namespace prosoft;
-using namespace prosoft::filesystem;
+namespace prosoft {
+namespace filesystem {
+inline namespace v1 {
 
 void assert_directory_exists(path& p, error_code& ec) {
     if (ec || p.empty() || !is_directory(p, ec)) {
@@ -62,6 +63,14 @@ void assert_directory_exists(path& p, error_code& ec) {
         }
     }
 }
+
+} // namespace v1
+} // namespace filesystem
+} // namespace prosoft
+
+namespace {
+using namespace prosoft;
+using namespace prosoft::filesystem;
 
 class mkdir_err_policy {
     static constexpr auto eexist =
