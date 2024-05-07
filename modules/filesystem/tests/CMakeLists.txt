@@ -29,18 +29,29 @@ project(ps_filesystem_tests)
 include("${CMAKE_CURRENT_LIST_DIR}/../../config_module.cmake")
 
 add_executable(${PROJECT_NAME}
+    src/dirops_internal_tests.cpp
     src/filesystem_acl_tests.cpp
     src/filesystem_change_iterator_tests.cpp
+    src/filesystem_internal_tests.cpp
     src/filesystem_iterator_tests.cpp
     src/filesystem_monitor_tests.cpp
     src/filesystem_path_tests.cpp
     src/filesystem_snapshot_tests.cpp
     src/filesystem_tests.cpp
+    src/iterator_internal_tests.cpp
     src/path_utils_tests.cpp
+    src/pathops_internal_tests.cpp
 )
 if(APPLE)
     target_sources(${PROJECT_NAME} PRIVATE
+        src/change_iterator_internal_tests.cpp
+        src/fsevents_monitor_internal_tests.cpp
+        src/snapshot_mac_internal_tests.cpp
         src/spawn_tests.cpp
+    )
+elseif(WIN32)
+    target_sources(${PROJECT_NAME} PRIVATE
+        src/snapshot_win32_internal_tests.cpp
     )
 endif()
 

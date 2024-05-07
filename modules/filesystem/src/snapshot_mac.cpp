@@ -23,14 +23,8 @@
 // (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 // SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-#include <sys/mount.h>
-#include <sys/stat.h>
-
-#include <prosoft/core/modules/filesystem/filesystem.hpp>
-#include <prosoft/core/modules/filesystem/filesystem_snapshot.hpp>
 #include "spawn.hpp"
-#include <prosoft/core/include/string/string_component.hpp>
-
+#include "snapshot_mac_internal.hpp"
 #include "filesystem_private.hpp"
 
 namespace {
@@ -79,6 +73,12 @@ const std::error_category& tmutil_category() {
     static const tmutil_error_category cat;
     return cat;
 }
+
+} // namespace
+
+namespace prosoft {
+namespace filesystem {
+inline namespace v1 {
 
 std::string datestr(const prosoft::filesystem::snapshot_id& sid) {
     using namespace prosoft;
@@ -228,6 +228,12 @@ void mount_snapshot(const prosoft::filesystem::snapshot& snap, const prosoft::fi
     ec = err.code();
 }
 
+} // namespace v1
+} // namespace filesystem
+} // namespace prosoft
+
+namespace {
+
 struct force_unmount {
     bool value{false};
 };
@@ -246,6 +252,12 @@ void unmount_snapshot(const prosoft::filesystem::snapshot& snap, std::error_code
     spawn("diskutil", args, cout, cerr, err);
     ec = err.code();
 }
+
+} // namespace
+
+namespace prosoft {
+namespace filesystem {
+inline namespace v1 {
 
 bool can_snapshot(const struct statfs& sb, std::error_code& ec) {
     static const std::string apfs{"apfs"};
@@ -280,6 +292,12 @@ bool can_snapshot(const prosoft::filesystem::path& path, std::error_code& ec) {
     }
     return false;
 }
+
+} // namespace v1
+} // namespace filesystem
+} // namespace prosoft
+
+namespace {
 
 enum delete_flags : unsigned {
     detach_force = 0xf0f0f0f0U,
@@ -410,69 +428,3 @@ void prosoft::filesystem::v1::delete_snapshot(snapshot& snap, std::error_code& e
         snapshot_manager::id(snap).m_id.clear();
     }
 }
-
-#if PSTEST_HARNESS
-// Internal tests.
-
-#include <catch2/catch_test_macros.hpp>
-
-TEST_CASE("snapshot_internal") {
-    using namespace prosoft::filesystem;
-    CHECK(datestr(snapshot_id("")).empty());
-    CHECK(datestr(snapshot_id("com.apple.TimeMachine.2018-02-15-195835")) == "2018-02-15-195835");
-    CHECK(datestr(snapshot_id("com.apple.TimeMachine.2020-01-22-144343.local")) == "2020-01-22-144343");
-
-    std::error_code ec;
-    auto sid = tmutil_getsnapshot("Created local snapshot with date: 2018-02-15-195835\n", ec);
-    CHECK(sid == "2018-02-15-195835");
-    CHECK(!ec);
-    
-    // not trimmed
-    sid = tmutil_getsnapshot("com.apple.TimeMachine.2018-02-15-193329\ncom.apple.TimeMachine.2018-02-15-195835\n", sid, ec);
-    CHECK(sid == "com.apple.TimeMachine.2018-02-15-195835");
-    CHECK(!ec);
-    CHECK(datestr(snapshot_id(sid)) == "2018-02-15-195835");
-    
-    // trimmed
-    const char* input = "com.apple.TimeMachine.2018-02-15-193329\ncom.apple.TimeMachine.2020-01-22-144343.local\ncom.apple.TimeMachine.2020-01-22-154343.local";
-    sid = tmutil_getsnapshot(input, "2018-02-15-193329", ec);
-    CHECK(sid == "com.apple.TimeMachine.2018-02-15-193329");
-    CHECK(!ec);
-    CHECK(datestr(snapshot_id(sid)) == "2018-02-15-193329");
-    
-    sid = tmutil_getsnapshot(input, "2020-01-22-144343", ec);
-    CHECK(sid == "com.apple.TimeMachine.2020-01-22-144343.local");
-    CHECK(!ec);
-    CHECK(datestr(snapshot_id(sid)) == "2020-01-22-144343");
-    
-    sid = tmutil_getsnapshot(input, "2020-01-22-154343", ec);
-    CHECK(sid == "com.apple.TimeMachine.2020-01-22-154343.local");
-    CHECK(!ec);
-    CHECK(datestr(snapshot_id(sid)) == "2020-01-22-154343");
-
-    CHECK(mount_opts(snapshot(snapshot_id(""), 0)) == "rdonly");
-    CHECK(mount_opts(snapshot(snapshot_id(""), snapshot_create_options::nobrowse)) == "rdonly,nobrowse");
-
-    struct statfs sb;
-    sb.f_flags = 0;
-    strlcpy(sb.f_fstypename, "hfs", sizeof(sb.f_fstypename));
-    CHECK_FALSE(can_snapshot(sb, ec));
-    CHECK(ec);
-
-    ec.clear();
-    sb.f_flags = MNT_RDONLY;
-    CHECK_FALSE(can_snapshot(sb, ec));
-    CHECK(ec);
-
-    ec.clear();
-    sb.f_flags = MNT_RDONLY;
-    strlcpy(sb.f_fstypename, "apfs", sizeof(sb.f_fstypename));
-    CHECK_FALSE(can_snapshot(sb, ec));
-    CHECK(ec);
-
-    sb.f_flags = 0;
-    CHECK(can_snapshot(sb, ec));
-    CHECK(!ec);
-}
-
-#endif // PSTEST_HARNESS

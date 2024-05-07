@@ -94,13 +94,6 @@ target_link_libraries(${PROJECT_NAME} PUBLIC ps::u8string)
 find_package(ps_system_identity REQUIRED)
 target_link_libraries(${PROJECT_NAME} PUBLIC ps::system_identity)
 
-if(PS_CORE_BUILD_PSTEST_HARNESS)
-    message("WARNING: ${PROJECT_NAME} is compiled with PSTEST_HARNESS. Don't use in production!")
-    target_compile_definitions(${PROJECT_NAME} PRIVATE PSTEST_HARNESS=1)
-    find_package(Catch2 REQUIRED)
-    target_link_libraries(${PROJECT_NAME} PRIVATE Catch2::Catch2)
-endif()
-
 add_library(ps::filesystem ALIAS ps_filesystem)
 
 add_library(ps_filesystem_internal INTERFACE)

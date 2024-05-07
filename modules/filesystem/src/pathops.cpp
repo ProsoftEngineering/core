@@ -25,18 +25,11 @@
 
 #include <prosoft/core/config/config.h>
 
-#if !_WIN32
-#include <sys/errno.h>
-#include <unistd.h>
-#else
-#include <windows.h>
-#endif
-
 #include <prosoft/core/modules/filesystem/filesystem.hpp>
 #include "filesystem_private.hpp"
+#include "pathops_internal.hpp"
 
 #include <prosoft/core/include/string/string_component.hpp>
-#include <prosoft/core/include/unique_resource.hpp>
 
 namespace {
 
@@ -55,38 +48,6 @@ struct SystemCwdProvider {
     }
 #endif
 };
-
-template <class Provider>
-path current_path(const Provider& cwd, error_code& ec) {
-#if !_WIN32
-    unique_malloc<char> p{cwd(nullptr, 0)}; // POSIX extension that's supported by *BSD and Linux
-    if (p) {
-        return {p.get()};
-    } else {
-        if (ERANGE == errno) {
-            p = make_malloc<char>(PATH_MAX);
-            PS_THROW_IF(!p, std::bad_alloc{});
-            if (cwd(p.get(), PATH_MAX)) {
-                return {p.get()};
-            }
-        }
-        ifilesystem::system_error(ec);
-    }
-#else
-    std::wstring buf(cwd(0, nullptr), 0); // GetCurrentDirectory will account for the null term.
-    if (buf.size() > 1 && cwd(static_cast<DWORD>(buf.size()), &buf[0]) > 1) {
-        buf.erase(--buf.end()); // null term
-        return {std::move(buf)};
-    } else {
-        ifilesystem::system_error(ec);
-        if (!ec.value()) {
-            // GetLastError was cleared (by wstring) or not set
-            ifilesystem::error(ERROR_FILE_NOT_FOUND, ec);
-        }
-    }
-#endif
-    return {};
-}
 
 #if _WIN32
 template <typename T> // Templates are used just to avoid unused function warnings.
@@ -253,59 +214,3 @@ path system_complete(const path& p, error_code& ec) {
 } // v1
 } // filesystem
 } // prosoft
-
-#if PSTEST_HARNESS
-
-// Internal tests.
-#include <catch2/catch_test_macros.hpp>
-
-struct ErrorCwdProvider {
-    using pointer = path::encoding_value_type*;
-#if !_WIN32
-    pointer operator()(pointer, size_t) const {
-        errno = EINVAL;
-        return nullptr;
-    }
-#else
-    DWORD operator()(DWORD, pointer) const {
-        SetLastError(1);
-        return 0;
-    }
-#endif
-};
-
-#if !_WIN32
-struct RangeErrorCwdProvider {
-    using pointer = path::encoding_value_type*;
-    pointer operator()(pointer p, size_t sz) const {
-        if (nullptr == p) {
-            errno = ERANGE;
-            return nullptr;
-        } else {
-            return ::getcwd(p, sz);
-        }
-    }
-};
-#endif
-
-TEST_CASE("pathops internal") {
-    using namespace prosoft::filesystem;
-    
-    WHEN("current_path fails") {
-        error_code ec;
-        (void)current_path(ErrorCwdProvider{}, ec);
-        CHECK(ec.value() != 0);
-    }
-    
-#if !_WIN32
-    WHEN("the system does not support the getcwd malloc extension") {
-        error_code ec;
-        CHECK(RangeErrorCwdProvider{}(nullptr, 0) == nullptr);
-        auto p = current_path(RangeErrorCwdProvider{}, ec);
-        CHECK_FALSE(p.empty());
-        CHECK(ec.value() == 0);
-    }
-#endif
-}
-
-#endif // PSTEST_HARNESS

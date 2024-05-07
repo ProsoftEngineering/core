@@ -31,23 +31,19 @@
 #include <utility>
 #include <vector>
 
-#include <vss.h>
-#include <vswriter.h>
-#include <vsbackup.h>
-#include <atlbase.h>
-
 #include <prosoft/core/modules/winutils/winutils.hpp>
 #include <prosoft/core/modules/winutils/win_token_privs.hpp>
 #endif
 
-#include <prosoft/core/modules/filesystem/filesystem.hpp>
-#include <prosoft/core/modules/filesystem/filesystem_snapshot.hpp>
+#include "snapshot_win32_internal.hpp"
 
 #include <prosoft/core/include/unique_resource.hpp>
 
 #if PS_HAVE_FILESYSTEM_SNAPSHOT
 
 namespace fs = prosoft::filesystem;
+
+using namespace prosoft::filesystem;
 
 namespace {
 
@@ -119,37 +115,9 @@ inline backup_components vss_backup(fs::error_code& ec) {
     return vss_backup(VSS_CTX_APP_ROLLBACK, ec);
 }
 
-struct vss_writer_component;
-
-struct vss_writer {
-    CComPtr<IVssExamineWriterMetadata> info;
-    GUID id;
-    GUID class_id;
-    GUID instance_id;
-    CComBSTR name;
-
-    enum class selectable {
-        required,
-        optional
-    };
-
-    using ctype = std::pair<selectable, fs::path>;
-    std::vector<ctype> components_added; // absolute paths, used for determining whether to add non-root components
-
-    explicit operator bool() const {
-        return info != nullptr;
-    }
-};
-
 std::ostream& operator<<(std::ostream& os, const vss_writer& w) {
     CW2A s{w.name};
     return os << s;
-}
-
-void clear(vss_writer& w) {
-    w.info.Release();
-    w.name = nullptr;
-    w.components_added.clear();
 }
 
 struct vss_writers {
@@ -183,108 +151,12 @@ struct vss_writers {
     }
 };
 
-struct vss_writer_component {
-    CComPtr<IVssWMComponent> com;
-    PVSSCOMPONENTINFO  info;
-
-    vss_writer_component()
-        : com()
-        , info() {}
-    
-    ~vss_writer_component() {
-        free_info();
-    }
-
-    PS_DISABLE_COPY(vss_writer_component); // raw ptr is not safe to copy
-
-    void free_info() {
-        if (com && info) {
-            com->FreeComponentInfo(info);
-            info = nullptr;
-        }
-    }
-
-    BSTR name() const {
-        PSASSERT_NOTNULL(info);
-        return info->bstrComponentName;
-    }
-
-    // Logcial paths and the selectable attribute form a complex set of rules regarding when components can be explicitly added to a snapshot.
-    // https://msdn.microsoft.com/en-us/library/windows/desktop/aa384316(v=vs.85).aspx
-    // https://technet.microsoft.com/en-us/subscriptions/aa384989(v=vs.85).aspx
-    
-    BSTR logical_path() const {
-        PSASSERT_NOTNULL(info);
-        return info->bstrLogicalPath;
-    }
-
-    bool optional() const {
-         PSASSERT_NOTNULL(info);
-         return info->bSelectable; // Stupid terms: "selectable" == optional, "not-selectable" == required.
-    }
-
-    bool required() const {
-        return !optional();
-    }
-
-    bool root() const {
-        return !logical_path() || 0 == wcscmp(name(), logical_path());
-    }
-
-    fs::path absolute_path() const {
-        if (auto lp = logical_path()) {
-            fs::path p{lp};
-            p /= name();
-            return p;
-        }
-        return fs::path{name()};
-    }
-
-    fs::path parent_path() const {
-        if (auto lp  = logical_path()) {
-            return fs::path{lp};
-        }
-        return {};
-    }
-
-    UINT file_count() const {
-        PSASSERT_NOTNULL(info);
-        return info->cFileCount;
-    }
-
-    UINT database_count() const {
-        PSASSERT_NOTNULL(info);
-        return info->cDatabases; 
-    }
-
-    UINT log_count() const {
-        PSASSERT_NOTNULL(info);
-        return info->cLogFiles;
-    }
-
-    auto type() const {
-         PSASSERT_NOTNULL(info);
-         return info->type;
-    }
-
-    explicit operator bool() const {
-        return com != nullptr;
-    }
-};
 
 std::ostream& operator<<(std::ostream& os, const vss_writer_component& wc) {
     CW2A n{wc.name()};
     auto lp = wc.logical_path();
     CW2A p{lp ? lp : L""};
     return os << n << " ::" << " path: " << p <<  " optional: " << wc.optional() << " files: " << wc.file_count() << " databases: " << wc.database_count() << " logs: " << wc.log_count();
-}
-
-void clear(vss_writer_component& wc) {
-    if (wc.com && wc.info) {
-        wc.com->FreeComponentInfo(wc.info);
-        wc.info = nullptr;
-    }
-    wc.com.Release();
 }
 
 struct vss_writer_components {
@@ -318,34 +190,6 @@ struct vss_writer_components {
         return current;
     }
 };
-
-void insert(const vss_writer_component& c, vss_writer& w) {
-    w.components_added.emplace_back(c.required() ? vss_writer::selectable::required : vss_writer::selectable::optional, c.absolute_path());
-}
-
-bool should_add(const vss_writer_component& c, const vss_writer& w) {
-    if (c.root()) {
-        return true;
-    } else {
-        auto start = w.components_added.begin();
-        auto eof = w.components_added.end();
-        auto p = c.parent_path();
-        // XXX: assumes parent components are encountered before children.
-        while (!p.empty()) {
-            auto i = std::find_if(start, eof, [&p](auto& val) {
-                return val.second == p;
-            });
-            // A set is defined as a parent that is "selectable" (optional).
-            // If a component is not-selectable (required), then it does not define a set even if parent-child relationships exist between commponents.
-            // In that case, children of the required component MUST be added explicitly if there are no other selectable (optional) parents.
-            if (eof != i && i->first == vss_writer::selectable::optional) {
-                return false;
-            }
-            p = p.parent_path();
-        }
-        return true;
-    }
-}
 
 bool add(const vss_writer_component& c, vss_writer& w, backup_components& backup, std::error_code& ec) {
     PSASSERT(!ec, "Broken assumption");
@@ -696,20 +540,8 @@ std::error_category& snapshot_category() {
     return cat;
 }
 
-enum snapshot_flags : unsigned {
-    snapshot_attached = 0x1U,
-};
-
 inline bool attached(const fs::snapshot& snap) noexcept {
     return 0 != (snap.reserved() & snapshot_attached);
-}
-
-inline const GUID& guid(const fs::snapshot_id& sid) noexcept {
-    return *reinterpret_cast<const GUID*>(&sid.m_id[0]);
-}
-
-inline const GUID& guid(const fs::snapshot& snap) noexcept {
-    return guid(snap.id());
 }
 
 } // anon
@@ -763,21 +595,6 @@ snapshot_id::snapshot_id(native_string_type::const_pointer s) {
     const auto result = IIDFromString(s, reinterpret_cast<GUID*>(&m_id[0]));
     PS_THROW_IF(result != S_OK, std::invalid_argument("Invalid GUID string"));
 }
-
-class snapshot_manager {
-public:
-    static inline void set(snapshot& s, snapshot_flags f) {
-        s.m_flags |= f;
-    }
-
-    static inline void clear(snapshot& s, snapshot_flags f) {
-        s.m_flags &= ~f;
-    }
-
-    static inline void clear(snapshot& s) {
-        s.clear();
-    }
-};
 
 snapshot::~snapshot() {
     static_assert(sizeof(flags_type) == sizeof(snapshot_flags), "Internal flag size is different!");
@@ -877,188 +694,5 @@ void delete_snapshot(snapshot& snap, std::error_code& ec) {
 } // v1
 } // filesystem
 } // prosoft
-
-#if PSTEST_HARNESS
-// Internal tests.
-#include <memory>
-
-#include <catch2/catch_test_macros.hpp>
-
-TEST_CASE("snapshot_internal") {
-    WHEN("changing snapshot state") {
-        using namespace fs;
-        snapshot snap{snapshot_id{reinterpret_cast<const unsigned char*>(&GUID_DEVINTERFACE_FLOPPY)}};
-        CHECK(snap.reserved() == 0);
-        snapshot_manager::set(snap, snapshot_attached);
-        CHECK(snap.reserved() == snapshot_attached);
-        snapshot_manager::clear(snap, snapshot_attached);
-        CHECK(snap.reserved() == 0);
-        snapshot_manager::set(snap, snapshot_attached);
-        CHECK(snap.reserved() != 0);
-        snapshot_manager::clear(snap);
-        CHECK(guid(snap) == GUID_NULL);
-        CHECK(snap.reserved() == 0);
-    }
-
-    WHEN("clearing a writer") {
-        vss_writer w;
-        CHECK_FALSE(w);
-        w.name = decltype(w.name){L"test"};
-        CHECK(w.name);
-        w.components_added.emplace_back(vss_writer::selectable::optional, L"test");
-        CHECK_FALSE(w.components_added.empty());
-
-        clear(w);
-        CHECK_FALSE(w.name);
-        CHECK(w.components_added.empty());
-    }
-
-    WHEN("clearing a component") {
-        vss_writer_component c;
-        CHECK_FALSE(c);
-        clear(c);
-    }
-
-    WHEN("processing components") {
-        static auto set = [](auto& v, wchar_t* name, wchar_t* path = nullptr, bool selectable = false) {
-            auto i = &v.second;
-            i->bstrComponentName = name;
-            i->bstrLogicalPath = path;
-            i->bSelectable = selectable;
-            v.first.info = i;
-        };
-
-        vss_writer w;
-
-        using val = std::pair<vss_writer_component, VSS_COMPONENTINFO>;
-        // From MSDN "Logical Pathing of Components" doc.
-        val executables;
-        set(executables, L"Executables");
-        auto c = &executables.first;
-        CHECK_FALSE(c->optional());
-        CHECK(c->required());
-        CHECK(c->root());
-        CHECK(c->absolute_path().native() == c->name());
-        CHECK(c->parent_path().empty());
-        CHECK(should_add(*c, w));
-        insert(*c, w);
-        REQUIRE(w.components_added.size() > 0);
-        CHECK(w.components_added.back().first == vss_writer::selectable::required);
-        CHECK(w.components_added.back().second.native() == c->absolute_path());
-
-        val configFiles;
-        set(configFiles, L"ConfigFiles", executables.first.name());
-        c = &configFiles.first;
-        CHECK_FALSE(c->optional());
-        CHECK(c->required());
-        CHECK_FALSE(c->root());
-        CHECK(c->absolute_path().native() == L"Executables\\ConfigFiles");
-        CHECK(c->parent_path().native() == executables.first.name());
-        CHECK(should_add(*c, w));
-        insert(*c, w);
-
-        val licenseInfo;
-        set(licenseInfo, L"LicenseInfo", nullptr, true);
-        c = &licenseInfo.first;
-        CHECK(c->optional());
-        CHECK_FALSE(c->required());
-        CHECK(should_add(*c, w));
-        insert(*c, w);
-
-        val security;
-        set(security, L"Security", nullptr, true);
-        c = &security.first;
-        CHECK(should_add(*c, w));
-        insert(*c, w);
-
-        val userInfo;
-        set(userInfo, L"UserInfo", security.first.name());
-        c = &userInfo.first;
-        CHECK_FALSE(should_add(*c, w));
-
-        val certificates;
-        set(certificates, L"Certificates", security.first.name());
-        c = &certificates.first;
-        CHECK_FALSE(should_add(*c, w));
-
-        val writerData;
-        set(writerData, L"writerData", nullptr, true);
-        c = &writerData.first;
-        CHECK(should_add(*c, w));
-        insert(*c, w);
-
-        val set1;
-        set(set1, L"Set1", writerData.first.name());
-        c= &set1.first;
-        CHECK_FALSE(should_add(*c, w));
-
-        val jan;
-        set(jan, L"Jan", L"writerData\\Set1");
-        c = &jan.first;
-        CHECK(c->absolute_path().native() == L"writerData\\Set1\\Jan");
-        CHECK(c->parent_path().native() == c->logical_path());
-        CHECK_FALSE(should_add(*c, w)); // Set1 is not a set, but writerData is
-
-        val dec;
-        set(dec, L"Dec", L"writerData\\Set1");
-        c = &dec.first;
-        CHECK_FALSE(should_add(*c, w));
-
-        val set2;
-        set(set2, L"Set2", writerData.first.name());
-        c = &set2.first;
-        CHECK_FALSE(should_add(*c, w));
-
-        val jan2;
-        set(jan2, L"Jan", L"writerData\\Set2");
-        c = &jan2.first;
-        CHECK_FALSE(should_add(*c, w));
-
-        val dec2;
-        set(dec2, L"Dec", L"writerData\\Set2");
-        c = &dec2.first;
-        CHECK_FALSE(should_add(*c, w));
-
-        val query;
-        set(query, L"Query", L"writerData\\QueryLogs");
-        c = &query.first;
-        CHECK_FALSE(should_add(*c, w));
-
-        val usage;
-        set(usage, L"Usage", writerData.first.name(), true);
-        c = &usage.first;
-        CHECK_FALSE(should_add(*c, w));
-
-        val janU;
-        set(janU, L"Jan", L"writerData\\Usage");
-        c = &janU.first;
-        CHECK_FALSE(should_add(*c, w));
-
-        val decU;
-        set(decU, L"Dec", L"writerData\\Usage");
-        c = &decU.first;
-        CHECK_FALSE(should_add(*c, w));
-
-        clear(w);
-        writerData.second.bSelectable = false; // no longer a set root
-        c = &writerData.first;
-        CHECK(c->required());
-        CHECK(should_add(*c, w));
-        insert(*c, w);
-
-        c = &set1.first;
-        CHECK(should_add(*c, w));
-        insert(*c, w);
-
-        c = &jan.first;
-        CHECK(should_add(*c, w));
-        insert(*c, w);
-
-        c = &usage.first;
-        CHECK(should_add(*c, w));
-        insert(*c, w);
-    }
-}
-#endif // PSTEST_HARNESS
 
 #endif // PS_HAVE_FILESYSTEM_SNAPSHOT

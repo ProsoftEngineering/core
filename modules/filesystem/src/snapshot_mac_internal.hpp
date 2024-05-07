@@ -1,0 +1,65 @@
+// Copyright © 2024, Prosoft Engineering, Inc. (A.K.A "Prosoft")
+// All rights reserved.
+//
+// Redistribution and use in source and binary forms, with or without
+// modification, are permitted provided that the following conditions are met:
+//     * Redistributions of source code must retain the above copyright
+//       notice, this list of conditions and the following disclaimer.
+//     * Redistributions in binary form must reproduce the above copyright
+//       notice, this list of conditions and the following disclaimer in the
+//       documentation and/or other materials provided with the distribution.
+//     * Neither the name of Prosoft nor the names of its contributors may be
+//       used to endorse or promote products derived from this software without
+//       specific prior written permission.
+//
+// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+// ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+// WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+// DISCLAIMED. IN NO EVENT SHALL PROSOFT ENGINEERING, INC. BE LIABLE FOR ANY
+// DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+// (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+// LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+// ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+// (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+// SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+#ifndef PS_CORE_SNAPSHOT_MAC_INTERNAL_HPP
+#define PS_CORE_SNAPSHOT_MAC_INTERNAL_HPP
+
+#include <sys/mount.h>
+#include <sys/stat.h>
+
+#include <prosoft/core/modules/filesystem/filesystem.hpp>
+#include <prosoft/core/modules/filesystem/filesystem_snapshot.hpp>
+
+namespace prosoft {
+namespace filesystem {
+inline namespace v1 {
+
+bool can_snapshot(const struct statfs& sb, std::error_code& ec);
+
+bool can_snapshot(const prosoft::filesystem::path& path, std::error_code& ec);
+
+std::string datestr(const prosoft::filesystem::snapshot_id& sid);
+
+std::string tmutil_getsnapshot(const std::string& cout, const std::string& date, std::error_code& ec);
+
+std::string tmutil_findsnapshot(const prosoft::filesystem::path& path, const std::string& date, std::error_code& ec);
+
+void tmutil_delete(const std::string& date, std::error_code& ec);
+
+void tmutil_delete(const prosoft::filesystem::snapshot_id& snap, std::error_code& ec);
+
+std::string tmutil_getsnapshot(const std::string& cout, std::error_code& ec);
+
+std::string tmutil_snapshot(const prosoft::filesystem::path& path, std::error_code& ec);
+
+std::string mount_opts(const prosoft::filesystem::snapshot& snap);
+
+void mount_snapshot(const prosoft::filesystem::snapshot& snap, const prosoft::filesystem::path& mp, std::error_code& ec);
+
+} // namespace v1
+} // namespace filesystem
+} // namespace prosoft
+
+#endif // PS_CORE_SNAPSHOT_MAC_INTERNAL_HPP

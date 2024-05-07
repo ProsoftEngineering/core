@@ -48,14 +48,12 @@ target_link_libraries(${PROJECT_NAME} PUBLIC ps::core)
 find_package(ps_u8string REQUIRED)
 target_link_libraries(${PROJECT_NAME} PRIVATE ps::u8string)
 
-if(PS_CORE_BUILD_PSTEST_HARNESS)
-    message("WARNING: ${PROJECT_NAME} is compiled with PSTEST_HARNESS. Don't use in production!")
-    target_compile_definitions(${PROJECT_NAME} PRIVATE PSTEST_HARNESS=1)
-    find_package(Catch2 REQUIRED)
-    target_link_libraries(${PROJECT_NAME} PRIVATE Catch2::Catch2)
-endif()
-
 add_library(ps::system_identity ALIAS ps_system_identity)
+
+add_library(${PROJECT_NAME}_internal INTERFACE)
+target_include_directories(${PROJECT_NAME}_internal INTERFACE src)
+target_link_libraries(${PROJECT_NAME}_internal INTERFACE ps::system_identity)
+add_library(ps::system_identity_internal ALIAS ${PROJECT_NAME}_internal)
 
 if(PS_CORE_BUILD_TESTS)
     enable_testing()

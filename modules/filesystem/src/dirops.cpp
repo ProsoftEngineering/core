@@ -43,11 +43,12 @@
 #include <prosoft/core/include/string/platform_convert.hpp>
 
 #include <prosoft/core/modules/filesystem/filesystem.hpp>
+#include "dirops_internal.hpp"
 #include "filesystem_private.hpp"
 
-namespace {
-using namespace prosoft;
-using namespace prosoft::filesystem;
+namespace prosoft {
+namespace filesystem {
+inline namespace v1 {
 
 void assert_directory_exists(path& p, error_code& ec) {
     if (ec || p.empty() || !is_directory(p, ec)) {
@@ -62,6 +63,14 @@ void assert_directory_exists(path& p, error_code& ec) {
         }
     }
 }
+
+} // namespace v1
+} // namespace filesystem
+} // namespace prosoft
+
+namespace {
+using namespace prosoft;
+using namespace prosoft::filesystem;
 
 class mkdir_err_policy {
     static constexpr auto eexist =
@@ -416,36 +425,3 @@ path unused_drive(error_code& ec) {
 } // v1
 } // filesystem
 } // prosoft
-
-#if PSTEST_HARNESS
-// Internal tests.
-#include <catch2/catch_test_macros.hpp>
-
-TEST_CASE("dirops_internal") {
-    using namespace prosoft::filesystem;
-    
-    SECTION("directory exists") {
-        auto p = ""_p; // empty path fail
-        auto ec = error_code{0, filesystem_category()};
-        REQUIRE(ec.value() == 0);
-        REQUIRE(p.empty());
-        assert_directory_exists(p, ec);
-        CHECK(ec.value() != 0);
-
-        p = "adfhaosidufbasdfoiuabsdofiubasodbfaosdbfaosbdfoabsdf"_p; // not dir fail
-        ec.clear();
-        REQUIRE(ec.value() == 0);
-        REQUIRE_FALSE(p.empty());
-        assert_directory_exists(p, ec);
-        CHECK(ec.value() != 0);
-        CHECK(p.empty());
-
-        p = "test"_p;
-        ec = error_code{5, filesystem_category()}; // error fail
-        REQUIRE_FALSE(p.empty());
-        assert_directory_exists(p, ec);
-        CHECK(ec.value() == 5);
-        CHECK(p.empty());
-    }
-}
-#endif // PSTEST_HARNESS

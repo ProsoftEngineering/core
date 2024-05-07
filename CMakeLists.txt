@@ -23,15 +23,14 @@
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-# This CMakeLists.txt includes find_packages() for all ps_core modules
-# and be used to attach ps_core to own project with add_subdirectory(),
-# as example how to use selected ps_core modules with find_package(),
-# or for ps_core testing with BUILD_TESTS and BUILD_PSTEST_HARNESS options
+# This CMakeLists.txt includes find_package()s for all ps_core modules
+# and can be used to attach ps_core to own project with add_subdirectory(),
+# or as an example how to use selected ps_core modules with find_package(),
+# or for full ps_core testing with BUILD_TESTS option
 cmake_minimum_required(VERSION 3.15)
 project(ps_core_all)
 
 option(PS_CORE_BUILD_TESTS "Build tests" OFF)
-option(PS_CORE_BUILD_PSTEST_HARNESS "Build internal tests. Don't use in production!" OFF)
 
 # Init find_packages()
 list(APPEND CMAKE_PREFIX_PATH ${CMAKE_CURRENT_LIST_DIR}/cmake/packages)

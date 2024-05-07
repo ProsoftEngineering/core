@@ -30,6 +30,7 @@ include("${CMAKE_CURRENT_LIST_DIR}/../../config_module.cmake")
 
 add_executable(${PROJECT_NAME}
     src/regex_tests.cpp
+    src/regex_internal_tests.cpp
 )
 
 ps_core_module_config(${PROJECT_NAME})
@@ -39,6 +40,7 @@ find_package(ps_u8string REQUIRED)
 target_link_libraries(${PROJECT_NAME}
     PRIVATE
         ps::regex
+        ps::regex_internal
         ps::u8string
 )
 
