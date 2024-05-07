@@ -51,6 +51,12 @@ endif()
 
 add_library(ps::regex ALIAS ps_regex)
 
+add_library(${PROJECT_NAME}_internal INTERFACE)
+target_include_directories(${PROJECT_NAME}_internal INTERFACE src)
+target_link_libraries(${PROJECT_NAME}_internal INTERFACE ps::regex)
+target_link_libraries(${PROJECT_NAME}_internal INTERFACE oniguruma::onig)
+add_library(ps::regex_internal ALIAS ${PROJECT_NAME}_internal)
+
 if(PS_CORE_BUILD_TESTS)
     enable_testing()
     add_subdirectory(tests)
