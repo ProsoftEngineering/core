@@ -38,7 +38,7 @@ macro(ps_core_config_compiler_default_flags TARGET_NAME)
         # /4127 shows up with /W4
         target_compile_options(${TARGET_NAME} PRIVATE "/W3" "/WX" "/sdl" "/wd4127")
     else()
-        target_compile_options(${TARGET_NAME} PRIVATE "-Wall" "-Werror" "-Wextra")
+        target_compile_options(${TARGET_NAME} PRIVATE "-Wall" "-Werror" "-Wextra" "-Wpedantic")
         if(NOT APPLE)
             target_compile_definitions(${TARGET_NAME} PRIVATE __STDC_LIMIT_MACROS __STDC_FORMAT_MACROS _FILE_OFFSET_BITS=64)
         endif()
