@@ -49,6 +49,10 @@ if(APPLE)
         src/snapshot_mac_internal_tests.cpp
         src/spawn_tests.cpp
     )
+elseif(WIN32)
+    target_sources(${PROJECT_NAME} PRIVATE
+        src/snapshot_win32_internal_tests.cpp
+    )
 endif()
 
 ps_core_module_config(${PROJECT_NAME})
