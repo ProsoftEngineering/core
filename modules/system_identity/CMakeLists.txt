@@ -57,6 +57,11 @@ endif()
 
 add_library(ps::system_identity ALIAS ps_system_identity)
 
+add_library(${PROJECT_NAME}_internal INTERFACE)
+target_include_directories(${PROJECT_NAME}_internal INTERFACE src)
+target_link_libraries(${PROJECT_NAME}_internal INTERFACE ps::system_identity)
+add_library(ps::system_identity_internal ALIAS ${PROJECT_NAME}_internal)
+
 if(PS_CORE_BUILD_TESTS)
     enable_testing()
     add_subdirectory(tests)
