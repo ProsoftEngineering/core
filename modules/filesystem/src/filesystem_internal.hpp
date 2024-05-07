@@ -88,10 +88,10 @@ struct to_owner {
 struct to_times {
     ::timespec to_timespec(const file_time_type& t) const {
         auto ns = std::chrono::duration_cast<std::chrono::nanoseconds>(t.time_since_epoch());
-        return ::timespec{
-            .tv_sec = ns.count() / std::chrono::nanoseconds::period::den,
-            .tv_nsec = ns.count() % std::chrono::nanoseconds::period::den,
-        };
+        ::timespec ts;
+        ts.tv_sec = ns.count() / std::chrono::nanoseconds::period::den;
+        ts.tv_nsec = ns.count() % std::chrono::nanoseconds::period::den;
+        return ts;
     }
     
     // XXX: timeval is platform specific (nsec on BSD and usec on Linux)
