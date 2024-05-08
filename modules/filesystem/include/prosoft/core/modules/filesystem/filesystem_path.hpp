@@ -529,7 +529,14 @@ public:
         , mEnd(p.native().end())
         , mPos()
         , mRootName(mEnd) {
+#if _MSC_VER
+__pragma(warning(push))
+__pragma(warning(disable:4127)) // C4127: conditional expression is constant
+#endif
         if (path_type::preferred_separator_style != path_style::windows) {
+#if _MSC_VER
+__pragma(warning(pop))
+#endif
             get_element(mStart, mEnd); // retrieve the 1st path element w/o additional processing of next_element()
             mPos = mStart;
         } else {
@@ -741,7 +748,14 @@ inline typename basic_path<String>::iterator basic_path<String>::end() const {
 
 template <class String>
 basic_path<String>::basic_path(iterator first, iterator last) {
+#if _MSC_VER
+__pragma(warning(push))
+__pragma(warning(disable:4127)) // C4127: conditional expression is constant
+#endif
     if (preferred_separator_style == path_style::windows) {
+#if _MSC_VER
+__pragma(warning(pop))
+#endif
         if ((*first).has_root_name()) {
             operator+=(*first++);
             if (first != last) {
