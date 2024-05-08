@@ -88,10 +88,10 @@ struct to_owner {
 struct to_times {
     ::timespec to_timespec(const file_time_type& t) const {
         auto ns = std::chrono::duration_cast<std::chrono::nanoseconds>(t.time_since_epoch());
-        return ::timespec{
-            .tv_sec = ns.count() / std::chrono::nanoseconds::period::den,
-            .tv_nsec = ns.count() % std::chrono::nanoseconds::period::den,
-        };
+        ::timespec ts;
+        ts.tv_sec = ns.count() / std::chrono::nanoseconds::period::den;
+        ts.tv_nsec = ns.count() % std::chrono::nanoseconds::period::den;
+        return ts;
     }
     
     // XXX: timeval is platform specific (nsec on BSD and usec on Linux)
@@ -284,8 +284,8 @@ struct to_perms {
                 // if we are not the owner check our membership in groups for "other" perms
                 if (o.user() != access_control_identity::effective_user()) {
                     for (const auto& ae : al) {
-                        std::error_code ec;
-                        if (is_member(ae.identity(), ec)) {
+                        std::error_code ae_ec;
+                        if (is_member(ae.identity(), ae_ec)) {
                             pp |= other_perms(ae.perms());
                         }
                     }

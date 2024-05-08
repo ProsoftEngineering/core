@@ -46,25 +46,38 @@
 
 #include <stdio.h>
 
-#define PSASSERT(condition, fmt, ...)                                                                                                                \
-    do {                                                                                                                                             \
-        if (0 == (condition)) {                                                                                                                      \
-            (void) fprintf(stderr, "!!ASSERT FIRED!! (%s:%d,%s) cond=(%s): " fmt "\n", __FILE__, __LINE__, __FUNCTION__, #condition, ##__VA_ARGS__); \
-            fflush(stderr);                                                                                                                          \
-            __builtin_debugger();                                                                                                                    \
-        }                                                                                                                                            \
+#define PSASSERT(condition, fmt) \
+    do { \
+        if (0 == (condition)) { \
+            (void) fprintf(stderr, "!!ASSERT FIRED!! (%s:%d,%s) cond=(%s): " fmt "\n", __FILE__, __LINE__, __FUNCTION__, #condition); \
+            fflush(stderr); \
+            __builtin_debugger(); \
+        } \
     } while (0)
 
-#if _MSC_VER
-// clang-format off
-#define PSASSERT_UNREACHABLE(...) __pragma(warning(push)) \
-    __pragma(warning(disable : 4127))                     \
-    PSASSERT(0, __VA_ARGS__);                             \
-    __pragma(warning(pop))
-// clang-format on
-#else
-#define PSASSERT_UNREACHABLE(...) PSASSERT(0, __VA_ARGS__)
-#endif
+#define PSASSERT_WITH_ARGS(condition, fmt, ...) \
+    do { \
+        if (0 == (condition)) { \
+            (void) fprintf(stderr, "!!ASSERT FIRED!! (%s:%d,%s) cond=(%s): " fmt "\n", __FILE__, __LINE__, __FUNCTION__, #condition, __VA_ARGS__); \
+            fflush(stderr); \
+            __builtin_debugger(); \
+        } \
+    } while (0)
+
+#define PSASSERT_UNREACHABLE(fmt) \
+    do { \
+        (void) fprintf(stderr, "!!ASSERT FIRED!! (%s:%d,%s) UNREACHABLE: " fmt "\n", __FILE__, __LINE__, __FUNCTION__); \
+        fflush(stderr); \
+        __builtin_debugger(); \
+    } while (0)
+
+#define PSASSERT_UNREACHABLE_WITH_ARGS(fmt, ...) \
+    do { \
+        (void) fprintf(stderr, "!!ASSERT FIRED!! (%s:%d,%s) UNREACHABLE: " fmt "\n", __FILE__, __LINE__, __FUNCTION__, __VA_ARGS__); \
+        fflush(stderr); \
+        __builtin_debugger(); \
+    } while (0)
+
 
 #ifdef __cplusplus
 #define PSASSERT_NOTNULL(obj_) PSASSERT(nullptr != obj_, "null!")
@@ -91,8 +104,10 @@ PS_EXTERN_C int pthread_main_np(void);
 
 #else // DEBUG
 
-#define PSASSERT(condition, fmt, ...)
-#define PSASSERT_UNREACHABLE(fmt, ...)
+#define PSASSERT(condition, fmt)
+#define PSASSERT_WITH_ARGS(condition, fmt, ...)
+#define PSASSERT_UNREACHABLE(fmt)
+#define PSASSERT_UNREACHABLE_WITH_ARGS(fmt, ...)
 #define PSASSERT_NOTNULL(obj_)
 #define PSASSERT_NULL(obj_)
 #define PSASSERT_MAIN()
