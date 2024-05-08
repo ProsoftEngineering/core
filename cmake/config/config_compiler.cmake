@@ -35,9 +35,8 @@ endif()
 
 macro(ps_core_config_compiler_default_flags TARGET_NAME)
     if(MSVC)
-        # /MP is for multi-processor compilation
         # /4127 shows up with /W4
-        target_compile_options(${TARGET_NAME} PRIVATE "/W3" "/WX" "/MP" "/sdl" "/wd4127")
+        target_compile_options(${TARGET_NAME} PRIVATE "/W3" "/WX" "/sdl" "/wd4127")
     else()
         target_compile_options(${TARGET_NAME} PRIVATE "-Wall" "-Werror" "-Wextra")
         if(NOT APPLE)
