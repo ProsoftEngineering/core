@@ -43,6 +43,15 @@ add_library(${PROJECT_NAME}
 
 ps_core_module_config(${PROJECT_NAME})
 
+target_compile_features(${PROJECT_NAME} PUBLIC cxx_std_14)  # public headers
+# C++14 is required for "static constexpr file_time_type m_invalidTime = file_time_type::min();"
+# in filesystem_primatives.hpp. cppreference: time_point() is constexpr since C++14.
+
+set_target_properties(${PROJECT_NAME} PROPERTIES
+    CXX_STANDARD 14
+    CXX_EXTENSIONS OFF
+)
+
 target_include_directories(${PROJECT_NAME} PUBLIC include)
 
 if(APPLE)
