@@ -52,6 +52,11 @@ endif()
 
 ps_core_module_config(${PROJECT_NAME})
 
+set_target_properties(${PROJECT_NAME} PROPERTIES
+    CXX_STANDARD 14     # Catch2 does not support C++11
+    CXX_EXTENSIONS OFF
+)
+
 find_package(ps_core REQUIRED)
 target_link_libraries(${PROJECT_NAME} PRIVATE ps::core)
 

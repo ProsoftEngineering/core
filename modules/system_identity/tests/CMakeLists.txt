@@ -35,6 +35,11 @@ add_executable(${PROJECT_NAME}
 
 ps_core_module_config(${PROJECT_NAME})
 
+set_target_properties(${PROJECT_NAME} PROPERTIES
+    CXX_STANDARD 14     # Catch2 does not support C++11
+    CXX_EXTENSIONS OFF
+)
+
 find_package(ps_system_identity REQUIRED)
 target_link_libraries(${PROJECT_NAME} PRIVATE ps::system_identity)
 target_link_libraries(${PROJECT_NAME} PRIVATE ps::system_identity_internal)
