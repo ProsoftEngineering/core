@@ -39,6 +39,18 @@ find_package(ps_system_identity REQUIRED)
 target_link_libraries(${PROJECT_NAME} PRIVATE ps::system_identity)
 target_link_libraries(${PROJECT_NAME} PRIVATE ps::system_identity_internal)
 
+add_library(${PROJECT_NAME}-test-public-headers
+    src/test_public_headers.cpp
+)
+set_target_properties(${PROJECT_NAME}-test-public-headers PROPERTIES
+    CXX_STANDARD 98     # test cxx_std_... in module CMakeLists.txt
+    CXX_EXTENSIONS OFF
+)
+target_link_libraries(${PROJECT_NAME}-test-public-headers PRIVATE ps::system_identity)
+if(MSVC)
+    target_compile_options(${PROJECT_NAME}-test-public-headers PRIVATE "/Zc:__cplusplus")   # enable __cplusplus
+endif()
+
 find_package(Catch2 REQUIRED)
 target_link_libraries(${PROJECT_NAME} PRIVATE Catch2::Catch2WithMain)
 
