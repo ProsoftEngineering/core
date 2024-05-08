@@ -284,8 +284,8 @@ struct to_perms {
                 // if we are not the owner check our membership in groups for "other" perms
                 if (o.user() != access_control_identity::effective_user()) {
                     for (const auto& ae : al) {
-                        std::error_code ec;
-                        if (is_member(ae.identity(), ec)) {
+                        std::error_code ae_ec;
+                        if (is_member(ae.identity(), ae_ec)) {
                             pp |= other_perms(ae.perms());
                         }
                     }
