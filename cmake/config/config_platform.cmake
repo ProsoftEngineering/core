@@ -27,10 +27,6 @@ if(NOT PSCONFIG)
     message(FATAL_ERROR, "PSCONFIG is missing!")
 endif()
 
-if(WIN32)
-    include("${PSCONFIG}/config_windows.cmake")
-endif()
-
 # Define missing CMake platform vars
 if(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
     set(PSLINUX true)
@@ -46,7 +42,4 @@ if(APPLE)
 endif()
 
 macro(ps_core_config_platform_required TARGET_NAME)
-    if(WIN32)
-        ps_core_config_windows_required(${TARGET_NAME})
-    endif()
 endmacro()
