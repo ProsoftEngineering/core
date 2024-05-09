@@ -40,6 +40,3 @@ endif()
 if(APPLE)
     set(PSBSD true)
 endif()
-
-macro(ps_core_config_platform_required TARGET_NAME)
-endmacro()
