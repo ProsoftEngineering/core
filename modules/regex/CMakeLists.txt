@@ -34,6 +34,13 @@ add_library(${PROJECT_NAME}
 
 ps_core_module_config(${PROJECT_NAME})
 
+target_compile_features(${PROJECT_NAME} PUBLIC cxx_std_11)  # public headers
+
+set_target_properties(${PROJECT_NAME} PROPERTIES
+    CXX_STANDARD 11
+    CXX_EXTENSIONS OFF
+)
+
 target_include_directories(${PROJECT_NAME} PUBLIC include)
 
 find_package(ps_core REQUIRED)

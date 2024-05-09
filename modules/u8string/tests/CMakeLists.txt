@@ -34,8 +34,25 @@ add_executable(${PROJECT_NAME}
 
 ps_core_module_config(${PROJECT_NAME})
 
+set_target_properties(${PROJECT_NAME} PROPERTIES
+    CXX_STANDARD 14     # Catch2 does not support C++11
+    CXX_EXTENSIONS OFF
+)
+
 find_package(ps_u8string REQUIRED)
 target_link_libraries(${PROJECT_NAME} PRIVATE ps::u8string)
+
+add_library(${PROJECT_NAME}-test-public-headers
+    src/test_public_headers.cpp
+)
+set_target_properties(${PROJECT_NAME}-test-public-headers PROPERTIES
+    CXX_STANDARD 98     # test cxx_std_... in module CMakeLists.txt
+    CXX_EXTENSIONS OFF
+)
+target_link_libraries(${PROJECT_NAME}-test-public-headers PRIVATE ps::u8string)
+if(MSVC)
+    target_compile_options(${PROJECT_NAME}-test-public-headers PRIVATE "/Zc:__cplusplus")   # enable __cplusplus
+endif()
 
 find_package(Catch2 REQUIRED)
 target_link_libraries(${PROJECT_NAME} PRIVATE Catch2::Catch2WithMain)
