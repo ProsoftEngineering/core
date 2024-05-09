@@ -9,3 +9,12 @@ compiler.psconfig = "pscore-240416"
 &:tools.build:cflags += ["-fvisibility=hidden"]
 &:tools.build:cxxflags += ["-fvisibility=hidden"]
 catch2/*:tools.build:cxxflags += ["-fvisibility=hidden"]
+
+# As of conan v2.2.2 "tools.build:defines" is broken for multiconfig generators (see below)
+&:tools.build:cflags += ["-D_FILE_OFFSET_BITS=64"]
+&:tools.build:cxxflags += ["-D_FILE_OFFSET_BITS=64"]
+
+#
+# FIXME: restore "tools.build:defines += [...]" when multiconfig generator is fixed
+# (https://github.com/conan-io/conan/issues/15921)
+#
