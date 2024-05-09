@@ -28,9 +28,4 @@ if(NOT PSCONFIG)
 endif()
 
 macro(ps_core_config_windows_required TARGET_NAME)
-    # Force Unicode build (*W functions)
-    target_compile_definitions(${TARGET_NAME} PRIVATE _UNICODE UNICODE)
-        
-    # Including Windows.h includes minwindef.h which defines min()/max() macros that conflict with c++ use of min()/max() method names.
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DNOMINMAX")
 endmacro()

@@ -5,3 +5,22 @@ include(default)
 # (install settings_user.xml with compiler.psconfig)
 # Fix catch2 static build ("error LNK2019: unresolved external symbol ...")
 compiler.psconfig = "pscore-240416"
+
+[conf]
+# Force Unicode build:
+# * UNICODE for Windows headers (*W functions)
+# * _UNICODE for C run-time and MFC headers (_tcs*, _T, ...)
+&:tools.build:cflags += ["/DUNICODE", "/D_UNICODE"]
+&:tools.build:cxxflags += ["/DUNICODE", "/D_UNICODE"]
+# ... As of conan v2.2.2 "tools.build:defines" is broken for multiconfig generators (see below)
+
+# Windows.h includes minwindef.h which defines min()/max() macros that conflict
+# with C++ use of min()/max() method names
+&:tools.build:cflags += ["/DNOMINMAX"]
+&:tools.build:cxxflags += ["/DNOMINMAX"]
+# ... As of conan v2.2.2 "tools.build:defines" is broken for multiconfig generators (see below)
+
+#
+# FIXME: restore "tools.build:defines += [...]" when multiconfig generator is fixed
+# (https://github.com/conan-io/conan/issues/15921)
+#
