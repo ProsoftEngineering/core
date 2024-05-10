@@ -44,10 +44,8 @@ if(APPLE)
     target_sources(${PROJECT_NAME} PRIVATE
         src/apple_convert_tests.mm
     )
-    set_source_files_properties(
-        src/apple_convert_tests.mm
-        PROPERTIES COMPILE_OPTIONS -fobjc-arc
-    )
+    find_package(PSCoreCMakeUtils)
+    ps_core_use_objc_arc(${PROJECT_NAME})
 endif()
 
 ps_core_module_config(${PROJECT_NAME})
