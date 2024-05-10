@@ -46,7 +46,7 @@ if(APPLE)
     )
     set_source_files_properties(
         src/apple_convert_tests.mm
-        PROPERTIES COMPILE_FLAGS -fobjc-arc
+        PROPERTIES COMPILE_OPTIONS -fobjc-arc
     )
 endif()
 
