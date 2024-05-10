@@ -60,10 +60,8 @@ if(APPLE)
         src/snapshot_mac.cpp
         src/spawn_mac.mm
     )
-    set_source_files_properties(
-        src/spawn_mac.mm
-        PROPERTIES COMPILE_OPTIONS -fobjc-arc
-    )
+    find_package(PSCoreCMakeUtils)
+    ps_core_use_objc_arc(${PROJECT_NAME})
     target_link_libraries(${PROJECT_NAME} PRIVATE "-framework Foundation" "-framework CoreServices")
     find_package(nlohmann_json REQUIRED)        # fsevents_monitor.cpp
     target_link_libraries(${PROJECT_NAME} PRIVATE nlohmann_json::nlohmann_json)
