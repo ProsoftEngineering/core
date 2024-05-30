@@ -71,7 +71,7 @@ if(WIN32)
     target_sources(${PROJECT_NAME} PRIVATE
         src/snapshot_win32.cpp
     )
-    target_link_libraries(${PROJECT_NAME} PRIVATE shell32 vssapi)
+    target_link_libraries(${PROJECT_NAME} PRIVATE shell32.lib vssapi.lib)
     find_package(ps_winutils REQUIRED)
     target_link_libraries(${PROJECT_NAME} PRIVATE ps::winutils)
 endif()
