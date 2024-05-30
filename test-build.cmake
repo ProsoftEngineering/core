@@ -116,6 +116,12 @@ set(COMMAND ${COMMAND} "${CMAKE_CURRENT_LIST_DIR}")
 if(PS_CORE_BUILD_TESTS)
     set(COMMAND ${COMMAND} "-DPS_CORE_BUILD_TESTS=${PS_CORE_BUILD_TESTS}")
 endif()
+if(CMAKE_HOST_SYSTEM_NAME STREQUAL "Windows")
+    # Currently "Visual Studio" can work without conanbuild environment,
+    # but in future (to use tools built with conan) PATH will be required.
+    # Other generators (like "Ninja") require conanbuild PATH for compiler.
+    set(COMMAND conanbuild.bat && ${COMMAND})
+endif()
 list(JOIN COMMAND " " COMMAND_STRING)
 message(STATUS "COMMAND: ${COMMAND_STRING}")
 execute_process(
@@ -127,6 +133,9 @@ execute_process(
 set(COMMAND cmake --build .)
 if(GENERATOR_MULTICONFIG)
     set(COMMAND ${COMMAND} --config "${BUILD_TYPE}")
+endif()
+if(CMAKE_HOST_SYSTEM_NAME STREQUAL "Windows")
+    set(COMMAND conanbuild.bat && ${COMMAND})   # see comment above
 endif()
 list(JOIN COMMAND " " COMMAND_STRING)
 message(STATUS "COMMAND: ${COMMAND_STRING}")
