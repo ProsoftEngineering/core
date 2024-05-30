@@ -52,6 +52,7 @@ if(APPLE)
 elseif(WIN32)
     target_sources(${PROJECT_NAME} PRIVATE
         src/snapshot_win32_internal_tests.cpp
+        src/crtdbg_win32.cpp
     )
 endif()
 
