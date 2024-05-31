@@ -52,7 +52,42 @@ if(APPLE)
 elseif(WIN32)
     target_sources(${PROJECT_NAME} PRIVATE
         src/snapshot_win32_internal_tests.cpp
+        src/crtdbg_win32.cpp
     )
+    #
+    # Fix 'atltrace.h(339) : Assertion failed: false && "Too many categories defined"'
+    # multiple errors after latest Visual Studio Community 2022 upgrade (17.10.1).
+    # Also reproduced in GitHub Actions "windows-latest" image (Windows Server 2022)
+    # with Visual Studio Enterprise 2022 (17.9.34902.65).
+    #
+    # The problem is that the linker does not remove duplicates of global initializers,
+    # declared with __declspec(selectany) in atltrace.h as
+    #   __declspec(selectany) CTraceCategoryEx<CTraceCategoryEx<>::TraceGeneral> atlTraceGeneral(_T("atlTraceGeneral"));
+    # Two copies of each can be found in the generated code ("dumpbin.exe /DISASM ps_filesystem_tests.exe"):
+    #   ATL::`dynamic initializer for 'atlTraceGeneral'':
+    #   000000014000649D: 48 8D 0D A8 AB 11  lea         rcx,[?atlTraceGeneral@ATL@@3V?$CTraceCategoryEx@$00$0A@@1@A]
+    #   ATL::`dynamic initializer for 'atlTraceGeneral'':
+    #   000000014000696D: 48 8D 0D D8 A6 11  lea         rcx,[?atlTraceGeneral@ATL@@3V?$CTraceCategoryEx@$00$0A@@1@A]
+    # One is from snapshot_win32.cpp.obj (ps_filesystem static library objects).
+    # Another one is from snapshot_win32_internal_tests.cpp.obj (ps_filesystem_tests executable objects).
+    # (Both include <atlbase.h>/<atltrace.h> with these initializers via snapshot_win32_internal.hpp.)
+    #
+    # MSDN: "__declspec(selectany) - At link time, if multiple definitions of a COMDAT are seen,
+    #       the linker picks one and discards the rest."
+    # Which it doesn't after latest VS update in this particilar case, when the duplicates are
+    # both in static library and executable objects. Let's add a workaround for "Debug" mode.
+    #       "... If the linker option /OPT:REF (Optimizations) is selected, then COMDAT elimination
+    #       will occur to remove all the unreferenced data items in the linker output."
+    #       "... By default, /OPT:REF is enabled by the linker unless /OPT:NOREF or /DEBUG is specified."
+    #
+    # Note: this workaround does not break global atltrace initialization:
+    #   ATLTRACE(atlTraceGeneral, 0, _T("TEST ATLTRACE\n"));    // works as expected
+    #
+    if(CMAKE_BUILD_TYPE STREQUAL "Debug")
+        target_link_options(${PROJECT_NAME} PRIVATE "/OPT:REF")
+        # Fix 'warning LNK4075: ignoring '/INCREMENTAL' due to '/OPT:REF' specification'
+        target_link_options(${PROJECT_NAME} PRIVATE "/OPT:REF" "/INCREMENTAL:NO")
+    endif()
 endif()
 
 ps_core_module_config(${PROJECT_NAME})

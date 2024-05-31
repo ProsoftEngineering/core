@@ -46,7 +46,7 @@ target_include_directories(${PROJECT_NAME} PUBLIC include)
 if(APPLE)
     target_link_libraries(${PROJECT_NAME} PRIVATE "-framework CoreServices" "-framework SystemConfiguration")
 elseif(WIN32)
-    target_link_libraries(${PROJECT_NAME} PRIVATE secur32 wtsapi32)
+    target_link_libraries(${PROJECT_NAME} PRIVATE secur32.lib wtsapi32.lib)
 endif()
 
 find_package(ps_core REQUIRED)
