@@ -12,6 +12,8 @@ jobs:
           pip install --upgrade conan
           conan --version
           cmake --version
+          pip install --upgrade ninja
+          ninja --version
       - name: Configure conan
         run: |
           conan profile detect
@@ -20,7 +22,7 @@ jobs:
         run: |
           mkdir build
           cd build
-          cmake -P ../test-build-all.cmake
+          cmake -DBUILDERS=NINJA -P ../test-build-all.cmake
 
   ubuntu-latest:
     runs-on: ubuntu-latest
@@ -33,6 +35,8 @@ jobs:
           pip install --upgrade conan
           conan --version
           cmake --version
+          pip install --upgrade ninja
+          ninja --version
           sudo apt-get install libacl1-dev
       - name: Configure conan
         run: |
@@ -42,7 +46,7 @@ jobs:
         run: |
           mkdir build
           cd build
-          cmake -P ../test-build-all.cmake
+          cmake -DBUILDERS=NINJA -P ../test-build-all.cmake
 
   windows-latest:
     runs-on: windows-latest
@@ -55,6 +59,8 @@ jobs:
           pip install --upgrade conan
           conan --version
           cmake --version
+          pip install --upgrade ninja
+          ninja --version
       - name: Configure conan
         run: |
           conan profile detect
@@ -63,4 +69,4 @@ jobs:
         run: |
           mkdir build
           cd build
-          cmake -P ../test-build-all.cmake
+          cmake -DBUILDERS=NINJA -P ../test-build-all.cmake
